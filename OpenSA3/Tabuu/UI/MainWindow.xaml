@@ -1,0 +1,21 @@
+﻿<Window x:Class="Tabuu.UI.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:utility="clr-namespace:Tabuu.Utility"
+        xmlns:ext="clr-namespace:WPG;assembly=WPG"
+        Title="Tabuu" Height="350" Width="325">
+    <Window.Resources>
+        <utility:ItemToContextMenuConverter x:Key="ContextMenuConverter" />
+        <HierarchicalDataTemplate x:Key="TreeTemp" ItemsSource="{Binding}" >
+            <TextBlock Text="{Binding}" ContextMenu="{Binding Converter={StaticResource ContextMenuConverter}}"/>
+        </HierarchicalDataTemplate>
+    </Window.Resources>
+    <DockPanel>
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="Open" Click="MenuItem_ClickOpen" />
+            <MenuItem Header="Script" Click="MenuItem_Click"/>
+        </Menu>
+        <ext:PropertyGrid Instance="{Binding ElementName=TreeView,Path=SelectedItem}" DockPanel.Dock="Bottom"/>
+        <TreeView Name="TreeView" ItemTemplate="{StaticResource TreeTemp}" />
+    </DockPanel>
+</Window>
