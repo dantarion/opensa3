@@ -1,0 +1,16 @@
+﻿<Application x:Class="Tabuu.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:Tabuu.UI"
+             StartupUri="UI/MainWindow.xaml">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ContextMenu x:Key="DatFileContextMenu">
+                <MenuItem Header="Close File" Command="{x:Static local:MainWindow.CloseFileCommand}" CommandParameter="{Binding}"/>
+            </ContextMenu>
+            <ContextMenu x:Key="DatSectionContextMenu">
+                <MenuItem Header="Open Hex View"  Command="{x:Static local:MainWindow.HexOpenCommand}" CommandParameter="{Binding}"/>
+            </ContextMenu>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>
