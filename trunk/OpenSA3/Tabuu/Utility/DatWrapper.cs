@@ -95,14 +95,14 @@ namespace Tabuu.Utility {
     }
     class DatEnemerator : IEnumerator {
         private readonly DatFile _file;
-        public int i = -1;
+        private int _i = -1;
         public DatEnemerator(DatFile f) {
             _file = f;
         }
 
         public object Current {
             get {
-                switch (i) {
+                switch (_i) {
                     case 0:
                         return new NamedList<DatSection>(_file.Sections, "Sections");
                     case 1:
@@ -113,12 +113,12 @@ namespace Tabuu.Utility {
         }
 
         public bool MoveNext() {
-            i++;
-            return i <= 1;
+            _i++;
+            return _i <= 1;
         }
 
         public void Reset() {
-            i = -1;
+            _i = -1;
         }
     }
 
