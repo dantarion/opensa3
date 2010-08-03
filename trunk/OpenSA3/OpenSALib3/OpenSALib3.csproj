@@ -66,9 +66,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DatElement.cs" />
-    <Compile Include="DatSection.cs" />
-    <Compile Include="DatFile.cs" />
+    <Compile Include="DatHandler\DatElement.cs" />
+    <Compile Include="DatHandler\DatSection.cs" />
+    <Compile Include="DatHandler\DatFile.cs" />
     <Compile Include="Moveset\MovesetSection.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RunScript.cs" />

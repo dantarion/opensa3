@@ -7,59 +7,47 @@ using IronPython;
 using BrawlLib.SSBB.ResourceNodes;
 using System.IO;
 using Microsoft.Scripting.Hosting;
-namespace OpenSALib3
-{
-    public class RunScript
-    {
-        private static ScriptRuntime runtime;
-        private static ScriptScope scope;
-        private static ScriptEngine engine   = IronPython.Hosting.Python.CreateEngine();
-        private static StringBuilder sb = new StringBuilder();
-        public static void ResetScope()
-        {
-            scope = null;
+using OpenSALib3.DatHandler;
+
+namespace OpenSALib3 {
+    public class RunScript {
+        private static ScriptRuntime _runtime;
+        private static ScriptScope _scope;
+        private static readonly ScriptEngine Engine = IronPython.Hosting.Python.CreateEngine();
+        private static readonly StringBuilder SB = new StringBuilder();
+        public static void ResetScope() {
+            _scope = null;
         }
-        public static void LoadAssmbly(System.Reflection.Assembly asm)
-        {
-            engine.Runtime.LoadAssembly(asm);
-            scope = null;
+        public static void LoadAssmbly(System.Reflection.Assembly asm) {
+            Engine.Runtime.LoadAssembly(asm);
+            _scope = null;
         }
-        public static void SetVar(String str, object obj)
-        {
-            setupScope();
-            scope.SetVariable(str, obj);
+        public static void SetVar(String str, object obj) {
+            SetupScope();
+            _scope.SetVariable(str, obj);
         }
-        public static void setupScope()
-        {
-           if (scope == null)
-                {
-                    
-                    
-                    runtime = engine.Runtime; 
-                    runtime.LoadAssembly(typeof(DatFile).Assembly);
-                    runtime.LoadAssembly(typeof(ResourceNode).Assembly);
-                                   
-                    scope = engine.CreateScope();
-                }
+        public static void SetupScope() {
+            if (_scope != null) return;
+            _runtime = Engine.Runtime;
+            _runtime.LoadAssembly(typeof(DatFile).Assembly);
+            _runtime.LoadAssembly(typeof(ResourceNode).Assembly);
+
+            _scope = Engine.CreateScope();
         }
-        public static String FromString(String str, DatFile file)
-        {
-            try
-            {
-                setupScope();
+        public static String FromString(String str, DatFile file) {
+            try {
+                SetupScope();
                 var ms = new MemoryStream();
-                sb.Clear();
-                runtime.IO.SetOutput(ms, new StringWriter(sb));
-                scope.SetVariable("currentDat", file);
-                var script = engine.CreateScriptSourceFromString(str);
-                
-                script.Execute(scope);
+                SB.Clear();
+                _runtime.IO.SetOutput(ms, new StringWriter(SB));
+                _scope.SetVariable("currentDat", file);
+                var script = Engine.CreateScriptSourceFromString(str);
+
+                script.Execute(_scope);
                 ms.Flush();
-                return sb.ToString();
-            }
-            catch (Exception err)
-            {
-                return err.Message+"\n";
+                return SB.ToString();
+            } catch (Exception err) {
+                return err.Message + "\n";
             }
         }
 

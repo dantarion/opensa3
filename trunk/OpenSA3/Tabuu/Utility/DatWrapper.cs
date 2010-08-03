@@ -1,156 +1,125 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Collections;
-using OpenSALib3;
-using System.Windows.Controls;
 using BrawlLib.SSBB.ResourceNodes;
-namespace Tabuu
-{
-    namespace Utility
-    {
-        public class DatWrapper : DatFile, IEnumerable, Be.Windows.Forms.IByteProvider
-        {
-            public static DatWrapper fromFile(string filename)
-            {
-                var node = NodeFactory.FromFile(null, filename);
-                return new DatWrapper(node.Children[0]);
-            }
-            protected DatWrapper(ResourceNode s)
-                : base(s)
-            {
-            }
-            public IEnumerator GetEnumerator()
-            {
-                return new DatEnemerator(this);
-            }
-            #region IByteProvider
-            public void ApplyChanges()
-            {
-                throw new NotImplementedException();
-            }
+using OpenSALib3.DatHandler;
 
-            public event EventHandler Changed;
-
-            public void DeleteBytes(long index, long length)
-            {
-                throw new NotImplementedException();
-            }
-
-            public bool HasChanges()
-            {
-                throw new NotImplementedException();
-            }
-
-            public void InsertBytes(long index, byte[] bs)
-            {
-                throw new NotImplementedException();
-            }
-
-            public long Length
-            {
-                get { return FileSize; }
-            }
-
-            public event EventHandler LengthChanged;
-
-            public unsafe byte ReadByte(long index)
-            {
-                return *(byte*)(Address + (uint)index);
-            }
-
-            public bool SupportsDeleteBytes()
-            {
-                throw new NotImplementedException();
-            }
-
-            public bool SupportsInsertBytes()
-            {
-                throw new NotImplementedException();
-            }
-
-            public bool SupportsWriteByte()
-            {
-                return true;
-            }
-
-            public unsafe void WriteByte(long index, byte value)
-            {
-                *(byte*)(Address + (uint)index) = value;
-            }
-            #endregion
-            #region Scripting Usability Functions
-            public unsafe int readInt(int offset)
-            {
-                return *(bint*)(Address + offset);
-            }
-            public unsafe short readShort(int offset)
-            {
-                return *(bshort*)(Address + offset);
-            }
-            public unsafe float readFloat(int offset)
-            {
-                return *(bfloat*)(Address + offset);
-            }
-            #endregion
+namespace Tabuu.Utility {
+    public class DatWrapper : DatFile, IEnumerable, Be.Windows.Forms.IByteProvider {
+        public new static DatWrapper FromFile(string filename) {
+            var node = NodeFactory.FromFile(null, filename);
+            return new DatWrapper(node.Children[0]);
         }
-        class NamedList<T> : IEnumerable
-        {
-            private List<T> list;
-            public String Name { get; set; }
-            public NamedList(List<T> l, String n)
-            {
-                list = l;
-                Name = n;
-            }
-            public IEnumerator GetEnumerator()
-            {
-                return list.GetEnumerator();
-            }
-            public override string ToString()
-            {
-                return Name;
-            }
+        protected DatWrapper(ResourceNode s)
+            : base(s) {
         }
-        class DatEnemerator : IEnumerator
-        {
-            private DatFile f;
-            public int i = -1;
-            public DatEnemerator(DatFile f)
-            {
-                this.f = f;
-            }
-
-            public object Current
-            {
-
-                get
-                {
-                    switch (i)
-                    {
-                        case 0:
-                            return new NamedList<DatSection>(f.Sections, "Sections");
-                        case 1:
-                            return new NamedList<DatSection>(f.References, "References");
-                    }
-                    return null;
-                }
-            }
-
-            public bool MoveNext()
-            {
-                i++;
-                if (i > 1)
-                    return false;
-                return true;
-            }
-
-            public void Reset()
-            {
-                i = -1;
-            }
+        public IEnumerator GetEnumerator() {
+            return new DatEnemerator(this);
+        }
+        #region IByteProvider
+        public void ApplyChanges() {
+            throw new NotImplementedException();
         }
 
+        public event EventHandler Changed {
+            add { throw new NotImplementedException(); }
+            remove { throw new NotImplementedException(); }
+        }
+
+        public void DeleteBytes(long index, long length) {
+            throw new NotImplementedException();
+        }
+
+        public bool HasChanges() {
+            throw new NotImplementedException();
+        }
+
+        public void InsertBytes(long index, byte[] bs) {
+            throw new NotImplementedException();
+        }
+
+        public long Length {
+            get { return FileSize; }
+        }
+
+        public event EventHandler LengthChanged {
+            add { throw new NotImplementedException(); }
+            remove { throw new NotImplementedException(); }
+        }
+
+        public unsafe byte ReadByte(long index) {
+            return *(byte*)(Address + (uint)index);
+        }
+
+        public bool SupportsDeleteBytes() {
+            throw new NotImplementedException();
+        }
+
+        public bool SupportsInsertBytes() {
+            throw new NotImplementedException();
+        }
+
+        public bool SupportsWriteByte() {
+            return true;
+        }
+
+        public unsafe void WriteByte(long index, byte value) {
+            *(byte*)(Address + (uint)index) = value;
+        }
+        #endregion
+        #region Scripting Usability Functions
+        public unsafe int ReadInt32(int offset) {
+            return *(bint*)(Address + offset);
+        }
+        public unsafe short ReadInt16(int offset) {
+            return *(bshort*)(Address + offset);
+        }
+        public unsafe float ReadSingle(int offset) {
+            return *(bfloat*)(Address + offset);
+        }
+        #endregion
     }
+    class NamedList<T> : IEnumerable {
+        private readonly List<T> _list;
+        public String Name { get; set; }
+        public NamedList(List<T> l, String n) {
+            _list = l;
+            Name = n;
+        }
+        public IEnumerator GetEnumerator() {
+            return _list.GetEnumerator();
+        }
+        public override string ToString() {
+            return Name;
+        }
+    }
+    class DatEnemerator : IEnumerator {
+        private readonly DatFile _file;
+        public int i = -1;
+        public DatEnemerator(DatFile f) {
+            _file = f;
+        }
+
+        public object Current {
+            get {
+                switch (i) {
+                    case 0:
+                        return new NamedList<DatSection>(_file.Sections, "Sections");
+                    case 1:
+                        return new NamedList<DatSection>(_file.References, "References");
+                }
+                return null;
+            }
+        }
+
+        public bool MoveNext() {
+            i++;
+            return i <= 1;
+        }
+
+        public void Reset() {
+            i = -1;
+        }
+    }
+
 }

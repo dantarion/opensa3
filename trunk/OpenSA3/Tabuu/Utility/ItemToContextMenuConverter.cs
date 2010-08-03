@@ -1,12 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Windows;
 using System.Windows.Data;
 using System.Windows.Controls;
 using System.Globalization;
 using OpenSALib3;
-namespace Tabuu
+using OpenSALib3.DatHandler;
+
+namespace Tabuu.Utility
 {
     namespace Utility
     {
@@ -20,14 +20,10 @@ namespace Tabuu
                 var ds = value as DatSection;
                 if (ds != null)
                 {
-                    return App.Current.Resources["DatSectionContextMenu"];
+                    return Application.Current.Resources["DatSectionContextMenu"];
                 }
                 var df = value as DatWrapper;
-                if (df != null)
-                {
-                    return App.Current.Resources["DatFileContextMenu"];
-                }
-                return null;
+                return df != null ? Application.Current.Resources["DatFileContextMenu"] : null;
             }
 
             public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
