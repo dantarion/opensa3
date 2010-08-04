@@ -79,7 +79,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="UI\TabuuByteProvider.cs" />
-    <Compile Include="UI\HexBox.cs" />
+    <Compile Include="UI\HexBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Utility\ItemToContextMenuConverter.cs" />
     <Compile Include="Utility\DatWrapper.cs" />
     <Compile Include="UI\HexViewWindow.cs">
