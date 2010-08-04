@@ -39,9 +39,6 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Be.Windows.Forms.HexBox">
-      <HintPath>res\Be.Windows.Forms.HexBox.dll</HintPath>
-    </Reference>
     <Reference Include="BrawlLib, Version=0.10.3691.33773, Culture=neutral, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>W:\brawl_hax\BBox\BrawlLib.dll</HintPath>
@@ -82,9 +79,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="UI\TabuuByteProvider.cs" />
-    <Compile Include="UI\HexBox.cs">
-      <SubType>Component</SubType>
-    </Compile>
+    <Compile Include="UI\HexBox.cs" />
     <Compile Include="Utility\ItemToContextMenuConverter.cs" />
     <Compile Include="Utility\DatWrapper.cs" />
     <Compile Include="UI\HexViewWindow.cs">
@@ -131,6 +126,10 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Be.Windows.Forms\Be.Windows.Forms.HexBox.csproj">
+      <Project>{26C5F25F-B450-4CAF-AD8B-B8D11AE73457}</Project>
+      <Name>Be.Windows.Forms.HexBox</Name>
+    </ProjectReference>
     <ProjectReference Include="..\OpenSALib3\OpenSALib3.csproj">
       <Project>{F311A879-8B59-4C07-95EF-4E9DD0AA9577}</Project>
       <Name>OpenSALib3</Name>
