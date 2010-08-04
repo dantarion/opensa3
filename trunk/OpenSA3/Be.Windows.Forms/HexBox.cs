@@ -1675,14 +1675,17 @@ namespace Be.Windows.Forms {
             float y = ((float)(p.Y - _recHex.Y) / _charSize.Height);
             int iX = (int)x;
             int iY = (int)y;
-
-            int hPos = (iX / 2 + 1); //TODO MOUSE HERE
+            int hPos = (iX / 2); //TODO MOUSE HERE
+            if (hPos > 0 && (hPos+1) % 5 == 0)//If you click in the space
+            {
+                hPos++;//Select Next Byte
+                iX = 0;//Select the 1st digit
+            }
+            hPos = hPos - hPos / 5;//Adjust for the spacing
 
             bytePos = Math.Min(_byteProvider.Length,
-                _startByte + (_iHexMaxHBytes * (iY + 1) - _iHexMaxHBytes) + hPos - 1);
-            byteCharaterPos = (iX % 3);
-            if (byteCharaterPos > 1)
-                byteCharaterPos = 1;
+                _startByte + (_iHexMaxHBytes * (iY + 1) - _iHexMaxHBytes) + hPos);
+            byteCharaterPos = (iX % 2);
 
             if (bytePos == _byteProvider.Length)
                 byteCharaterPos = 0;
@@ -2097,11 +2100,11 @@ namespace Be.Windows.Forms {
             // Ensure endByte isn't > length of array.
             endByte = Math.Min(_byteProvider.Length - 1, endByte);
 
-            Color lineInfoColor = (this.LineInfoForeColor != Color.Empty) ? this.LineInfoForeColor : this.ForeColor;
-            Brush brush = new SolidBrush(lineInfoColor);
+            Brush brush = SystemBrushes.ControlText;
 
             int maxLine = GetGridBytePoint(endByte - startByte).Y + 1;
-
+            g.FillRectangle(SystemBrushes.ControlLight,new Rectangle(0,0,70,this.Height));
+            g.DrawRectangle(SystemPens.ControlDark, new Rectangle(0, 0, 70, this.Height));
             for (int i = 0; i < maxLine; i++) {
                 long firstLineByte = startByte + (_iHexMaxHBytes) * i;
 
@@ -2114,7 +2117,7 @@ namespace Be.Windows.Forms {
                 } else {
                     formattedInfo = new string('~', 8);
                 }
-
+                
                 g.DrawString(formattedInfo, Font, brush, new PointF(_recLineInfo.X, bytePointF.Y), _stringFormat);
             }
         }
@@ -2161,7 +2164,7 @@ namespace Be.Windows.Forms {
 
             PointF bytePointF = GetBytePointF(gridPoint);
 
-            bool isLastLineChar = (gridPoint.X + 1 == _iHexMaxHBytes);
+            bool isLastLineChar = true;// (gridPoint.X + 1 == _iHexMaxHBytes);
             float bcWidth = (isLastLineChar) ? _charSize.Width * 2 : _charSize.Width * 3;
 
             g.FillRectangle(brushBack, bytePointF.X, bytePointF.Y, bcWidth, _charSize.Height);
@@ -2446,7 +2449,6 @@ namespace Be.Windows.Forms {
 
         PointF GetBytePointF(long byteIndex) {
             Point gp = GetGridBytePoint(byteIndex);
-
             return GetBytePointF(gp);
         }
 
@@ -2467,7 +2469,7 @@ namespace Be.Windows.Forms {
         Point GetGridBytePoint(long byteIndex) {
             int row = (int)Math.Floor((double)byteIndex / (double)_iHexMaxHBytes);
             int column = (int)(byteIndex + _iHexMaxHBytes - _iHexMaxHBytes * (row + 1));
-
+            column += column / 4;
             Point res = new Point(column, row);
             return res;
         }
