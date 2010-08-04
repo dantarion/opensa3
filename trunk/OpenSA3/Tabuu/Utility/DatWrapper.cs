@@ -42,10 +42,7 @@ namespace Tabuu.Utility {
             get { return FileSize; }
         }
 
-        public event EventHandler LengthChanged {
-            add { throw new NotImplementedException(); }
-            remove { throw new NotImplementedException(); }
-        }
+        public event EventHandler LengthChanged;
 
         public unsafe byte ReadByte(long index) {
             return *(byte*)(Address + (uint)index);
