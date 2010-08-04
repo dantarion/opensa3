@@ -83,7 +83,7 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Utility\ItemToContextMenuConverter.cs" />
-    <Compile Include="Utility\DatWrapper.cs" />
+    <Compile Include="Utility\DatElementWrapper.cs" />
     <Compile Include="UI\HexViewWindow.cs">
       <SubType>Form</SubType>
     </Compile>

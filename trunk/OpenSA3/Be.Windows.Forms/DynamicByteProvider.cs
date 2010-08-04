@@ -171,5 +171,11 @@ namespace Be.Windows.Forms
 			return true;
 		}
 		#endregion
-	}
+
+
+        public System.Drawing.Color GetByteColor(long index)
+        {
+            throw new NotImplementedException();
+        }
+    }
 }

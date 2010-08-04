@@ -8,8 +8,6 @@ using OpenSALib3.DatHandler;
 
 namespace Tabuu.Utility
 {
-    namespace Utility
-    {
         public class ItemToContextMenuConverter : IValueConverter
         {
             public static ContextMenu OpenInHexContextMenu;
@@ -22,7 +20,7 @@ namespace Tabuu.Utility
                 {
                     return Application.Current.Resources["DatSectionContextMenu"];
                 }
-                var df = value as DatWrapper;
+                var df = value as DatFile;
                 return df != null ? Application.Current.Resources["DatFileContextMenu"] : null;
             }
 
@@ -31,6 +29,5 @@ namespace Tabuu.Utility
                 throw new Exception("The method or operation is not implemented.");
             }
         }
-    }
 
 }

@@ -122,6 +122,8 @@ namespace Be.Windows.Forms {
                 _hexBox.MouseDown += new MouseEventHandler(BeginMouseSelection);
                 _hexBox.MouseMove += new MouseEventHandler(UpdateMouseSelection);
                 _hexBox.MouseUp += new MouseEventHandler(EndMouseSelection);
+                _hexBox.KeyDown += new KeyEventHandler(KeyDownEventHL);
+                
             }
 
             public virtual void Deactivate() {
@@ -130,7 +132,12 @@ namespace Be.Windows.Forms {
                 _hexBox.MouseUp -= new MouseEventHandler(EndMouseSelection);
             }
             #endregion
-
+            void KeyDownEventHL(object sender, KeyEventArgs e)
+            {
+                var m = new Message();
+                m.WParam = (IntPtr)e.KeyData;
+                PreProcessWmKeyDown(ref m);
+            }
             #region Mouse selection methods
             void BeginMouseSelection(object sender, MouseEventArgs e) {
                 System.Diagnostics.Debug.WriteLine("BeginMouseSelection()", "KeyInterpreter");
@@ -181,12 +188,13 @@ namespace Be.Windows.Forms {
 
             #region PrePrcessWmKeyDown methods
             public virtual bool PreProcessWmKeyDown(ref Message m) {
+
                 System.Diagnostics.Debug.WriteLine("PreProcessWmKeyDown(ref Message m)", "KeyInterpreter");
 
                 Keys vc = (Keys)m.WParam.ToInt32();
 
                 Keys keyData = vc | Control.ModifierKeys;
-
+                /*
                 switch (keyData) {
                     case Keys.Left:
                     case Keys.Up:
@@ -211,6 +219,7 @@ namespace Be.Windows.Forms {
                             return true;
                         break;
                 }
+                 */
 
                 switch (keyData) {
                     case Keys.Left:						// move left
@@ -253,7 +262,7 @@ namespace Be.Windows.Forms {
                         return PreProcessWmKeyDown_ControlV(ref m);
                     default:
                         _hexBox.ScrollByteIntoView();
-                        return _hexBox.BasePreProcessMessage(ref m);
+                        return PreProcessWmChar(ref m);
                 }
             }
 
@@ -633,7 +642,7 @@ namespace Be.Windows.Forms {
                 int cp = _hexBox._byteCharacterPos;
 
                 if (
-                    (!sw && pos != _hexBox._byteProvider.Length) ||
+                    (!sw) ||
                     (!si && pos == _hexBox._byteProvider.Length)) {
                     return _hexBox.BasePreProcessMessage(ref m);
                 }
@@ -2142,6 +2151,8 @@ namespace Be.Windows.Forms {
                 if (isSelectedByte && isKeyInterpreterActive) {
                     PaintHexStringSelected(g, b, selBrush, selBrushBack, gridPoint);
                 } else {
+                    PointF pf = GetBytePointF(gridPoint);
+                    g.FillRectangle(new SolidBrush(_byteProvider.GetByteColor(i)),pf.X,pf.Y,(int)_charSize.Width * 2, (int)_charSize.Height);
                     PaintHexString(g, b, brush, gridPoint);
                 }
             }

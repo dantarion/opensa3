@@ -45,7 +45,7 @@ namespace OpenSALib3.Moveset
         public unsafe MovesetSection(VoidPtr ptr, VoidPtr stringPtr, DatElement parent)
             : base(ptr, stringPtr, parent)
         {
-            header = *(MovesetHeader*)(RootFile.Address + DataOffset);
+            header = *(MovesetHeader*)(RootFile.Address + FileOffset);
 
         }
     }
