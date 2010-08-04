@@ -566,5 +566,11 @@ namespace Be.Windows.Forms
             _dataMap.AddFirst(new FileDataBlock(0, _stream.Length));
             _totalLength = _stream.Length;
         }
+
+
+        public System.Drawing.Color GetByteColor(long index)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

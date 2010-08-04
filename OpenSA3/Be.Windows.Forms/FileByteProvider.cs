@@ -267,5 +267,11 @@ namespace Be.Windows.Forms
 			GC.SuppressFinalize(this);
 		}
 		#endregion
-	}
+
+
+        public System.Drawing.Color GetByteColor(long index)
+        {
+            throw new NotImplementedException();
+        }
+    }
 }

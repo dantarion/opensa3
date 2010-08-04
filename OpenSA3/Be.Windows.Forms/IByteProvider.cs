@@ -13,6 +13,7 @@ namespace Be.Windows.Forms
 		/// <param name="index">the index of the byte to read</param>
 		/// <returns>the byte to read</returns>
 		byte ReadByte(long index);
+        System.Drawing.Color GetByteColor(long index);
 		/// <summary>
 		/// Writes a byte into the provider
 		/// </summary>
