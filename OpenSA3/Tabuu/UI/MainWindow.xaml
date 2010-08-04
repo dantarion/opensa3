@@ -9,12 +9,20 @@
             <TextBlock Text="{Binding}" ContextMenu="{Binding Converter={StaticResource ContextMenuConverter}}"/>
         </HierarchicalDataTemplate>
     </Window.Resources>
-    <DockPanel>
-        <Menu DockPanel.Dock="Top">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            
+        </Grid.RowDefinitions>
+        <Menu Grid.Row="0">
             <MenuItem Header="Open" Click="MenuItemClickOpen" />
             <MenuItem Header="Script" Click="MenuItem_Click"/>
         </Menu>
-        <ext:PropertyGrid Instance="{Binding ElementName=TreeView,Path=SelectedItem}" DockPanel.Dock="Bottom"/>
-        <TreeView Name="TreeView" ItemTemplate="{StaticResource TreeTemp}" />
-    </DockPanel>
+        <TreeView Grid.Row="1" Name="TreeView" ItemTemplate="{StaticResource TreeTemp}" />
+        <GridSplitter Grid.Row="2" HorizontalAlignment="Stretch" Margin="0 5" Height="2" Background="SlateGray" />
+        <ext:PropertyGrid Grid.Row="3" Instance="{Binding ElementName=TreeView,Path=SelectedItem}" DockPanel.Dock="Bottom"/>
+    </Grid>
 </Window>

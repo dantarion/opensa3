@@ -48,7 +48,7 @@ namespace OpenSALib3.DatHandler {
             if (_header.FileSize != node.WorkingUncompressed.Length)
                 throw new Exception("This is not a valid moveset file");
 
-            Address = node.WorkingUncompressed.Address + 0x20;
+            Address = node.WorkingUncompressed.Address + SizeOf.Header;
             var section = Address + _header.DataChunkSize + _header.OffsetCount * 4;
             var stringptr = section + (_header.SectionCount + _header.ReferenceCount) * 8;
             //Parse sections

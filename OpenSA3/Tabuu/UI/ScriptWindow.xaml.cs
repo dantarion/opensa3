@@ -12,7 +12,9 @@ namespace Tabuu.UI {
         }
 
         private void ButtonClick(object sender, RoutedEventArgs e) {
-            OutputTextBox.Text += ">>\n" + RunScript.FromString(ScriptTextBox.Text, null);
+            OutputTextBox.Text += ">>\n";
+            OutputTextBox.Text += RunScript.FromString(ScriptTextBox.Text, null);
+            OutputTextBox.ScrollToEnd();
         }
 
         private void Button2Click(object sender, RoutedEventArgs e) {
@@ -23,6 +25,7 @@ namespace Tabuu.UI {
             if (e.Key != Key.Return)
                 return;
             OutputTextBox.Text += ">>" + CommandTextBox.Text + "\n" + RunScript.FromString(CommandTextBox.Text, null);
+            OutputTextBox.ScrollToEnd();
         }
     }
 }
