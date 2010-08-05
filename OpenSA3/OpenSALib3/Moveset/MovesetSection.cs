@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using OpenSALib3.DatHandler;
+using System.Collections;
+using OpenSALib3.Utility;
 
 namespace OpenSALib3.Moveset
 {
@@ -22,31 +24,87 @@ namespace OpenSALib3.Moveset
         private const int SUBACTION_SFX_OFFSETS_START = 14;
         private const int SUBACTION_OTHER_OFFSETS_START = 15;
          */
-        public unsafe struct MovesetHeader 
+        unsafe struct MovesetHeader 
         {
-            public uint SubactionFlagsStart;
-            public uint Unknown1;
-            public uint AttributeStart;
-            public uint Attribute2Start;
-            public uint Attribute3Start;
-            public uint Unknown5;
-            public uint Unknown6;
-            public uint Unknown7;
-            public uint Unknown8;
-            public uint ActionsStart;
-            public uint Actions2Start;
-            public uint Unknown11;
-            public uint SubactionMainStart;
-            public uint SubactionGFXStart;
-            public uint SubactionSFXStart;
-            public uint SubactionOtherStart;
+            public buint SubactionFlagsStart;
+            public buint Unknown1;
+            public buint AttributeStart;
+            public buint SSEAttributeStart;
+            public buint MiscSectionOffset;
+            public buint Unknown5;
+            public buint Unknown6;
+            public buint Unknown7;
+            public buint Unknown8;
+            public buint ActionsStart;
+            public buint Actions2Start;
+            public buint Unknown11;
+            public buint SubactionMainStart;
+            public buint SubactionGFXStart;
+            public buint SubactionSFXStart;
+            public buint SubactionOtherStart;
         }
         private MovesetHeader header;
+        private List<Attribute> _attributes = new List<Attribute>();
+        public List<Attribute> Attributes { get { return _attributes; } }
+        private List<Attribute> _sseattributes = new List<Attribute>();
+        public List<Attribute> SSEAttributes { get { return _sseattributes; } }
+        private MiscSection _miscsection;
+        public MiscSection MiscSection { get { return _miscsection; } }
         public unsafe MovesetSection(VoidPtr ptr, VoidPtr stringPtr, DatElement parent)
             : base(ptr, stringPtr, parent)
         {
             header = *(MovesetHeader*)(RootFile.Address + FileOffset);
+            _miscsection = new MiscSection(this, header.MiscSectionOffset);
+            for (uint i = header.AttributeStart; i < header.SSEAttributeStart; i +=4)
+            {
+                _attributes.Add(new Attribute(this, i));
+            }
+            for (uint i = header.SSEAttributeStart; i < header.Unknown5; i += 4)
+            {
+                _sseattributes.Add(new Attribute(this, i));
+            }
 
+        }
+        public override IEnumerator GetEnumerator()
+        {
+            return new MovesetSectionEnumerator(this);
+        }
+    }
+    class MovesetSectionEnumerator : IEnumerator
+    {
+        private readonly MovesetSection _file;
+        private int _i = -1;
+        public MovesetSectionEnumerator(MovesetSection f)
+        {
+            _file = f;
+        }
+
+        public object Current
+        {
+            get
+            {
+                switch (_i)
+                {
+                    case 0:
+                        return new NamedList<Attribute>(_file.Attributes, "Attributes");
+                    case 1:
+                        return new NamedList<Attribute>(_file.SSEAttributes, "SSE Attributes");
+                   case 2:
+                        return _file.MiscSection;
+                }
+                return null;
+            }
+        }
+
+        public bool MoveNext()
+        {
+            _i++;
+            return _i <= 2;
+        }
+
+        public void Reset()
+        {
+            _i = -1;
         }
     }
 }

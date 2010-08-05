@@ -33,5 +33,16 @@ namespace Tabuu.UI
             if (bytesperLine != 0)
                 hexBox1.BytesPerLine = bytesperLine;
         }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            var jumpto = -1;
+            Int32.TryParse(textBox4.Text,System.Globalization.NumberStyles.HexNumber,new System.Globalization.CultureInfo("en-US"), out jumpto);
+            if (jumpto != -1 && jumpto < hexBox1.ByteProvider.Length)
+            {
+                hexBox1.ScrollByteIntoView(jumpto);
+                hexBox1.Select(jumpto, 4);
+            }
+        }
     }
 }

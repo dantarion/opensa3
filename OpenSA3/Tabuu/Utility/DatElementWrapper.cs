@@ -48,12 +48,36 @@ namespace Tabuu.Utility
         }
         public System.Drawing.Color GetByteColor(long index)
         {
-            DatFile file = _datelement as DatFile;
-            if (file != null)
-                foreach (DatSection section in file.Sections)
-                    if (index >= section.FileOffset && index < section.FileOffset + section.Length)
-                        return section.Color;
-            return System.Drawing.Color.Transparent;
+            var ele = SearchForDatElement(_datelement,_datelement.FileOffset+ index);
+            return ele != null ? ele.Color : System.Drawing.Color.Transparent;
+        }
+        private static DatElement SearchForDatElement(IEnumerable node, long index)
+        {
+            DatElement found = null;
+            foreach(object o in node)//Search Childen IEnemerables
+            {
+                var searchableChild = o as IEnumerable;
+                if (searchableChild == null)
+                    continue;
+                found = SearchForDatElement(searchableChild, index);//Search child nodes
+                if (found != null)
+                    break;//If we find it, stop searching
+            }
+            if(found != null)
+                return found;//Return the found result
+            //If its not in any of the children, maybe this is it!
+            var asDatElement = node as DatElement;
+            if (asDatElement == null)//If its not a DatElement though, the search failed
+                return null;
+            if (new DatElementWrapper(asDatElement).isInDatElement(index))//But if it is, and we are in there, we found it!
+                return asDatElement;
+            return null;//But if its not we failed
+
+          
+        }
+        private bool isInDatElement(long index)
+        {
+            return index >= _datelement.FileOffset && index < _datelement.FileOffset + Length;
         }
         public bool SupportsDeleteBytes()
         {

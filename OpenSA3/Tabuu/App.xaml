@@ -5,13 +5,17 @@
     <Application.Resources>
         <ResourceDictionary>
             <ContextMenu x:Key="DatFileContextMenu">
-                <MenuItem Header="Open Hex View"  Command="{x:Static local:MainWindow.HexOpenCommand}" CommandParameter="{Binding}"/>
+                <MenuItem Header="Open Hex View..."  Command="{x:Static local:MainWindow.HexOpenCommand}" CommandParameter="{Binding}"/>
+                <MenuItem Header="Load Bone Names"  Command="{x:Static local:MainWindow.LoadBoneCommand}" CommandParameter="{Binding}"/>
                 <MenuItem Header="Save File" Command="{x:Static local:MainWindow.SaveFileCommand}" CommandParameter="{Binding}"/>
-                <MenuItem Header="Save File As" Command="{x:Static local:MainWindow.SaveFileAsCommand}" CommandParameter="{Binding}"/>
+                <MenuItem Header="Save File As..." Command="{x:Static local:MainWindow.SaveFileAsCommand}" CommandParameter="{Binding}"/>
                 <MenuItem Header="Close File" Command="{x:Static local:MainWindow.CloseFileCommand}" CommandParameter="{Binding}"/>
             </ContextMenu>
-            <ContextMenu x:Key="DatSectionContextMenu">
-                <MenuItem Header="Open Hex View"  Command="{x:Static local:MainWindow.HexOpenCommand}" CommandParameter="{Binding}"/>
+            <ContextMenu x:Key="DatElementContextMenu">
+                <MenuItem Header="Open Hex View..."  Command="{x:Static local:MainWindow.HexOpenCommand}" CommandParameter="{Binding}"/>
+            </ContextMenu>
+            <ContextMenu x:Key="NamedListContextMenu">
+                <MenuItem Header="Examine..."  Command="{x:Static local:MainWindow.ExamineCommand}" CommandParameter="{Binding}"/>
             </ContextMenu>
         </ResourceDictionary>
     </Application.Resources>

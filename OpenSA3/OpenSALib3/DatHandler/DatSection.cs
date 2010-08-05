@@ -16,7 +16,7 @@ namespace OpenSALib3.DatHandler {
         [Browsable(false)]
         public uint StringOffset { get { return _header.StringOffset; } set { _header.StringOffset = value; } }
 
-        protected DatSection(VoidPtr ptr, VoidPtr stringPtr, DatElement parent) : base(parent) {
+        protected DatSection(VoidPtr ptr, VoidPtr stringPtr, DatElement parent) : base(parent,0) {
             _header = *(DatSectionHeader*)ptr;
             Name = new String((sbyte*)stringPtr + StringOffset);
             FileOffset = _header.DataOffset;
