@@ -10,7 +10,7 @@ using Microsoft.Scripting.Hosting;
 using OpenSALib3.DatHandler;
 
 namespace OpenSALib3 {
-    public class RunScript {
+    public static class RunScript {
         private static ScriptRuntime _runtime;
         private static ScriptScope _scope;
         private static readonly ScriptEngine Engine = IronPython.Hosting.Python.CreateEngine();
@@ -18,13 +18,13 @@ namespace OpenSALib3 {
         public static void ResetScope() {
             _scope = null;
         }
-        public static void LoadAssmbly(System.Reflection.Assembly asm) {
+        public static void LoadAssembly(System.Reflection.Assembly asm) {
             Engine.Runtime.LoadAssembly(asm);
             _scope = null;
         }
-        public static void SetVar(String str, object obj) {
+        public static void SetVar(String key, object value) {
             SetupScope();
-            _scope.SetVariable(str, obj);
+            _scope.SetVariable(key, value);
         }
         public static void SetupScope() {
             if (_scope != null) return;
@@ -34,16 +34,16 @@ namespace OpenSALib3 {
 
             _scope = Engine.CreateScope();
         }
-        public static String FromString(String str, DatFile file) {
+        public static String FromString(String script, DatFile file) {
             try {
                 SetupScope();
                 var ms = new MemoryStream();
                 SB.Clear();
-                _runtime.IO.SetOutput(ms, new StringWriter(SB));
+                _runtime.IO.SetOutput(ms, new StringWriter(SB, new System.Globalization.CultureInfo("en-US")));
                 _scope.SetVariable("currentDat", file);
-                var script = Engine.CreateScriptSourceFromString(str);
+                var compiledscript = Engine.CreateScriptSourceFromString(script);
 
-                script.Execute(_scope);
+                compiledscript.Execute(_scope);
                 ms.Flush();
                 return SB.ToString();
             } catch (Exception err) {

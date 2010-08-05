@@ -14,14 +14,15 @@ namespace OpenSALib3.DatHandler {
 
         public override string ToString()
         {
-            return Name;
+            return Name != null ? Name :"NullName" ;
         }
         public uint FileOffset { get; protected set; }
         public uint Length { get; set; }
         public Color Color { get; set; }
-        protected DatElement(DatElement parent) {
+        private static Random rnd = new Random();
+        protected DatElement(DatElement parent,uint fileoffset) {
             Parent = parent;
-            var rnd = new Random();
+            FileOffset = fileoffset;
             Color = Color.FromArgb(255/2,rnd.Next(255), rnd.Next(255), rnd.Next(255));
         }
 

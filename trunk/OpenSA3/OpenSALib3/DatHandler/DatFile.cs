@@ -38,7 +38,31 @@ namespace OpenSALib3.DatHandler
             file.Filename = node.OriginalSource.Map.FilePath;
             return file;
         }
+        private Dictionary<int, string> boneNames;
+        public void readBoneNames(string filename)
+        {
+            try
+            {
+                boneNames = new Dictionary<int, string>();
+                var node = NodeFactory.FromFile(null, filename);
+                var model = node.Children[0].Children[0].Children[0] as MDL0Node;
+                ResourceNode search = model;
+                foreach (var innernode in model.FindChildrenByType("", ResourceType.MDL0Bone))
+                    boneNames[(innernode as MDL0BoneNode).BoneIndex] = (innernode as MDL0BoneNode).Name;
+                node.Dispose();
 
+            }
+            catch (Exception error)
+            {
+                boneNames = null;
+            }
+        }
+        public string getBoneName(int boneIndex)
+        {
+            if (boneNames == null || !boneNames.ContainsKey(boneIndex))
+                return "No Model Ref Loaded";
+            return boneNames[boneIndex];
+        }
         private DatFileHeader _header;
         private VoidPtr _dataChunk;
         private DataSource source;
@@ -55,7 +79,7 @@ namespace OpenSALib3.DatHandler
             get { return this; }
         }
         protected DatFile(ResourceNode node)
-            : base(null)
+            : base(null,0)
         {
             source = node.OriginalSource;
             _node = node;
@@ -66,9 +90,9 @@ namespace OpenSALib3.DatHandler
             Sections = new List<DatSection>();
             References = new List<DatSection>();
             Name = node.RootNode.Name;
-            FileOffset = 0;
             Length = _header.FileSize - SizeOf.Header;
             Changed = false;
+            Color = System.Drawing.Color.Transparent;
             //Start Parse
 
             var section = Address + _header.DataChunkSize + _header.OffsetCount * 4;
@@ -119,8 +143,10 @@ namespace OpenSALib3.DatHandler
                 switch (_i)
                 {
                     case 0:
-                        return new NamedList<DatSection>(_file.Sections, "Sections");
+                        return _file.Sections[0];
                     case 1:
+                        return new NamedList<DatSection>(_file.Sections, "Sections");
+                    case 2:
                         return new NamedList<DatSection>(_file.References, "References");
                 }
                 return null;
@@ -130,7 +156,7 @@ namespace OpenSALib3.DatHandler
         public bool MoveNext()
         {
             _i++;
-            return _i <= 1;
+            return _i <= 2;
         }
 
         public void Reset()
