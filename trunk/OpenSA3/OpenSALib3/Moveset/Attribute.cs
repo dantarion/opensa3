@@ -5,10 +5,12 @@ using System.Text;
 using System.Collections;
 using System.IO;
 using OpenSALib3.DatHandler;
+using System.ComponentModel;
 namespace OpenSALib3.Moveset
 {
     public class Attribute : DatElement
     {
+        #region Static functions
         struct Metadata
         {
             public string Name;
@@ -45,6 +47,7 @@ namespace OpenSALib3.Moveset
                 sr.ReadLine();
             }
         }
+        #endregion
         public Attribute(DatElement parent,uint FileOffset) : base(parent,FileOffset)
         {
             Length = 4;
@@ -53,14 +56,17 @@ namespace OpenSALib3.Moveset
                 Name = DB[FileOffset].Name;
             else Name = String.Format("0x{0:X03}", FileOffset);
         }
+        [Category("Attribute")]
         public string Description
         {
             get { return DB.ContainsKey(FileOffset) ? DB[FileOffset].Description : "Unknown"; }
         }
+        [Category("Attribute")]
         public Type Type
         {
             get { return DB.ContainsKey(FileOffset) ? DB[FileOffset].Type : typeof(float); }
         }
+        [Category("Attribute")]
         public unsafe object Value
         {
             get { 

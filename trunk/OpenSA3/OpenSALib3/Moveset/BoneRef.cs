@@ -7,15 +7,12 @@ using OpenSALib3.DatHandler;
 namespace OpenSALib3.Moveset
 {
     public class BoneRef : DatElement
-    {
-        unsafe struct BoneData
-        {
-            public bint boneindex;
-        }
-        private BoneData _boneData;
+    { 
+        private bint _index;
         public int Index
         {
-            get { return _boneData.boneindex; } set{ _boneData.boneindex = value; }
+            get { return _index; }
+            set { _index = value; }
         }
         public string BoneName
         {
@@ -25,7 +22,7 @@ namespace OpenSALib3.Moveset
             : base(parent, offset)
         {
              Name = name;
-            _boneData = *(BoneData*)(RootFile.Address + offset);
+             _index = *(bint*)(RootFile.Address + offset);
         }
         public override string ToString()
         {

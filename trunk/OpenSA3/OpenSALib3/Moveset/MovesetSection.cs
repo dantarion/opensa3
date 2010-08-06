@@ -5,7 +5,7 @@ using System.Text;
 using OpenSALib3.DatHandler;
 using System.Collections;
 using OpenSALib3.Utility;
-
+using System.ComponentModel;
 namespace OpenSALib3.Moveset
 {
     public class MovesetSection : DatSection
@@ -45,10 +45,13 @@ namespace OpenSALib3.Moveset
         }
         private MovesetHeader header;
         private List<Attribute> _attributes = new List<Attribute>();
+        [Browsable(false)]
         public List<Attribute> Attributes { get { return _attributes; } }
         private List<Attribute> _sseattributes = new List<Attribute>();
+        [Browsable(false)]
         public List<Attribute> SSEAttributes { get { return _sseattributes; } }
         private MiscSection _miscsection;
+        [Browsable(false)]
         public MiscSection MiscSection { get { return _miscsection; } }
         public unsafe MovesetSection(VoidPtr ptr, VoidPtr stringPtr, DatElement parent)
             : base(ptr, stringPtr, parent)
