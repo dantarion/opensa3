@@ -29,7 +29,10 @@ namespace OpenSALib3.Moveset
         public List<int> Section { get { return _section1; } }
         private List<Hurtbox> _hurtboxes = new List<Hurtbox>();
         public List<Hurtbox> Hurtboxes { get { return _hurtboxes; } }
-
+        private List<UnknownType1> _unknowntype1s = new List<UnknownType1>();
+        public List<UnknownType1> UnknownType1s { get { return _unknowntype1s; } }
+        private List<LedgegrabBox> _ledgegrabboxes = new List<LedgegrabBox>();
+        public List<LedgegrabBox> LedgegrabBoxes { get { return _ledgegrabboxes; } }
         unsafe public MiscSection(DatElement parent, uint fileoffset)
             : base(parent, fileoffset)
         {
@@ -40,6 +43,11 @@ namespace OpenSALib3.Moveset
                 _section1.Add(*(bint*)(RootFile.Address + _header.Section1 + i * 4));
             for (uint i = 0; i < +_header.HurtBoxCount; i++)
                 _hurtboxes.Add(new Hurtbox(this,_header.HurtBoxOffset + i * 4 * 5));
+            for (uint i = 0; i < +_header.UnknownSectionCount; i++)
+                _unknowntype1s.Add(new UnknownType1(this, _header.UnknownSectionOffset + i * 4 * 8));
+            for (uint i = 0; i < +_header.LedgegrabCount; i++)
+                _ledgegrabboxes.Add(new LedgegrabBox(this, _header.LedgegrabOffset + i * 4 * 4));
+
 
         }
         public override IEnumerator GetEnumerator()
@@ -67,6 +75,10 @@ namespace OpenSALib3.Moveset
                             return new NamedList<int>(_file._section1, "Section1");
                         case 2:
                             return new NamedList<Hurtbox>(_file._hurtboxes, "Hurtboxes");
+                        case 3:
+                            return new NamedList<UnknownType1>(_file._unknowntype1s, "UnknownType1");
+                        case 4:
+                            return new NamedList<LedgegrabBox>(_file._ledgegrabboxes, "LedgegrabBoxes");
 
                     }
                     return null;
@@ -76,7 +88,7 @@ namespace OpenSALib3.Moveset
             public bool MoveNext()
             {
                 _i++;
-                return _i <= 2;
+                return _i <= 4;
             }
 
             public void Reset()

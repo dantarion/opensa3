@@ -27,6 +27,7 @@ namespace OpenSALib3.DatHandler
     }
     public unsafe class DatFile : DatElement
     {
+        #region Static Methods
         public static DatFile FromFile(string filename)
         {
             var node = NodeFactory.FromFile(null, filename);
@@ -38,6 +39,7 @@ namespace OpenSALib3.DatHandler
             file.Filename = node.OriginalSource.Map.FilePath;
             return file;
         }
+        #endregion
         private Dictionary<int, string> boneNames;
         public void readBoneNames(string filename)
         {
@@ -63,17 +65,25 @@ namespace OpenSALib3.DatHandler
                 return "No Model Ref Loaded";
             return boneNames[boneIndex];
         }
+        
         private DatFileHeader _header;
         private VoidPtr _dataChunk;
         private DataSource source;
         public ResourceNode _node;
+
+        [Browsable(false)]
         public List<DatSection> Sections { get; private set; }
+        [Browsable(false)]
         public List<DatSection> References { get; private set; }
+        [Category("File")]
+        [ReadOnly(true)]
         public bool Changed { get; set; }
+        [Category("File")]
+        [ReadOnly(true)]
         public String Filename { get; set; }
         [Browsable(false)]
         public VoidPtr Address { get { return _node.WorkingSource.Address+SizeOf.Header; } }
-
+        [Browsable(false)]
         public override DatFile RootFile
         {
             get { return this; }

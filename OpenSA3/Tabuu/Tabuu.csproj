@@ -44,6 +44,8 @@
       <HintPath>W:\brawl_hax\BBox\BrawlLib.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Activities" />
+    <Reference Include="System.Activities.Presentation" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
@@ -81,6 +83,7 @@
     <Compile Include="UI\HexBox.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="UI\WpfPropertyGrid.cs" />
     <Compile Include="Utility\ItemToContextMenuConverter.cs" />
     <Compile Include="Utility\DatElementWrapper.cs" />
     <Compile Include="UI\HexViewWindow.cs">
