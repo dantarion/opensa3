@@ -2,23 +2,22 @@ using System;
 using System.Collections;
 
 namespace Be.Windows.Forms {
-    internal class DataMap : ICollection, IEnumerable {
-        private readonly object _syncRoot = new object();
-        internal int _count;
-        internal DataBlock _firstBlock;
-        internal int _version;
-        public DataMap() {}
+    internal class DataMap : ICollection {
+        internal int Version;
+
+        public DataMap() {
+            SyncRoot = new object();
+        }
 
         public DataMap(IEnumerable collection) {
+            SyncRoot = new object();
             if (collection == null)
                 throw new ArgumentNullException("collection");
             foreach (DataBlock item in collection)
                 AddLast(item);
         }
 
-        public DataBlock FirstBlock {
-            get { return _firstBlock; }
-        }
+        public DataBlock FirstBlock { get; internal set; }
 
         public void AddAfter(DataBlock block, DataBlock newBlock) {
             AddAfterInternal(block, newBlock);
@@ -29,14 +28,14 @@ namespace Be.Windows.Forms {
         }
 
         public void AddFirst(DataBlock block) {
-            if (_firstBlock == null)
+            if (FirstBlock == null)
                 AddBlockToEmptyMap(block);
             else
-                AddBeforeInternal(_firstBlock, block);
+                AddBeforeInternal(FirstBlock, block);
         }
 
         public void AddLast(DataBlock block) {
-            if (_firstBlock == null)
+            if (FirstBlock == null)
                 AddBlockToEmptyMap(block);
             else
                 AddAfterInternal(GetLastBlock(), block);
@@ -47,13 +46,13 @@ namespace Be.Windows.Forms {
         }
 
         public void RemoveFirst() {
-            if (_firstBlock == null)
+            if (FirstBlock == null)
                 throw new InvalidOperationException("The collection is empty.");
-            RemoveInternal(_firstBlock);
+            RemoveInternal(FirstBlock);
         }
 
         public void RemoveLast() {
-            if (_firstBlock == null)
+            if (FirstBlock == null)
                 throw new InvalidOperationException("The collection is empty.");
             RemoveInternal(GetLastBlock());
         }
@@ -65,95 +64,91 @@ namespace Be.Windows.Forms {
         }
 
         public void Clear() {
-            DataBlock block = FirstBlock;
+            var block = FirstBlock;
             while (block != null) {
-                DataBlock nextBlock = block.NextBlock;
+                var nextBlock = block.NextBlock;
                 InvalidateBlock(block);
                 block = nextBlock;
             }
-            _firstBlock = null;
-            _count = 0;
-            _version++;
+            FirstBlock = null;
+            Count = 0;
+            Version++;
         }
 
         private void AddAfterInternal(DataBlock block, DataBlock newBlock) {
-            newBlock._previousBlock = block;
-            newBlock._nextBlock = block._nextBlock;
-            newBlock._map = this;
-            if (block._nextBlock != null)
-                block._nextBlock._previousBlock = newBlock;
-            block._nextBlock = newBlock;
-            this._version++;
-            this._count++;
+            newBlock.PreviousBlock = block;
+            newBlock.NextBlock = block.NextBlock;
+            newBlock.Map = this;
+            if (block.NextBlock != null)
+                block.NextBlock.PreviousBlock = newBlock;
+            block.NextBlock = newBlock;
+            Version++;
+            Count++;
         }
 
         private void AddBeforeInternal(DataBlock block, DataBlock newBlock) {
-            newBlock._nextBlock = block;
-            newBlock._previousBlock = block._previousBlock;
-            newBlock._map = this;
-            if (block._previousBlock != null)
-                block._previousBlock._nextBlock = newBlock;
-            block._previousBlock = newBlock;
-            if (_firstBlock == block)
-                _firstBlock = newBlock;
-            this._version++;
-            this._count++;
+            newBlock.NextBlock = block;
+            newBlock.PreviousBlock = block.PreviousBlock;
+            newBlock.Map = this;
+            if (block.PreviousBlock != null)
+                block.PreviousBlock.NextBlock = newBlock;
+            block.PreviousBlock = newBlock;
+            if (FirstBlock == block)
+                FirstBlock = newBlock;
+            Version++;
+            Count++;
         }
 
         private void RemoveInternal(DataBlock block) {
-            DataBlock previousBlock = block._previousBlock;
-            DataBlock nextBlock = block._nextBlock;
+            var previousBlock = block.PreviousBlock;
+            var nextBlock = block.NextBlock;
             if (previousBlock != null)
-                previousBlock._nextBlock = nextBlock;
+                previousBlock.NextBlock = nextBlock;
             if (nextBlock != null)
-                nextBlock._previousBlock = previousBlock;
-            if (_firstBlock == block)
-                _firstBlock = nextBlock;
+                nextBlock.PreviousBlock = previousBlock;
+            if (FirstBlock == block)
+                FirstBlock = nextBlock;
             InvalidateBlock(block);
-            _count--;
-            _version++;
+            Count--;
+            Version++;
         }
 
         private DataBlock GetLastBlock() {
             DataBlock lastBlock = null;
-            for (DataBlock block = FirstBlock; block != null; block = block.NextBlock)
+            for (var block = FirstBlock; block != null; block = block.NextBlock)
                 lastBlock = block;
             return lastBlock;
         }
 
-        private void InvalidateBlock(DataBlock block) {
-            block._map = null;
-            block._nextBlock = null;
-            block._previousBlock = null;
+        private static void InvalidateBlock(DataBlock block) {
+            block.Map = null;
+            block.NextBlock = null;
+            block.PreviousBlock = null;
         }
 
         private void AddBlockToEmptyMap(DataBlock block) {
-            block._map = this;
-            block._nextBlock = null;
-            block._previousBlock = null;
-            _firstBlock = block;
-            _version++;
-            _count++;
+            block.Map = this;
+            block.NextBlock = null;
+            block.PreviousBlock = null;
+            FirstBlock = block;
+            Version++;
+            Count++;
         }
 
         #region ICollection Members
         public void CopyTo(Array array, int index) {
-            DataBlock[] blockArray = array as DataBlock[];
-            for (DataBlock block = FirstBlock; block != null; block = block.NextBlock)
+            var blockArray = (DataBlock[]) array;
+            for (var block = FirstBlock; block != null; block = block.NextBlock)
                 blockArray[index++] = block;
         }
 
-        public int Count {
-            get { return _count; }
-        }
+        public int Count { get; internal set; }
 
         public bool IsSynchronized {
             get { return false; }
         }
 
-        public object SyncRoot {
-            get { return _syncRoot; }
-        }
+        public object SyncRoot { get; private set; }
         #endregion
 
         #region IEnumerable Members
@@ -164,14 +159,14 @@ namespace Be.Windows.Forms {
 
         #region Enumerator Nested Type
         internal class Enumerator : IEnumerator, IDisposable {
-            private DataMap _map;
+            private readonly DataMap _map;
             private DataBlock _current;
             private int _index;
-            private int _version;
+            private readonly int _version;
 
             internal Enumerator(DataMap map) {
                 _map = map;
-                _version = map._version;
+                _version = map.Version;
                 _current = null;
                 _index = -1;
             }
@@ -186,22 +181,19 @@ namespace Be.Windows.Forms {
             }
 
             public bool MoveNext() {
-                if (this._version != _map._version)
+                if (_version != _map.Version)
                     throw new InvalidOperationException("Collection was modified after the enumerator was instantiated.");
                 if (_index >= _map.Count)
                     return false;
-                if (++_index == 0)
-                    _current = _map.FirstBlock;
-                else
-                    _current = _current.NextBlock;
+                _current = ++_index == 0 ? _map.FirstBlock : _current.NextBlock;
                 return (_index < _map.Count);
             }
 
             void IEnumerator.Reset() {
-                if (this._version != this._map._version)
+                if (_version != _map.Version)
                     throw new InvalidOperationException("Collection was modified after the enumerator was instantiated.");
-                this._index = -1;
-                this._current = null;
+                _index = -1;
+                _current = null;
             }
 
             public void Dispose() {}

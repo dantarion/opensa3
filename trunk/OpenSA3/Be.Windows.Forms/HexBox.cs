@@ -1,17 +1,25 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Drawing;
+using System.Drawing.Design;
+using System.Drawing.Drawing2D;
+using System.Globalization;
+using System.IO;
 using System.Security.Permissions;
 using System.Text;
+using System.Threading;
 using System.Windows.Forms;
 using System.Windows.Forms.VisualStyles;
 using Be.Windows.Forms.Design;
+using Timer = System.Windows.Forms.Timer;
 
 namespace Be.Windows.Forms {
     /// <summary>
     ///   Represents a hex box control.
     /// </summary>
-    [ToolboxBitmap(typeof (HexBox), "HexBox.bmp")]
+    [ToolboxBitmap(typeof(HexBox), "HexBox.bmp")]
     public class HexBox : Control {
         #region IKeyInterpreter interface
         /// <summary>
@@ -64,15 +72,15 @@ namespace Be.Windows.Forms {
         ///   If is set ByteProvider to null, then this interpreter is used.
         /// </summary>
         private class EmptyKeyInterpreter : IKeyInterpreter {
-            private HexBox _hexBox;
+            private readonly HexBox _hexBox;
 
             public EmptyKeyInterpreter(HexBox hexBox) {
                 _hexBox = hexBox;
             }
 
             #region IKeyInterpreter Members
-            public void Activate() {}
-            public void Deactivate() {}
+            public void Activate() { }
+            public void Deactivate() { }
 
             public bool PreProcessWmKeyUp(ref Message m) {
                 return _hexBox.BasePreProcessMessage(ref m);
@@ -102,12 +110,12 @@ namespace Be.Windows.Forms {
             /// <summary>
             ///   Contains the parent HexBox control
             /// </summary>
-            protected HexBox _hexBox;
+            protected readonly HexBox HexBox;
 
             /// <summary>
             ///   Contains True, if shift key is down
             /// </summary>
-            protected bool _shiftDown;
+            private bool _shiftDown;
 
             /// <summary>
             ///   Contains True, if mouse is down
@@ -127,40 +135,40 @@ namespace Be.Windows.Forms {
 
             #region Ctors
             public KeyInterpreter(HexBox hexBox) {
-                _hexBox = hexBox;
+                HexBox = hexBox;
             }
             #endregion
 
             #region Activate, Deactive methods
             public virtual void Activate() {
-                _hexBox.MouseDown += new MouseEventHandler(BeginMouseSelection);
-                _hexBox.MouseMove += new MouseEventHandler(UpdateMouseSelection);
-                _hexBox.MouseUp += new MouseEventHandler(EndMouseSelection);
-                _hexBox.KeyDown += new KeyEventHandler(KeyDownEventHL);
+                HexBox.MouseDown += BeginMouseSelection;
+                HexBox.MouseMove += UpdateMouseSelection;
+                HexBox.MouseUp += EndMouseSelection;
+                HexBox.KeyDown += KeyDownEventHL;
             }
 
             public virtual void Deactivate() {
-                _hexBox.MouseDown -= new MouseEventHandler(BeginMouseSelection);
-                _hexBox.MouseMove -= new MouseEventHandler(UpdateMouseSelection);
-                _hexBox.MouseUp -= new MouseEventHandler(EndMouseSelection);
+                HexBox.MouseDown -= BeginMouseSelection;
+                HexBox.MouseMove -= UpdateMouseSelection;
+                HexBox.MouseUp -= EndMouseSelection;
             }
             #endregion
 
             private void KeyDownEventHL(object sender, KeyEventArgs e) {
-                var m = new Message();
-                m.WParam = (IntPtr) e.KeyData;
+                //TODO Highlight??
+                var m = new Message { WParam = (IntPtr)e.KeyData };
                 PreProcessWmKeyDown(ref m);
             }
 
             #region Mouse selection methods
             private void BeginMouseSelection(object sender, MouseEventArgs e) {
-                System.Diagnostics.Debug.WriteLine("BeginMouseSelection()", "KeyInterpreter");
+                Debug.WriteLine("BeginMouseSelection()", "KeyInterpreter");
                 if (e.Button != MouseButtons.Left)
                     return;
                 _mouseDown = true;
                 if (!_shiftDown) {
-                    _bpiStart = new BytePositionInfo(_hexBox._bytePos, _hexBox._byteCharacterPos);
-                    _hexBox.ReleaseSelection();
+                    _bpiStart = new BytePositionInfo(HexBox._bytePos, HexBox._byteCharacterPos);
+                    HexBox.ReleaseSelection();
                 } else UpdateMouseSelection(this, e);
             }
 
@@ -168,7 +176,7 @@ namespace Be.Windows.Forms {
                 if (!_mouseDown)
                     return;
                 _bpi = GetBytePositionInfo(new Point(e.X, e.Y));
-                long selEnd = _bpi.Index;
+                var selEnd = _bpi.Index;
                 long realselStart;
                 long realselLength;
                 if (selEnd < _bpiStart.Index) {
@@ -178,13 +186,12 @@ namespace Be.Windows.Forms {
                     realselStart = _bpiStart.Index;
                     realselLength = selEnd - realselStart;
                 } else {
-                    realselStart = _hexBox._bytePos;
+                    realselStart = HexBox._bytePos;
                     realselLength = 0;
                 }
-                if (realselStart != _hexBox._bytePos || realselLength != _hexBox._selectionLength) {
-                    _hexBox.InternalSelect(realselStart, realselLength);
-                    _hexBox.ScrollByteIntoView(_bpi.Index); /// <--- This line is added
-                }
+                if (realselStart == HexBox._bytePos && realselLength == HexBox._selectionLength) return;
+                HexBox.InternalSelect(realselStart, realselLength);
+                HexBox.ScrollByteIntoView(_bpi.Index); // <--- This line is added
             }
 
             private void EndMouseSelection(object sender, MouseEventArgs e) {
@@ -194,9 +201,7 @@ namespace Be.Windows.Forms {
 
             #region PrePrcessWmKeyDown methods
             public virtual bool PreProcessWmKeyDown(ref Message m) {
-                System.Diagnostics.Debug.WriteLine("PreProcessWmKeyDown(ref Message m)", "KeyInterpreter");
-                Keys vc = (Keys) m.WParam.ToInt32();
-                Keys keyData = vc | Control.ModifierKeys;
+                Debug.WriteLine("PreProcessWmKeyDown(ref Message m)", "KeyInterpreter");
                 /*
                 switch (keyData) {
                     case Keys.Left:
@@ -223,134 +228,134 @@ namespace Be.Windows.Forms {
                         break;
                 }
                  */
-                switch (keyData) {
+                switch ((Keys)m.WParam.ToInt32() | ModifierKeys) {
                     case Keys.Left: // move left
-                        return PreProcessWmKeyDown_Left(ref m);
+                        return PreProcessWmKeyDownLeft(ref m);
                     case Keys.Up: // move up
-                        return PreProcessWmKeyDown_Up(ref m);
+                        return PreProcessWmKeyDownUp(ref m);
                     case Keys.Right: // move right
-                        return PreProcessWmKeyDown_Right(ref m);
+                        return PreProcessWmKeyDownRight(ref m);
                     case Keys.Down: // move down
-                        return PreProcessWmKeyDown_Down(ref m);
+                        return PreProcessWmKeyDownDown(ref m);
                     case Keys.PageUp: // move pageup
-                        return PreProcessWmKeyDown_PageUp(ref m);
+                        return PreProcessWmKeyDownPageUp(ref m);
                     case Keys.PageDown: // move pagedown
-                        return PreProcessWmKeyDown_PageDown(ref m);
+                        return PreProcessWmKeyDownPageDown(ref m);
                     case Keys.Left | Keys.Shift: // move left with selection
-                        return PreProcessWmKeyDown_ShiftLeft(ref m);
+                        return PreProcessWmKeyDownShiftLeft(ref m);
                     case Keys.Up | Keys.Shift: // move up with selection
-                        return PreProcessWmKeyDown_ShiftUp(ref m);
+                        return PreProcessWmKeyDownShiftUp(ref m);
                     case Keys.Right | Keys.Shift: // move right with selection
-                        return PreProcessWmKeyDown_ShiftRight(ref m);
+                        return PreProcessWmKeyDownShiftRight(ref m);
                     case Keys.Down | Keys.Shift: // move down with selection
-                        return PreProcessWmKeyDown_ShiftDown(ref m);
+                        return PreProcessWmKeyDownShiftDown(ref m);
                     case Keys.Tab: // switch focus to string view
-                        return PreProcessWmKeyDown_Tab(ref m);
+                        return PreProcessWmKeyDownTab(ref m);
                     case Keys.Back: // back
-                        return PreProcessWmKeyDown_Back(ref m);
+                        return PreProcessWmKeyDownBack(ref m);
                     case Keys.Delete: // delete
-                        return PreProcessWmKeyDown_Delete(ref m);
+                        return PreProcessWmKeyDownDelete(ref m);
                     case Keys.Home: // move to home
-                        return PreProcessWmKeyDown_Home(ref m);
+                        return PreProcessWmKeyDownHome(ref m);
                     case Keys.End: // move to end
-                        return PreProcessWmKeyDown_End(ref m);
+                        return PreProcessWmKeyDownEnd(ref m);
                     case Keys.ShiftKey | Keys.Shift: // begin selection process
-                        return PreProcessWmKeyDown_ShiftShiftKey(ref m);
+                        return PreProcessWmKeyDownShiftShiftKey(ref m);
                     case Keys.C | Keys.Control: // copy
-                        return PreProcessWmKeyDown_ControlC(ref m);
+                        return PreProcessWmKeyDownControlC(ref m);
                     case Keys.X | Keys.Control: // cut
-                        return PreProcessWmKeyDown_ControlX(ref m);
+                        return PreProcessWmKeyDownControlX(ref m);
                     case Keys.V | Keys.Control: // paste
-                        return PreProcessWmKeyDown_ControlV(ref m);
+                        return PreProcessWmKeyDownControlV(ref m);
                     default:
-                        _hexBox.ScrollByteIntoView();
+                        HexBox.ScrollByteIntoView();
                         return PreProcessWmChar(ref m);
                 }
             }
 
             protected bool RaiseKeyDown(Keys keyData) {
-                KeyEventArgs e = new KeyEventArgs(keyData);
-                _hexBox.OnKeyDown(e);
+                var e = new KeyEventArgs(keyData);
+                HexBox.OnKeyDown(e);
                 return e.Handled;
             }
 
-            protected virtual bool PreProcessWmKeyDown_Left(ref Message m) {
+            protected virtual bool PreProcessWmKeyDownLeft(ref Message m) {
                 return PerformPosMoveLeft();
             }
 
-            protected virtual bool PreProcessWmKeyDown_Up(ref Message m) {
-                long pos = _hexBox._bytePos;
-                int cp = _hexBox._byteCharacterPos;
+            protected virtual bool PreProcessWmKeyDownUp(ref Message m) {
+                var pos = HexBox._bytePos;
+                var cp = HexBox._byteCharacterPos;
                 if (!(pos == 0 && cp == 0)) {
-                    pos = Math.Max(-1, pos - _hexBox._iHexMaxHBytes);
+                    pos = Math.Max(-1, pos - HexBox.HorizontalByteCount);
                     if (pos == -1)
                         return true;
-                    _hexBox.SetPosition(pos);
-                    if (pos < _hexBox._startByte) _hexBox.PerformScrollLineUp();
-                    _hexBox.UpdateCaret();
-                    _hexBox.Invalidate();
+                    HexBox.SetPosition(pos);
+                    if (pos < HexBox._startByte) HexBox.PerformScrollLineUp();
+                    HexBox.UpdateCaret();
+                    HexBox.Invalidate();
                 }
-                _hexBox.ScrollByteIntoView();
-                _hexBox.ReleaseSelection();
+                HexBox.ScrollByteIntoView();
+                HexBox.ReleaseSelection();
                 return true;
             }
 
-            protected virtual bool PreProcessWmKeyDown_Right(ref Message m) {
+            protected virtual bool PreProcessWmKeyDownRight(ref Message m) {
                 return PerformPosMoveRight();
             }
 
-            protected virtual bool PreProcessWmKeyDown_Down(ref Message m) {
-                long pos = _hexBox._bytePos;
-                int cp = _hexBox._byteCharacterPos;
-                if (pos == _hexBox._byteProvider.Length && cp == 0)
+            protected virtual bool PreProcessWmKeyDownDown(ref Message m) {
+                var pos = HexBox._bytePos;
+                var cp = HexBox._byteCharacterPos;
+                if (pos == HexBox._byteProvider.Length && cp == 0)
                     return true;
-                pos = Math.Min(_hexBox._byteProvider.Length, pos + _hexBox._iHexMaxHBytes);
-                if (pos == _hexBox._byteProvider.Length)
+                pos = Math.Min(HexBox._byteProvider.Length, pos + HexBox.HorizontalByteCount);
+                if (pos == HexBox._byteProvider.Length)
                     cp = 0;
-                _hexBox.SetPosition(pos, cp);
-                if (pos > _hexBox._endByte - 1) _hexBox.PerformScrollLineDown();
-                _hexBox.UpdateCaret();
-                _hexBox.ScrollByteIntoView();
-                _hexBox.ReleaseSelection();
-                _hexBox.Invalidate();
+                HexBox.SetPosition(pos, cp);
+                if (pos > HexBox._endByte - 1) HexBox.PerformScrollLineDown();
+                HexBox.UpdateCaret();
+                HexBox.ScrollByteIntoView();
+                HexBox.ReleaseSelection();
+                HexBox.Invalidate();
                 return true;
             }
 
-            protected virtual bool PreProcessWmKeyDown_PageUp(ref Message m) {
-                long pos = _hexBox._bytePos;
-                int cp = _hexBox._byteCharacterPos;
+            protected virtual bool PreProcessWmKeyDownPageUp(ref Message m) {
+                var pos = HexBox._bytePos;
+                var cp = HexBox._byteCharacterPos;
                 if (pos == 0 && cp == 0)
                     return true;
-                pos = Math.Max(0, pos - _hexBox._iHexMaxBytes);
+                pos = Math.Max(0, pos - HexBox._iHexMaxBytes);
                 if (pos == 0)
                     return true;
-                _hexBox.SetPosition(pos);
-                if (pos < _hexBox._startByte) _hexBox.PerformScrollPageUp();
-                _hexBox.ReleaseSelection();
-                _hexBox.UpdateCaret();
-                _hexBox.Invalidate();
+                HexBox.SetPosition(pos);
+                if (pos < HexBox._startByte) HexBox.PerformScrollPageUp();
+                HexBox.ReleaseSelection();
+                HexBox.UpdateCaret();
+                HexBox.Invalidate();
                 return true;
             }
 
-            protected virtual bool PreProcessWmKeyDown_PageDown(ref Message m) {
-                long pos = _hexBox._bytePos;
-                int cp = _hexBox._byteCharacterPos;
-                if (pos == _hexBox._byteProvider.Length && cp == 0)
+            protected virtual bool PreProcessWmKeyDownPageDown(ref Message m) {
+                var pos = HexBox._bytePos;
+                var cp = HexBox._byteCharacterPos;
+                if (pos == HexBox._byteProvider.Length && cp == 0)
                     return true;
-                pos = Math.Min(_hexBox._byteProvider.Length, pos + _hexBox._iHexMaxBytes);
-                if (pos == _hexBox._byteProvider.Length)
+                pos = Math.Min(HexBox._byteProvider.Length, pos + HexBox._iHexMaxBytes);
+                if (pos == HexBox._byteProvider.Length)
                     cp = 0;
-                _hexBox.SetPosition(pos, cp);
-                if (pos > _hexBox._endByte - 1) _hexBox.PerformScrollPageDown();
-                _hexBox.ReleaseSelection();
-                _hexBox.UpdateCaret();
-                _hexBox.Invalidate();
+                HexBox.SetPosition(pos, cp);
+                if (pos > HexBox._endByte - 1) HexBox.PerformScrollPageDown();
+                HexBox.ReleaseSelection();
+                HexBox.UpdateCaret();
+                HexBox.Invalidate();
                 return true;
             }
 
-            protected virtual bool PreProcessWmKeyDown_ShiftLeft(ref Message m) {
-                long pos = _hexBox._bytePos;
-                long sel = _hexBox._selectionLength;
+            protected virtual bool PreProcessWmKeyDownShiftLeft(ref Message m) {
+                var pos = HexBox._bytePos;
+                var sel = HexBox._selectionLength;
                 if (pos + sel < 1)
                     return true;
                 if (pos + sel <= _bpiStart.Index) {
@@ -359,263 +364,243 @@ namespace Be.Windows.Forms {
                     pos--;
                     sel++;
                 } else sel = Math.Max(0, sel - 1);
-                _hexBox.ScrollByteIntoView();
-                _hexBox.InternalSelect(pos, sel);
+                HexBox.ScrollByteIntoView();
+                HexBox.InternalSelect(pos, sel);
                 return true;
             }
 
-            protected virtual bool PreProcessWmKeyDown_ShiftUp(ref Message m) {
-                long pos = _hexBox._bytePos;
-                long sel = _hexBox._selectionLength;
-                if (pos - _hexBox._iHexMaxHBytes < 0 && pos <= _bpiStart.Index)
+            protected virtual bool PreProcessWmKeyDownShiftUp(ref Message m) {
+                var pos = HexBox._bytePos;
+                var sel = HexBox._selectionLength;
+                if (pos - HexBox.HorizontalByteCount < 0 && pos <= _bpiStart.Index)
                     return true;
                 if (_bpiStart.Index >= pos + sel) {
-                    pos = pos - _hexBox._iHexMaxHBytes;
-                    sel += _hexBox._iHexMaxHBytes;
-                    _hexBox.InternalSelect(pos, sel);
-                    _hexBox.ScrollByteIntoView();
+                    pos = pos - HexBox.HorizontalByteCount;
+                    sel += HexBox.HorizontalByteCount;
+                    HexBox.InternalSelect(pos, sel);
+                    HexBox.ScrollByteIntoView();
                 } else {
-                    sel -= _hexBox._iHexMaxHBytes;
+                    sel -= HexBox.HorizontalByteCount;
                     if (sel < 0) {
                         pos = _bpiStart.Index + sel;
                         sel = -sel;
-                        _hexBox.InternalSelect(pos, sel);
-                        _hexBox.ScrollByteIntoView();
+                        HexBox.InternalSelect(pos, sel);
+                        HexBox.ScrollByteIntoView();
                     } else {
-                        sel -= _hexBox._iHexMaxHBytes;
-                        _hexBox.InternalSelect(pos, sel);
-                        _hexBox.ScrollByteIntoView(pos + sel);
+                        sel -= HexBox.HorizontalByteCount;
+                        HexBox.InternalSelect(pos, sel);
+                        HexBox.ScrollByteIntoView(pos + sel);
                     }
                 }
                 return true;
             }
 
-            protected virtual bool PreProcessWmKeyDown_ShiftRight(ref Message m) {
-                long pos = _hexBox._bytePos;
-                long sel = _hexBox._selectionLength;
-                if (pos + sel >= _hexBox._byteProvider.Length)
+            protected virtual bool PreProcessWmKeyDownShiftRight(ref Message m) {
+                var pos = HexBox._bytePos;
+                var sel = HexBox._selectionLength;
+                if (pos + sel >= HexBox._byteProvider.Length)
                     return true;
                 if (_bpiStart.Index <= pos) {
                     sel++;
-                    _hexBox.InternalSelect(pos, sel);
-                    _hexBox.ScrollByteIntoView(pos + sel);
+                    HexBox.InternalSelect(pos, sel);
+                    HexBox.ScrollByteIntoView(pos + sel);
                 } else {
                     pos++;
                     sel = Math.Max(0, sel - 1);
-                    _hexBox.InternalSelect(pos, sel);
-                    _hexBox.ScrollByteIntoView();
+                    HexBox.InternalSelect(pos, sel);
+                    HexBox.ScrollByteIntoView();
                 }
                 return true;
             }
 
-            protected virtual bool PreProcessWmKeyDown_ShiftDown(ref Message m) {
-                long pos = _hexBox._bytePos;
-                long sel = _hexBox._selectionLength;
-                long max = _hexBox._byteProvider.Length;
-                if (pos + sel + _hexBox._iHexMaxHBytes > max)
+            protected virtual bool PreProcessWmKeyDownShiftDown(ref Message m) {
+                var pos = HexBox._bytePos;
+                var sel = HexBox._selectionLength;
+                var max = HexBox._byteProvider.Length;
+                if (pos + sel + HexBox.HorizontalByteCount > max)
                     return true;
                 if (_bpiStart.Index <= pos) {
-                    sel += _hexBox._iHexMaxHBytes;
-                    _hexBox.InternalSelect(pos, sel);
-                    _hexBox.ScrollByteIntoView(pos + sel);
+                    sel += HexBox.HorizontalByteCount;
+                    HexBox.InternalSelect(pos, sel);
+                    HexBox.ScrollByteIntoView(pos + sel);
                 } else {
-                    sel -= _hexBox._iHexMaxHBytes;
+                    sel -= HexBox.HorizontalByteCount;
                     if (sel < 0) {
                         pos = _bpiStart.Index;
                         sel = -sel;
-                    } else pos += _hexBox._iHexMaxHBytes;
+                    } else pos += HexBox.HorizontalByteCount;
                     //sel -= _hexBox._iHexMaxHBytes;
-                    _hexBox.InternalSelect(pos, sel);
-                    _hexBox.ScrollByteIntoView();
+                    HexBox.InternalSelect(pos, sel);
+                    HexBox.ScrollByteIntoView();
                 }
                 return true;
             }
 
-            protected virtual bool PreProcessWmKeyDown_Tab(ref Message m) {
-                if (_hexBox._stringViewVisible && _hexBox._keyInterpreter.GetType() == typeof (KeyInterpreter)) {
-                    _hexBox.ActivateStringKeyInterpreter();
-                    _hexBox.ScrollByteIntoView();
-                    _hexBox.ReleaseSelection();
-                    _hexBox.UpdateCaret();
-                    _hexBox.Invalidate();
+            protected virtual bool PreProcessWmKeyDownTab(ref Message m) {
+                if (HexBox._stringViewVisible && HexBox._keyInterpreter.GetType() == typeof(KeyInterpreter)) {
+                    HexBox.ActivateStringKeyInterpreter();
+                    HexBox.ScrollByteIntoView();
+                    HexBox.ReleaseSelection();
+                    HexBox.UpdateCaret();
+                    HexBox.Invalidate();
                     return true;
                 }
-                if (_hexBox.Parent == null) return true;
-                _hexBox.Parent.SelectNextControl(_hexBox, true, true, true, true);
+                if (HexBox.Parent == null) return true;
+                HexBox.Parent.SelectNextControl(HexBox, true, true, true, true);
                 return true;
             }
 
-            protected virtual bool PreProcessWmKeyDown_ShiftTab(ref Message m) {
-                if (_hexBox._keyInterpreter is StringKeyInterpreter) {
+            protected virtual bool PreProcessWmKeyDownShiftTab(ref Message m) {
+                if (HexBox._keyInterpreter is StringKeyInterpreter) {
                     _shiftDown = false;
-                    _hexBox.ActivateKeyInterpreter();
-                    _hexBox.ScrollByteIntoView();
-                    _hexBox.ReleaseSelection();
-                    _hexBox.UpdateCaret();
-                    _hexBox.Invalidate();
+                    HexBox.ActivateKeyInterpreter();
+                    HexBox.ScrollByteIntoView();
+                    HexBox.ReleaseSelection();
+                    HexBox.UpdateCaret();
+                    HexBox.Invalidate();
                     return true;
                 }
-                if (_hexBox.Parent == null) return true;
-                _hexBox.Parent.SelectNextControl(_hexBox, false, true, true, true);
+                if (HexBox.Parent == null) return true;
+                HexBox.Parent.SelectNextControl(HexBox, false, true, true, true);
                 return true;
             }
 
-            protected virtual bool PreProcessWmKeyDown_Back(ref Message m) {
-                if (!_hexBox._byteProvider.SupportsDeleteBytes())
+            protected virtual bool PreProcessWmKeyDownBack(ref Message m) {
+                if (!HexBox._byteProvider.SupportsDeleteBytes())
                     return true;
-                long pos = _hexBox._bytePos;
-                long sel = _hexBox._selectionLength;
-                int cp = _hexBox._byteCharacterPos;
-                long startDelete = (cp == 0 && sel == 0) ? pos - 1 : pos;
+                var pos = HexBox._bytePos;
+                var sel = HexBox._selectionLength;
+                var cp = HexBox._byteCharacterPos;
+                var startDelete = (cp == 0 && sel == 0) ? pos - 1 : pos;
                 if (startDelete < 0 && sel < 1)
                     return true;
-                long bytesToDelete = (sel > 0) ? sel : 1;
-                _hexBox._byteProvider.DeleteBytes(Math.Max(0, startDelete), bytesToDelete);
-                _hexBox.UpdateScrollSize();
+                var bytesToDelete = (sel > 0) ? sel : 1;
+                HexBox._byteProvider.DeleteBytes(Math.Max(0, startDelete), bytesToDelete);
+                HexBox.UpdateScrollSize();
                 if (sel == 0)
                     PerformPosMoveLeftByte();
-                _hexBox.ReleaseSelection();
-                _hexBox.Invalidate();
+                HexBox.ReleaseSelection();
+                HexBox.Invalidate();
                 return true;
             }
 
-            protected virtual bool PreProcessWmKeyDown_Delete(ref Message m) {
-                if (!_hexBox._byteProvider.SupportsDeleteBytes())
+            protected virtual bool PreProcessWmKeyDownDelete(ref Message m) {
+                if (!HexBox._byteProvider.SupportsDeleteBytes())
                     return true;
-                long pos = _hexBox._bytePos;
-                long sel = _hexBox._selectionLength;
-                if (pos >= _hexBox._byteProvider.Length)
+                var pos = HexBox._bytePos;
+                var sel = HexBox._selectionLength;
+                if (pos >= HexBox._byteProvider.Length)
                     return true;
-                long bytesToDelete = (sel > 0) ? sel : 1;
-                _hexBox._byteProvider.DeleteBytes(pos, bytesToDelete);
-                _hexBox.UpdateScrollSize();
-                _hexBox.ReleaseSelection();
-                _hexBox.Invalidate();
+                var bytesToDelete = (sel > 0) ? sel : 1;
+                HexBox._byteProvider.DeleteBytes(pos, bytesToDelete);
+                HexBox.UpdateScrollSize();
+                HexBox.ReleaseSelection();
+                HexBox.Invalidate();
                 return true;
             }
 
-            protected virtual bool PreProcessWmKeyDown_Home(ref Message m) {
-                long pos = _hexBox._bytePos;
-                int cp = _hexBox._byteCharacterPos;
-                if (pos < 1)
-                    return true;
-                pos = 0;
-                cp = 0;
-                _hexBox.SetPosition(pos, cp);
-                _hexBox.ScrollByteIntoView();
-                _hexBox.UpdateCaret();
-                _hexBox.ReleaseSelection();
+            protected virtual bool PreProcessWmKeyDownHome(ref Message m) {
+                if (HexBox._bytePos < 1) return true;
+                HexBox.SetPosition(0, 0);
+                HexBox.ScrollByteIntoView();
+                HexBox.UpdateCaret();
+                HexBox.ReleaseSelection();
                 return true;
             }
 
-            protected virtual bool PreProcessWmKeyDown_End(ref Message m) {
-                long pos = _hexBox._bytePos;
-                int cp = _hexBox._byteCharacterPos;
-                if (pos >= _hexBox._byteProvider.Length - 1)
+            protected virtual bool PreProcessWmKeyDownEnd(ref Message m) {
+                var length = HexBox._byteProvider.Length;
+                if (HexBox._bytePos >= length - 1)
                     return true;
-                pos = _hexBox._byteProvider.Length;
-                cp = 0;
-                _hexBox.SetPosition(pos, cp);
-                _hexBox.ScrollByteIntoView();
-                _hexBox.UpdateCaret();
-                _hexBox.ReleaseSelection();
+                HexBox.SetPosition(length, 0);
+                HexBox.ScrollByteIntoView();
+                HexBox.UpdateCaret();
+                HexBox.ReleaseSelection();
                 return true;
             }
 
-            protected virtual bool PreProcessWmKeyDown_ShiftShiftKey(ref Message m) {
+            protected virtual bool PreProcessWmKeyDownShiftShiftKey(ref Message m) {
+                //TODO UGHHHH
                 if (_mouseDown)
                     return true;
                 if (_shiftDown)
                     return true;
                 _shiftDown = true;
-                if (_hexBox._selectionLength > 0)
+                if (HexBox._selectionLength > 0)
                     return true;
-                _bpiStart = new BytePositionInfo(_hexBox._bytePos, _hexBox._byteCharacterPos);
+                _bpiStart = new BytePositionInfo(HexBox._bytePos, HexBox._byteCharacterPos);
                 return true;
             }
 
-            protected virtual bool PreProcessWmKeyDown_ControlC(ref Message m) {
-                _hexBox.Copy();
+            protected virtual bool PreProcessWmKeyDownControlC(ref Message m) {
+                HexBox.Copy();
                 return true;
             }
 
-            protected virtual bool PreProcessWmKeyDown_ControlX(ref Message m) {
-                _hexBox.Cut();
+            protected virtual bool PreProcessWmKeyDownControlX(ref Message m) {
+                HexBox.Cut();
                 return true;
             }
 
-            protected virtual bool PreProcessWmKeyDown_ControlV(ref Message m) {
-                _hexBox.Paste();
+            protected virtual bool PreProcessWmKeyDownControlV(ref Message m) {
+                HexBox.Paste();
                 return true;
             }
             #endregion
 
             #region PreProcessWmChar methods
             public virtual bool PreProcessWmChar(ref Message m) {
-                if (Control.ModifierKeys == Keys.Control) return _hexBox.BasePreProcessMessage(ref m);
-                bool sw = _hexBox._byteProvider.SupportsWriteByte();
-                bool si = _hexBox._byteProvider.SupportsInsertBytes();
-                bool sd = _hexBox._byteProvider.SupportsDeleteBytes();
-                long pos = _hexBox._bytePos;
-                long sel = _hexBox._selectionLength;
-                int cp = _hexBox._byteCharacterPos;
+                if (ModifierKeys == Keys.Control) return HexBox.BasePreProcessMessage(ref m);
+                var sw = HexBox._byteProvider.SupportsWriteByte();
+                var si = HexBox._byteProvider.SupportsInsertBytes();
+                var sd = HexBox._byteProvider.SupportsDeleteBytes();
+                var pos = HexBox._bytePos;
+                var sel = HexBox._selectionLength;
+                var cp = HexBox._byteCharacterPos;
                 if (
                     (!sw) ||
-                    (!si && pos == _hexBox._byteProvider.Length)) return _hexBox.BasePreProcessMessage(ref m);
-                char c = (char) m.WParam.ToInt32();
-                if (Uri.IsHexDigit(c)) {
-                    if (RaiseKeyPress(c))
-                        return true;
-                    if (_hexBox.ReadOnly)
-                        return true;
-                    bool isInsertMode = (pos == _hexBox._byteProvider.Length);
-                    // do insert when insertActive = true
-                    if (!isInsertMode && si && _hexBox.InsertActive && cp == 0)
-                        isInsertMode = true;
-                    if (sd && si && sel > 0) {
-                        _hexBox._byteProvider.DeleteBytes(pos, sel);
-                        isInsertMode = true;
-                        cp = 0;
-                        _hexBox.SetPosition(pos, cp);
-                    }
-                    _hexBox.ReleaseSelection();
-                    byte currentByte;
-                    if (isInsertMode)
-                        currentByte = 0;
-                    else
-                        currentByte = _hexBox._byteProvider.ReadByte(pos);
-                    string sCb = currentByte.ToString("X", System.Threading.Thread.CurrentThread.CurrentCulture);
-                    if (sCb.Length == 1)
-                        sCb = "0" + sCb;
-                    string sNewCb = c.ToString();
-                    if (cp == 0)
-                        sNewCb += sCb.Substring(1, 1);
-                    else
-                        sNewCb = sCb.Substring(0, 1) + sNewCb;
-                    byte newcb = byte.Parse(sNewCb, System.Globalization.NumberStyles.AllowHexSpecifier,
-                                            System.Threading.Thread.CurrentThread.CurrentCulture);
-                    if (isInsertMode)
-                        _hexBox._byteProvider.InsertBytes(pos, new byte[] {newcb});
-                    else
-                        _hexBox._byteProvider.WriteByte(pos, newcb);
-                    PerformPosMoveRight();
-                    _hexBox.Invalidate();
-                    return true;
-                } else return _hexBox.BasePreProcessMessage(ref m);
+                    (!si && pos == HexBox._byteProvider.Length)) return HexBox.BasePreProcessMessage(ref m);
+                var c = (char)m.WParam.ToInt32();
+                if (!Uri.IsHexDigit(c)) return HexBox.BasePreProcessMessage(ref m);
+                if (RaiseKeyPress(c) || HexBox.ReadOnly) return true;
+                var isInsertMode = pos == HexBox._byteProvider.Length;
+                // do insert when insertActive = true
+                if (!isInsertMode && si && HexBox.InsertActive && cp == 0)
+                    isInsertMode = true;
+                if (sd && si && sel > 0) {
+                    HexBox._byteProvider.DeleteBytes(pos, sel);
+                    isInsertMode = true;
+                    cp = 0;
+                    HexBox.SetPosition(pos, cp);
+                }
+                HexBox.ReleaseSelection();
+                var currentByte = isInsertMode ? (byte)0 : HexBox._byteProvider.ReadByte(pos);
+                var sCb = currentByte.ToString("X", Thread.CurrentThread.CurrentCulture);
+                if (sCb.Length == 1) sCb = "0" + sCb;
+                var sNewCb = c.ToString();
+                sNewCb += sCb.Substring(cp == 0 ? 1 : 0, 1);
+                var newcb = byte.Parse(sNewCb, NumberStyles.AllowHexSpecifier,
+                                       Thread.CurrentThread.CurrentCulture);
+                if (isInsertMode)
+                    HexBox._byteProvider.InsertBytes(pos, new[] { newcb });
+                else
+                    HexBox._byteProvider.WriteByte(pos, newcb);
+                PerformPosMoveRight();
+                HexBox.Invalidate();
+                return true;
             }
 
             protected bool RaiseKeyPress(char keyChar) {
-                KeyPressEventArgs e = new KeyPressEventArgs(keyChar);
-                _hexBox.OnKeyPress(e);
+                var e = new KeyPressEventArgs(keyChar);
+                HexBox.OnKeyPress(e);
                 return e.Handled;
             }
             #endregion
 
             #region PreProcessWmKeyUp methods
             public virtual bool PreProcessWmKeyUp(ref Message m) {
-                System.Diagnostics.Debug.WriteLine("PreProcessWmKeyUp(ref Message m)", "KeyInterpreter");
-                Keys vc = (Keys) m.WParam.ToInt32();
-                Keys keyData = vc | Control.ModifierKeys;
+                Debug.WriteLine("PreProcessWmKeyUp(ref Message m)", "KeyInterpreter");
+                var keyData = (Keys)m.WParam.ToInt32() | ModifierKeys;
                 switch (keyData) {
                     case Keys.ShiftKey:
                     case Keys.Insert:
@@ -628,33 +613,33 @@ namespace Be.Windows.Forms {
                         _shiftDown = false;
                         return true;
                     case Keys.Insert:
-                        return PreProcessWmKeyUp_Insert(ref m);
+                        return PreProcessWmKeyUpInsert(ref m);
                     default:
-                        return _hexBox.BasePreProcessMessage(ref m);
+                        return HexBox.BasePreProcessMessage(ref m);
                 }
             }
 
-            protected virtual bool PreProcessWmKeyUp_Insert(ref Message m) {
-                _hexBox.InsertActive = !_hexBox.InsertActive;
+            protected virtual bool PreProcessWmKeyUpInsert(ref Message m) {
+                HexBox.InsertActive = !HexBox.InsertActive;
                 return true;
             }
 
-            protected bool RaiseKeyUp(Keys keyData) {
-                KeyEventArgs e = new KeyEventArgs(keyData);
-                _hexBox.OnKeyUp(e);
+            private bool RaiseKeyUp(Keys keyData) {
+                var e = new KeyEventArgs(keyData);
+                HexBox.OnKeyUp(e);
                 return e.Handled;
             }
             #endregion
 
             #region Misc
             protected virtual bool PerformPosMoveLeft() {
-                long pos = _hexBox._bytePos;
-                long sel = _hexBox._selectionLength;
-                int cp = _hexBox._byteCharacterPos;
+                var pos = HexBox._bytePos;
+                var sel = HexBox._selectionLength;
+                var cp = HexBox._byteCharacterPos;
                 if (sel != 0) {
                     cp = 0;
-                    _hexBox.SetPosition(pos, cp);
-                    _hexBox.ReleaseSelection();
+                    HexBox.SetPosition(pos, cp);
+                    HexBox.ReleaseSelection();
                 } else {
                     if (pos == 0 && cp == 0)
                         return true;
@@ -663,75 +648,70 @@ namespace Be.Windows.Forms {
                         pos = Math.Max(0, pos - 1);
                         cp++;
                     }
-                    _hexBox.SetPosition(pos, cp);
-                    if (pos < _hexBox._startByte) _hexBox.PerformScrollLineUp();
-                    _hexBox.UpdateCaret();
-                    _hexBox.Invalidate();
+                    HexBox.SetPosition(pos, cp);
+                    if (pos < HexBox._startByte) HexBox.PerformScrollLineUp();
+                    HexBox.UpdateCaret();
+                    HexBox.Invalidate();
                 }
-                _hexBox.ScrollByteIntoView();
+                HexBox.ScrollByteIntoView();
                 return true;
             }
 
             protected virtual bool PerformPosMoveRight() {
-                long pos = _hexBox._bytePos;
-                int cp = _hexBox._byteCharacterPos;
-                long sel = _hexBox._selectionLength;
+                var pos = HexBox._bytePos;
+                var cp = HexBox._byteCharacterPos;
+                var sel = HexBox._selectionLength;
                 if (sel != 0) {
                     pos += sel;
                     cp = 0;
-                    _hexBox.SetPosition(pos, cp);
-                    _hexBox.ReleaseSelection();
-                } else if (!(pos == _hexBox._byteProvider.Length && cp == 0)) {
+                    HexBox.SetPosition(pos, cp);
+                    HexBox.ReleaseSelection();
+                } else if (!(pos == HexBox._byteProvider.Length && cp == 0)) {
                     if (cp > 0) {
-                        pos = Math.Min(_hexBox._byteProvider.Length, pos + 1);
+                        pos = Math.Min(HexBox._byteProvider.Length, pos + 1);
                         cp = 0;
                     } else cp++;
-                    _hexBox.SetPosition(pos, cp);
-                    if (pos > _hexBox._endByte - 1) _hexBox.PerformScrollLineDown();
-                    _hexBox.UpdateCaret();
-                    _hexBox.Invalidate();
+                    HexBox.SetPosition(pos, cp);
+                    if (pos > HexBox._endByte - 1) HexBox.PerformScrollLineDown();
+                    HexBox.UpdateCaret();
+                    HexBox.Invalidate();
                 }
-                _hexBox.ScrollByteIntoView();
+                HexBox.ScrollByteIntoView();
                 return true;
             }
 
             protected virtual bool PerformPosMoveLeftByte() {
-                long pos = _hexBox._bytePos;
-                int cp = _hexBox._byteCharacterPos;
-                if (pos == 0)
-                    return true;
+                var pos = HexBox._bytePos;
+                if (pos == 0) return true;
                 pos = Math.Max(0, pos - 1);
-                cp = 0;
-                _hexBox.SetPosition(pos, cp);
-                if (pos < _hexBox._startByte) _hexBox.PerformScrollLineUp();
-                _hexBox.UpdateCaret();
-                _hexBox.ScrollByteIntoView();
-                _hexBox.Invalidate();
+                HexBox.SetPosition(pos, 0);
+                if (pos < HexBox._startByte) HexBox.PerformScrollLineUp();
+                HexBox.UpdateCaret();
+                HexBox.ScrollByteIntoView();
+                HexBox.Invalidate();
                 return true;
             }
 
             protected virtual bool PerformPosMoveRightByte() {
-                long pos = _hexBox._bytePos;
-                int cp = _hexBox._byteCharacterPos;
-                if (pos == _hexBox._byteProvider.Length)
+                var pos = HexBox._bytePos;
+                if (pos == HexBox._byteProvider.Length)
                     return true;
-                pos = Math.Min(_hexBox._byteProvider.Length, pos + 1);
-                cp = 0;
-                _hexBox.SetPosition(pos, cp);
-                if (pos > _hexBox._endByte - 1) _hexBox.PerformScrollLineDown();
-                _hexBox.UpdateCaret();
-                _hexBox.ScrollByteIntoView();
-                _hexBox.Invalidate();
+                pos = Math.Min(HexBox._byteProvider.Length, pos + 1);
+                HexBox.SetPosition(pos, 0);
+                if (pos > HexBox._endByte - 1) HexBox.PerformScrollLineDown();
+                HexBox.UpdateCaret();
+                HexBox.ScrollByteIntoView();
+                HexBox.Invalidate();
                 return true;
             }
 
             public virtual PointF GetCaretPointF(long byteIndex) {
-                System.Diagnostics.Debug.WriteLine("GetCaretPointF()", "KeyInterpreter");
-                return _hexBox.GetBytePointF(byteIndex);
+                Debug.WriteLine("GetCaretPointF()", "KeyInterpreter");
+                return HexBox.GetBytePointF(byteIndex);
             }
 
             protected virtual BytePositionInfo GetBytePositionInfo(Point p) {
-                return _hexBox.GetHexBytePositionInfo(p);
+                return HexBox.GetHexBytePositionInfo(p);
             }
             #endregion
         }
@@ -745,14 +725,14 @@ namespace Be.Windows.Forms {
             #region Ctors
             public StringKeyInterpreter(HexBox hexBox)
                 : base(hexBox) {
-                _hexBox._byteCharacterPos = 0;
+                HexBox._byteCharacterPos = 0;
             }
             #endregion
 
             #region PreProcessWmKeyDown methods
             public override bool PreProcessWmKeyDown(ref Message m) {
-                Keys vc = (Keys) m.WParam.ToInt32();
-                Keys keyData = vc | Control.ModifierKeys;
+                var vc = (Keys)m.WParam.ToInt32();
+                var keyData = vc | ModifierKeys;
                 switch (keyData) {
                     case Keys.Tab | Keys.Shift:
                     case Keys.Tab:
@@ -762,70 +742,68 @@ namespace Be.Windows.Forms {
                 }
                 switch (keyData) {
                     case Keys.Tab | Keys.Shift:
-                        return PreProcessWmKeyDown_ShiftTab(ref m);
+                        return PreProcessWmKeyDownShiftTab(ref m);
                     case Keys.Tab:
-                        return PreProcessWmKeyDown_Tab(ref m);
+                        return PreProcessWmKeyDownTab(ref m);
                     default:
                         return base.PreProcessWmKeyDown(ref m);
                 }
             }
 
-            protected override bool PreProcessWmKeyDown_Left(ref Message m) {
+            protected override bool PreProcessWmKeyDownLeft(ref Message m) {
                 return PerformPosMoveLeftByte();
             }
 
-            protected override bool PreProcessWmKeyDown_Right(ref Message m) {
+            protected override bool PreProcessWmKeyDownRight(ref Message m) {
                 return PerformPosMoveRightByte();
             }
             #endregion
 
             #region PreProcessWmChar methods
             public override bool PreProcessWmChar(ref Message m) {
-                if (Control.ModifierKeys == Keys.Control) return _hexBox.BasePreProcessMessage(ref m);
-                bool sw = _hexBox._byteProvider.SupportsWriteByte();
-                bool si = _hexBox._byteProvider.SupportsInsertBytes();
-                bool sd = _hexBox._byteProvider.SupportsDeleteBytes();
-                long pos = _hexBox._bytePos;
-                long sel = _hexBox._selectionLength;
-                int cp = _hexBox._byteCharacterPos;
+                if (ModifierKeys == Keys.Control) return HexBox.BasePreProcessMessage(ref m);
+                var sw = HexBox._byteProvider.SupportsWriteByte();
+                var si = HexBox._byteProvider.SupportsInsertBytes();
+                var sd = HexBox._byteProvider.SupportsDeleteBytes();
+                var pos = HexBox._bytePos;
+                var sel = HexBox._selectionLength;
                 if (
-                    (!sw && pos != _hexBox._byteProvider.Length) ||
-                    (!si && pos == _hexBox._byteProvider.Length)) return _hexBox.BasePreProcessMessage(ref m);
-                char c = (char) m.WParam.ToInt32();
+                    (!sw && pos != HexBox._byteProvider.Length) ||
+                    (!si && pos == HexBox._byteProvider.Length)) return HexBox.BasePreProcessMessage(ref m);
+                var c = (char)m.WParam.ToInt32();
                 if (RaiseKeyPress(c))
                     return true;
-                if (_hexBox.ReadOnly)
+                if (HexBox.ReadOnly)
                     return true;
-                bool isInsertMode = (pos == _hexBox._byteProvider.Length);
+                var isInsertMode = (pos == HexBox._byteProvider.Length);
                 // do insert when insertActive = true
-                if (!isInsertMode && si && _hexBox.InsertActive)
+                if (!isInsertMode && si && HexBox.InsertActive)
                     isInsertMode = true;
                 if (sd && si && sel > 0) {
-                    _hexBox._byteProvider.DeleteBytes(pos, sel);
+                    HexBox._byteProvider.DeleteBytes(pos, sel);
                     isInsertMode = true;
-                    cp = 0;
-                    _hexBox.SetPosition(pos, cp);
+                    HexBox.SetPosition(pos, 0);
                 }
-                _hexBox.ReleaseSelection();
+                HexBox.ReleaseSelection();
                 if (isInsertMode)
-                    _hexBox._byteProvider.InsertBytes(pos, new byte[] {(byte) c});
+                    HexBox._byteProvider.InsertBytes(pos, new[] { (byte)c });
                 else
-                    _hexBox._byteProvider.WriteByte(pos, (byte) c);
+                    HexBox._byteProvider.WriteByte(pos, (byte)c);
                 PerformPosMoveRightByte();
-                _hexBox.Invalidate();
+                HexBox.Invalidate();
                 return true;
             }
             #endregion
 
             #region Misc
             public override PointF GetCaretPointF(long byteIndex) {
-                System.Diagnostics.Debug.WriteLine("GetCaretPointF()", "StringKeyInterpreter");
-                Point gp = _hexBox.GetGridBytePoint(byteIndex);
-                return _hexBox.GetByteStringPointF(gp);
+                Debug.WriteLine("GetCaretPointF()", "StringKeyInterpreter");
+                var gp = HexBox.GetGridBytePoint(byteIndex);
+                return HexBox.GetByteStringPointF(gp);
             }
 
             protected override BytePositionInfo GetBytePositionInfo(Point p) {
-                return _hexBox.GetStringBytePositionInfo(p);
+                return HexBox.GetStringBytePositionInfo(p);
             }
             #endregion
         }
@@ -855,22 +833,12 @@ namespace Be.Windows.Forms {
         /// <summary>
         ///   Contains string format information for text drawing
         /// </summary>
-        private StringFormat _stringFormat;
+        private readonly StringFormat _stringFormat;
 
         /// <summary>
         ///   Contains the width and height of a single char
         /// </summary>
         private SizeF _charSize;
-
-        /// <summary>
-        ///   Contains the maximum of visible horizontal bytes
-        /// </summary>
-        private int _iHexMaxHBytes;
-
-        /// <summary>
-        ///   Contains the maximum of visible vertical bytes
-        /// </summary>
-        private int _iHexMaxVBytes;
 
         /// <summary>
         ///   Contains the maximum of visible bytes.
@@ -895,12 +863,12 @@ namespace Be.Windows.Forms {
         /// <summary>
         ///   Contains a vertical scroll
         /// </summary>
-        private VScrollBar _vScrollBar;
+        private readonly VScrollBar _vScrollBar;
 
         /// <summary>
         ///   Contains a timer for thumbtrack scrolling
         /// </summary>
-        private Timer _thumbTrackTimer = new Timer();
+        private readonly Timer _thumbTrackTimer = new Timer();
 
         /// <summary>
         ///   Contains the thumbtrack scrolling position
@@ -996,11 +964,6 @@ namespace Be.Windows.Forms {
         ///   Contains true, if the find (Find method) should be aborted.
         /// </summary>
         private bool _abortFind;
-
-        /// <summary>
-        ///   Contains a value of the current finding position.
-        /// </summary>
-        private long _findingPos;
 
         /// <summary>
         ///   Contains a state value about Insert or Write mode. When this value is true and the ByteProvider SupportsInsert is true bytes are inserted instead of overridden.
@@ -1123,25 +1086,27 @@ namespace Be.Windows.Forms {
         ///   Initializes a new instance of a HexBox class.
         /// </summary>
         public HexBox() {
-            this._vScrollBar = new VScrollBar();
-            this._vScrollBar.Scroll += new ScrollEventHandler(_vScrollBar_Scroll);
-            this._builtInContextMenu = new BuiltInContextMenu(this);
+            _vScrollBar = new VScrollBar();
+            _vScrollBar.Scroll += VScrollBarScroll;
+            _builtInContextMenu = new BuiltInContextMenu(this);
             BackColor = Color.White;
-            Font = new Font("Courier New", 9F, FontStyle.Regular, GraphicsUnit.Point, ((byte) (0)));
-            _stringFormat = new StringFormat(StringFormat.GenericTypographic);
-            _stringFormat.FormatFlags = StringFormatFlags.MeasureTrailingSpaces;
+            Font = new Font("Courier New", 9F, FontStyle.Regular, GraphicsUnit.Point, ((0)));
+            _stringFormat =
+                new StringFormat(StringFormat.GenericTypographic) {
+                    FormatFlags = StringFormatFlags. MeasureTrailingSpaces
+                };
             ActivateEmptyKeyInterpreter();
             SetStyle(ControlStyles.UserPaint, true);
             SetStyle(ControlStyles.DoubleBuffer, true);
             SetStyle(ControlStyles.AllPaintingInWmPaint, true);
             SetStyle(ControlStyles.ResizeRedraw, true);
             _thumbTrackTimer.Interval = 50;
-            _thumbTrackTimer.Tick += new EventHandler(PerformScrollThumbTrack);
+            _thumbTrackTimer.Tick += PerformScrollThumbTrack;
         }
         #endregion
 
         #region Scroll methods
-        private void _vScrollBar_Scroll(object sender, ScrollEventArgs e) {
+        private void VScrollBarScroll(object sender, ScrollEventArgs e) {
             switch (e.Type) {
                 case ScrollEventType.Last:
                     break;
@@ -1160,7 +1125,7 @@ namespace Be.Windows.Forms {
                     PerformScrollPageUp();
                     break;
                 case ScrollEventType.ThumbPosition:
-                    long lPos = FromScrollPos(e.NewValue);
+                    var lPos = FromScrollPos(e.NewValue);
                     PerformScrollThumpPosition(lPos);
                     break;
                 case ScrollEventType.ThumbTrack:
@@ -1168,7 +1133,7 @@ namespace Be.Windows.Forms {
                     if (_thumbTrackTimer.Enabled) // stop old timer
                         _thumbTrackTimer.Enabled = false;
                     // perform scroll immediately only if last refresh is very old
-                    int currentThumbTrack = System.Environment.TickCount;
+                    var currentThumbTrack = Environment.TickCount;
                     if (currentThumbTrack - _lastThumbtrack > THUMPTRACKDELAY) {
                         PerformScrollThumbTrack(null, null);
                         _lastThumbtrack = currentThumbTrack;
@@ -1196,14 +1161,14 @@ namespace Be.Windows.Forms {
         }
 
         private void UpdateScrollSize() {
-            System.Diagnostics.Debug.WriteLine("UpdateScrollSize()", "HexBox");
+            Debug.WriteLine("UpdateScrollSize()", "HexBox");
             // calc scroll bar info
-            if (VScrollBarVisible && _byteProvider != null && _byteProvider.Length > 0 && _iHexMaxHBytes != 0) {
-                long scrollmax =
+            if (VScrollBarVisible && _byteProvider != null && _byteProvider.Length > 0 && HorizontalByteCount != 0) {
+                var scrollmax =
                     (long)
-                    Math.Ceiling((double) (_byteProvider.Length + 1)/(double) _iHexMaxHBytes - (double) _iHexMaxVBytes);
+                    Math.Ceiling((_byteProvider.Length + 1) / (double)HorizontalByteCount - VerticalByteCount);
                 scrollmax = Math.Max(0, scrollmax);
-                long scrollpos = _startByte/_iHexMaxHBytes;
+                var scrollpos = _startByte / HorizontalByteCount;
                 if (scrollmax < _scrollVmax) /* Data size has been decreased. */
                     if (_scrollVpos == _scrollVmax)
                         /* Scroll one line up if we at bottom. */
@@ -1224,8 +1189,8 @@ namespace Be.Windows.Forms {
         }
 
         private void UpdateVScroll() {
-            System.Diagnostics.Debug.WriteLine("UpdateVScroll()", "HexBox");
-            int max = ToScrollMax(_scrollVmax);
+            Debug.WriteLine("UpdateVScroll()", "HexBox");
+            var max = ToScrollMax(_scrollVmax);
             if (max > 0) {
                 _vScrollBar.Minimum = 0;
                 _vScrollBar.Maximum = max;
@@ -1235,34 +1200,23 @@ namespace Be.Windows.Forms {
         }
 
         private int ToScrollPos(long value) {
-            int max = 65535;
-            if (_scrollVmax < max)
-                return (int) value;
-            else {
-                double valperc = (double) value/(double) _scrollVmax*(double) 100;
-                int res = (int) Math.Floor((double) max/(double) 100*valperc);
-                res = (int) Math.Max(_scrollVmin, res);
-                res = (int) Math.Min(_scrollVmax, res);
-                return res;
-            }
+            if (_scrollVmax < int.MaxValue)
+                return (int)value;
+            var valperc = (double)value / _scrollVmax * 100;
+            var res = (int)Math.Floor((double)int.MaxValue / 100 * valperc); //TODO ...
+            res = (int)Math.Max(_scrollVmin, res);
+            res = (int)Math.Min(_scrollVmax, res);
+            return res;
         }
 
         private long FromScrollPos(int value) {
-            int max = 65535;
-            if (_scrollVmax < max) return (long) value;
-            else {
-                double valperc = (double) value/(double) max*(double) 100;
-                long res = (int) Math.Floor((double) _scrollVmax/(double) 100*valperc);
-                return res;
-            }
+            if (_scrollVmax < int.MaxValue) return value;
+            var valperc = (double)value / int.MaxValue * 100;
+            return (long)Math.Floor((double)_scrollVmax / 100 * valperc);
         }
 
-        private int ToScrollMax(long value) {
-            long max = 65535;
-            if (value > max)
-                return (int) max;
-            else
-                return (int) value;
+        private static int ToScrollMax(long value) {
+            return Math.Max((int)value, int.MaxValue);
         }
 
         private void PerformScrollToLine(long pos) {
@@ -1284,24 +1238,24 @@ namespace Be.Windows.Forms {
         }
 
         private void PerformScrollLineDown() {
-            this.PerformScrollLines(1);
+            PerformScrollLines(1);
         }
 
         private void PerformScrollLineUp() {
-            this.PerformScrollLines(-1);
+            PerformScrollLines(-1);
         }
 
         private void PerformScrollPageDown() {
-            this.PerformScrollLines(_iHexMaxVBytes);
+            PerformScrollLines(VerticalByteCount);
         }
 
         private void PerformScrollPageUp() {
-            this.PerformScrollLines(-_iHexMaxVBytes);
+            PerformScrollLines(-VerticalByteCount);
         }
 
         private void PerformScrollThumpPosition(long pos) {
             // Bug fix: Scroll to end, do not scroll to end
-            int difference = (_scrollVmax > 65535) ? 10 : 9;
+            var difference = (_scrollVmax > 65535) ? 10 : 9;
             if (ToScrollPos(pos) == ToScrollMax(_scrollVmax) - difference)
                 pos = _scrollVmax;
             // End Bug fix
@@ -1312,7 +1266,7 @@ namespace Be.Windows.Forms {
         ///   Scrolls the selection start byte into view
         /// </summary>
         public void ScrollByteIntoView() {
-            System.Diagnostics.Debug.WriteLine("ScrollByteIntoView()", "HexBox");
+            Debug.WriteLine("ScrollByteIntoView()", "HexBox");
             ScrollByteIntoView(_bytePos);
         }
 
@@ -1321,15 +1275,15 @@ namespace Be.Windows.Forms {
         /// </summary>
         /// <param name = "index">the index of the byte</param>
         public void ScrollByteIntoView(long index) {
-            System.Diagnostics.Debug.WriteLine("ScrollByteIntoView(long index)", "HexBox");
+            Debug.WriteLine("ScrollByteIntoView(long index)", "HexBox");
             if (_byteProvider == null || _keyInterpreter == null)
                 return;
             if (index < _startByte) {
-                long line = (long) Math.Floor((double) index/(double) _iHexMaxHBytes);
+                var line = (long)Math.Floor(index / (double)HorizontalByteCount);
                 PerformScrollThumpPosition(line);
             } else if (index > _endByte) {
-                long line = (long) Math.Floor((double) index/(double) _iHexMaxHBytes);
-                line -= _iHexMaxVBytes - 1;
+                var line = (long)Math.Floor(index / (double)HorizontalByteCount);
+                line -= VerticalByteCount - 1;
                 PerformScrollThumpPosition(line);
             }
         }
@@ -1337,7 +1291,7 @@ namespace Be.Windows.Forms {
 
         #region Selection methods
         private void ReleaseSelection() {
-            System.Diagnostics.Debug.WriteLine("ReleaseSelection()", "HexBox");
+            Debug.WriteLine("ReleaseSelection()", "HexBox");
             if (_selectionLength == 0)
                 return;
             _selectionLength = 0;
@@ -1352,21 +1306,17 @@ namespace Be.Windows.Forms {
         /// <summary>
         ///   Returns true if Select method could be invoked.
         /// </summary>
-        public bool CanSelect() {
-            if (!this.Enabled)
-                return false;
-            if (_byteProvider == null)
-                return false;
-            return true;
+        public new bool CanSelect() {
+            return _byteProvider != null && Enabled;
         }
 
         /// <summary>
         ///   Selects all bytes.
         /// </summary>
         public void SelectAll() {
-            if (this.ByteProvider == null)
+            if (ByteProvider == null)
                 return;
-            this.Select(0, this.ByteProvider.Length);
+            Select(0, ByteProvider.Length);
         }
 
         /// <summary>
@@ -1375,24 +1325,21 @@ namespace Be.Windows.Forms {
         /// <param name = "start">the start index of the selection</param>
         /// <param name = "length">the length of the selection</param>
         public void Select(long start, long length) {
-            if (this.ByteProvider == null)
+            if (ByteProvider == null)
                 return;
-            if (!this.Enabled)
+            if (!Enabled)
                 return;
             InternalSelect(start, length);
             ScrollByteIntoView();
         }
 
         private void InternalSelect(long start, long length) {
-            long pos = start;
-            long sel = length;
-            int cp = 0;
-            if (sel > 0 && _caretVisible)
+            if (length > 0 && _caretVisible)
                 DestroyCaret();
-            else if (sel == 0 && !_caretVisible)
+            else if (length == 0 && !_caretVisible)
                 CreateCaret();
-            SetPosition(pos, cp);
-            SetSelectionLength(sel);
+            SetPosition(start, 0);
+            SetSelectionLength(length);
             UpdateCaret();
             Invalidate();
         }
@@ -1435,12 +1382,12 @@ namespace Be.Windows.Forms {
 
         #region Caret methods
         private void CreateCaret() {
-            if (_byteProvider == null || _keyInterpreter == null || _caretVisible || !this.Focused)
+            if (_byteProvider == null || _keyInterpreter == null || _caretVisible || !Focused)
                 return;
-            System.Diagnostics.Debug.WriteLine("CreateCaret()", "HexBox");
+            Debug.WriteLine("CreateCaret()", "HexBox");
             // define the caret width depending on InsertActive mode
-            int caretWidth = (this.InsertActive) ? 1 : (int) _charSize.Width;
-            int caretHeight = (int) _charSize.Height;
+            var caretWidth = (InsertActive) ? 1 : (int)_charSize.Width;
+            var caretHeight = (int)_charSize.Height;
             NativeMethods.CreateCaret(Handle, IntPtr.Zero, caretWidth, caretHeight);
             UpdateCaret();
             NativeMethods.ShowCaret(Handle);
@@ -1450,29 +1397,29 @@ namespace Be.Windows.Forms {
         private void UpdateCaret() {
             if (_byteProvider == null || _keyInterpreter == null)
                 return;
-            System.Diagnostics.Debug.WriteLine("UpdateCaret()", "HexBox");
-            long byteIndex = _bytePos - _startByte;
-            PointF p = _keyInterpreter.GetCaretPointF(byteIndex);
-            p.X += _byteCharacterPos*_charSize.Width;
-            NativeMethods.SetCaretPos((int) p.X, (int) p.Y);
+            Debug.WriteLine("UpdateCaret()", "HexBox");
+            var byteIndex = _bytePos - _startByte;
+            var p = _keyInterpreter.GetCaretPointF(byteIndex);
+            p.X += _byteCharacterPos * _charSize.Width;
+            NativeMethods.SetCaretPos((int)p.X, (int)p.Y);
         }
 
         private void DestroyCaret() {
             if (!_caretVisible)
                 return;
-            System.Diagnostics.Debug.WriteLine("DestroyCaret()", "HexBox");
+            Debug.WriteLine("DestroyCaret()", "HexBox");
             NativeMethods.DestroyCaret();
             _caretVisible = false;
         }
 
         private void SetCaretPosition(Point p) {
-            System.Diagnostics.Debug.WriteLine("SetCaretPosition()", "HexBox");
+            Debug.WriteLine("SetCaretPosition()", "HexBox");
             if (_byteProvider == null || _keyInterpreter == null)
                 return;
-            long pos = _bytePos;
-            int cp = _byteCharacterPos;
+            long pos;
+            int cp;
             if (_recHex.Contains(p)) {
-                BytePositionInfo bpi = GetHexBytePositionInfo(p);
+                var bpi = GetHexBytePositionInfo(p);
                 pos = bpi.Index;
                 cp = bpi.CharacterPosition;
                 SetPosition(pos, cp);
@@ -1480,7 +1427,7 @@ namespace Be.Windows.Forms {
                 UpdateCaret();
                 Invalidate();
             } else if (_recStringView.Contains(p)) {
-                BytePositionInfo bpi = GetStringBytePositionInfo(p);
+                var bpi = GetStringBytePositionInfo(p);
                 pos = bpi.Index;
                 cp = bpi.CharacterPosition;
                 SetPosition(pos, cp);
@@ -1491,45 +1438,33 @@ namespace Be.Windows.Forms {
         }
 
         private BytePositionInfo GetHexBytePositionInfo(Point p) {
-            System.Diagnostics.Debug.WriteLine("GetHexBytePositionInfo()", "HexBox");
-            long bytePos;
-            int byteCharaterPos;
-            float x = ((float) (p.X - _recHex.X)/_charSize.Width);
-            float y = ((float) (p.Y - _recHex.Y)/_charSize.Height);
-            int iX = (int) x;
-            int iY = (int) y;
-            int hPos = (iX/2); //TODO MOUSE HERE
-            if (hPos > 0 && (hPos + 1)%5 == 0) //If you click in the space
+            Debug.WriteLine("GetHexBytePositionInfo()", "HexBox");
+            var x = (int)((p.X - _recHex.X) / _charSize.Width);
+            var y = (int)((p.Y - _recHex.Y) / _charSize.Height);
+            var hPos = (x / 2); //TODO MOUSE HERE
+            if (hPos > 0 && (hPos + 1) % 5 == 0) //If you click in the space
             {
                 hPos++; //Select Next Byte
-                iX = 0; //Select the 1st digit
+                x = 0; //Select the 1st digit
             }
-            hPos = hPos - hPos/5; //Adjust for the spacing
-            bytePos = Math.Min(_byteProvider.Length,
-                               _startByte + (_iHexMaxHBytes*(iY + 1) - _iHexMaxHBytes) + hPos);
-            byteCharaterPos = (iX%2);
+            hPos = hPos - hPos / 5; //Adjust for the spacing
+            var bytePos = Math.Min(_byteProvider.Length,
+                                   _startByte + (HorizontalByteCount * (y + 1) - HorizontalByteCount) + hPos);
+            var byteCharacterPos = (x % 2);
             if (bytePos == _byteProvider.Length)
-                byteCharaterPos = 0;
-            if (bytePos < 0)
-                return new BytePositionInfo(0, 0);
-            return new BytePositionInfo(bytePos, byteCharaterPos);
+                byteCharacterPos = 0;
+            return bytePos < 0
+                       ? new BytePositionInfo(0, 0)
+                       : new BytePositionInfo(bytePos, byteCharacterPos);
         }
 
         private BytePositionInfo GetStringBytePositionInfo(Point p) {
-            System.Diagnostics.Debug.WriteLine("GetStringBytePositionInfo()", "HexBox");
-            long bytePos;
-            int byteCharacterPos;
-            float x = ((float) (p.X - _recStringView.X)/_charSize.Width);
-            float y = ((float) (p.Y - _recStringView.Y)/_charSize.Height);
-            int iX = (int) x;
-            int iY = (int) y;
-            int hPos = iX + 1;
-            bytePos = Math.Min(_byteProvider.Length,
-                               _startByte + (_iHexMaxHBytes*(iY + 1) - _iHexMaxHBytes) + hPos - 1);
-            byteCharacterPos = 0;
-            if (bytePos < 0)
-                return new BytePositionInfo(0, 0);
-            return new BytePositionInfo(bytePos, byteCharacterPos);
+            Debug.WriteLine("GetStringBytePositionInfo()", "HexBox");
+            var x = (int)((p.X - _recStringView.X) / _charSize.Width);
+            var y = (int)((p.Y - _recStringView.Y) / _charSize.Height);
+            var bytePos = Math.Min(_byteProvider.Length,
+                                   _startByte + (HorizontalByteCount * (y + 1) - HorizontalByteCount) + x);
+            return new BytePositionInfo(Math.Min(bytePos, 0), 0);
         }
         #endregion
 
@@ -1543,11 +1478,11 @@ namespace Be.Windows.Forms {
          SecurityPermission(SecurityAction.InheritanceDemand, UnmanagedCode = true)]
         public override bool PreProcessMessage(ref Message m) {
             switch (m.Msg) {
-                case NativeMethods.WM_KEYDOWN:
+                case NativeMethods.WMKeydown:
                     return _keyInterpreter.PreProcessWmKeyDown(ref m);
-                case NativeMethods.WM_CHAR:
+                case NativeMethods.WMChar:
                     return _keyInterpreter.PreProcessWmChar(ref m);
-                case NativeMethods.WM_KEYUP:
+                case NativeMethods.WMKeyup:
                     return _keyInterpreter.PreProcessWmKeyUp(ref m);
                 default:
                     return base.PreProcessMessage(ref m);
@@ -1569,28 +1504,27 @@ namespace Be.Windows.Forms {
         ///   -1 if there is no match
         ///   -2 if Find was aborted.</returns>
         public long Find(byte[] bytes, long startIndex) {
-            int match = 0;
-            int bytesLength = bytes.Length;
+            var match = 0;
+            var bytesLength = bytes.Length;
             _abortFind = false;
-            for (long pos = startIndex; pos < _byteProvider.Length; pos++) {
+            for (var pos = startIndex; pos < _byteProvider.Length; pos++) {
                 if (_abortFind)
                     return -2;
-                if (pos%1000 == 0) // for performance reasons: DoEvents only 1 times per 1000 loops
+                if (pos % 1000 == 0) // for performance reasons: DoEvents only 1 times per 1000 loops
                     Application.DoEvents();
                 if (_byteProvider.ReadByte(pos) != bytes[match]) {
                     pos -= match;
                     match = 0;
-                    _findingPos = pos;
+                    CurrentFindingPosition = pos;
                     continue;
                 }
                 match++;
-                if (match == bytesLength) {
-                    long bytePos = pos - bytesLength + 1;
-                    Select(bytePos, bytesLength);
-                    ScrollByteIntoView(_bytePos + _selectionLength);
-                    ScrollByteIntoView(_bytePos);
-                    return bytePos;
-                }
+                if (match != bytesLength) continue;
+                var bytePos = pos - bytesLength + 1;
+                Select(bytePos, bytesLength);
+                ScrollByteIntoView(_bytePos + _selectionLength);
+                ScrollByteIntoView(_bytePos);
+                return bytePos;
             }
             return -1;
         }
@@ -1606,18 +1540,16 @@ namespace Be.Windows.Forms {
         ///   Gets a value that indicates the current position during Find method execution.
         /// </summary>
         [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public long CurrentFindingPosition {
-            get { return _findingPos; }
-        }
+        public long CurrentFindingPosition { get; private set; }
         #endregion
 
         #region Copy, Cut and Paste methods
         private byte[] GetCopyData() {
             if (!CanCopy()) return new byte[0];
             // put bytes into buffer
-            byte[] buffer = new byte[_selectionLength];
-            int id = -1;
-            for (long i = _bytePos; i < _bytePos + _selectionLength; i++) {
+            var buffer = new byte[_selectionLength];
+            var id = -1;
+            for (var i = _bytePos; i < _bytePos + _selectionLength; i++) {
                 id++;
                 buffer[id] = _byteProvider.ReadByte(i);
             }
@@ -1630,13 +1562,13 @@ namespace Be.Windows.Forms {
         public void Copy() {
             if (!CanCopy()) return;
             // put bytes into buffer
-            byte[] buffer = GetCopyData();
-            DataObject da = new DataObject();
+            var buffer = GetCopyData();
+            var da = new DataObject();
             // set string buffer clipbard data
-            string sBuffer = System.Text.Encoding.ASCII.GetString(buffer, 0, buffer.Length);
-            da.SetData(typeof (string), sBuffer);
+            var sBuffer = Encoding.ASCII.GetString(buffer, 0, buffer.Length);
+            da.SetData(typeof(string), sBuffer);
             //set memorystream (BinaryData) clipboard data
-            System.IO.MemoryStream ms = new System.IO.MemoryStream(buffer, 0, buffer.Length, false, true);
+            var ms = new MemoryStream(buffer, 0, buffer.Length, false, true);
             da.SetData("BinaryData", ms);
             Clipboard.SetDataObject(da, true);
             UpdateCaret();
@@ -1649,9 +1581,7 @@ namespace Be.Windows.Forms {
         ///   Return true if Copy method could be invoked.
         /// </summary>
         public bool CanCopy() {
-            if (_selectionLength < 1 || _byteProvider == null)
-                return false;
-            return true;
+            return _selectionLength >= 1 && _byteProvider != null;
         }
 
         /// <summary>
@@ -1673,13 +1603,11 @@ namespace Be.Windows.Forms {
         ///   Return true if Cut method could be invoked.
         /// </summary>
         public bool CanCut() {
-            if (ReadOnly || !this.Enabled)
+            if (ReadOnly || !Enabled)
                 return false;
             if (_byteProvider == null)
                 return false;
-            if (_selectionLength < 1 || !_byteProvider.SupportsDeleteBytes())
-                return false;
-            return true;
+            return _selectionLength >= 1 && _byteProvider.SupportsDeleteBytes();
         }
 
         /// <summary>
@@ -1689,15 +1617,16 @@ namespace Be.Windows.Forms {
             if (!CanPaste()) return;
             if (_selectionLength > 0)
                 _byteProvider.DeleteBytes(_bytePos, _selectionLength);
-            byte[] buffer = null;
-            IDataObject da = Clipboard.GetDataObject();
+            byte[] buffer;
+            var da = Clipboard.GetDataObject();
+            Debug.Assert(da != null);
             if (da.GetDataPresent("BinaryData")) {
-                System.IO.MemoryStream ms = (System.IO.MemoryStream) da.GetData("BinaryData");
+                var ms = (MemoryStream)da.GetData("BinaryData");
                 buffer = new byte[ms.Length];
                 ms.Read(buffer, 0, buffer.Length);
-            } else if (da.GetDataPresent(typeof (string))) {
-                string sBuffer = (string) da.GetData(typeof (string));
-                buffer = System.Text.Encoding.ASCII.GetBytes(sBuffer);
+            } else if (da.GetDataPresent(typeof(string))) {
+                var sBuffer = (string)da.GetData(typeof(string));
+                buffer = Encoding.ASCII.GetBytes(sBuffer);
             } else return;
             _byteProvider.InsertBytes(_bytePos, buffer);
             SetPosition(_bytePos + buffer.Length, 0);
@@ -1711,18 +1640,14 @@ namespace Be.Windows.Forms {
         ///   Return true if Paste method could be invoked.
         /// </summary>
         public bool CanPaste() {
-            if (ReadOnly || !this.Enabled) return false;
+            if (ReadOnly || !Enabled) return false;
             if (_byteProvider == null || !_byteProvider.SupportsInsertBytes())
                 return false;
             if (!_byteProvider.SupportsDeleteBytes() && _selectionLength > 0)
                 return false;
-            IDataObject da = Clipboard.GetDataObject();
-            if (da.GetDataPresent("BinaryData"))
-                return true;
-            else if (da.GetDataPresent(typeof (string)))
-                return true;
-            else
-                return false;
+            var da = Clipboard.GetDataObject();
+            Debug.Assert(da != null);
+            return da.GetDataPresent("BinaryData") || da.GetDataPresent(typeof(string));
         }
 
         /// <summary>
@@ -1730,11 +1655,11 @@ namespace Be.Windows.Forms {
         /// </summary>
         public bool CanPasteHex() {
             if (!CanPaste()) return false;
-            byte[] buffer = null;
-            IDataObject da = Clipboard.GetDataObject();
-            if (da.GetDataPresent(typeof (string))) {
-                string hexString = (string) da.GetData(typeof (string));
-                buffer = ConvertHexToBytes(hexString);
+            var da = Clipboard.GetDataObject();
+            Debug.Assert(da != null);
+            if (da.GetDataPresent(typeof(string))) {
+                var hexString = (string)da.GetData(typeof(string));
+                var buffer = ConvertHexToBytes(hexString);
                 return (buffer != null);
             }
             return false;
@@ -1745,10 +1670,11 @@ namespace Be.Windows.Forms {
         /// </summary>
         public void PasteHex() {
             if (!CanPaste()) return;
-            byte[] buffer = null;
-            IDataObject da = Clipboard.GetDataObject();
-            if (da.GetDataPresent(typeof (string))) {
-                string hexString = (string) da.GetData(typeof (string));
+            byte[] buffer;
+            var da = Clipboard.GetDataObject();
+            Debug.Assert(da != null);
+            if (da.GetDataPresent(typeof(string))) {
+                var hexString = (string)da.GetData(typeof(string));
                 buffer = ConvertHexToBytes(hexString);
                 if (buffer == null)
                     return;
@@ -1769,14 +1695,13 @@ namespace Be.Windows.Forms {
         public void CopyHex() {
             if (!CanCopy()) return;
             // put bytes into buffer
-            byte[] buffer = GetCopyData();
-            DataObject da = new DataObject();
+            var buffer = GetCopyData();
+            var da = new DataObject();
             // set string buffer clipbard data
-            string hexString = ConvertBytesToHex(buffer);
-            ;
-            da.SetData(typeof (string), hexString);
+            var hexString = ConvertBytesToHex(buffer);
+            da.SetData(typeof(string), hexString);
             //set memorystream (BinaryData) clipboard data
-            System.IO.MemoryStream ms = new System.IO.MemoryStream(buffer, 0, buffer.Length, false, true);
+            var ms = new MemoryStream(buffer, 0, buffer.Length, false, true);
             da.SetData("BinaryData", ms);
             Clipboard.SetDataObject(da, true);
             UpdateCaret();
@@ -1794,37 +1719,37 @@ namespace Be.Windows.Forms {
         protected override void OnPaintBackground(PaintEventArgs e) {
             switch (_borderStyle) {
                 case BorderStyle.Fixed3D: {
-                    if (TextBoxRenderer.IsSupported) {
-                        VisualStyleElement state = VisualStyleElement.TextBox.TextEdit.Normal;
-                        Color backColor = this.BackColor;
-                        if (this.Enabled) {
-                            if (this.ReadOnly)
-                                state = VisualStyleElement.TextBox.TextEdit.ReadOnly;
-                            else if (this.Focused)
-                                state = VisualStyleElement.TextBox.TextEdit.Focused;
+                        if (TextBoxRenderer.IsSupported) {
+                            var state = VisualStyleElement.TextBox.TextEdit.Normal;
+                            var backColor = BackColor;
+                            if (Enabled) {
+                                if (ReadOnly)
+                                    state = VisualStyleElement.TextBox.TextEdit.ReadOnly;
+                                else if (Focused)
+                                    state = VisualStyleElement.TextBox.TextEdit.Focused;
+                            } else {
+                                state = VisualStyleElement.TextBox.TextEdit.Disabled;
+                                backColor = BackColorDisabled;
+                            }
+                            var vsr = new VisualStyleRenderer(state);
+                            vsr.DrawBackground(e.Graphics, ClientRectangle);
+                            var rectContent = vsr.GetBackgroundContentRectangle(e.Graphics, ClientRectangle);
+                            e.Graphics.FillRectangle(new SolidBrush(backColor), rectContent);
                         } else {
-                            state = VisualStyleElement.TextBox.TextEdit.Disabled;
-                            backColor = this.BackColorDisabled;
+                            // draw background
+                            e.Graphics.FillRectangle(new SolidBrush(BackColor), ClientRectangle);
+                            // draw default border
+                            ControlPaint.DrawBorder3D(e.Graphics, ClientRectangle, Border3DStyle.Sunken);
                         }
-                        VisualStyleRenderer vsr = new VisualStyleRenderer(state);
-                        vsr.DrawBackground(e.Graphics, this.ClientRectangle);
-                        Rectangle rectContent = vsr.GetBackgroundContentRectangle(e.Graphics, this.ClientRectangle);
-                        e.Graphics.FillRectangle(new SolidBrush(backColor), rectContent);
-                    } else {
+                        break;
+                    }
+                case BorderStyle.FixedSingle: {
                         // draw background
                         e.Graphics.FillRectangle(new SolidBrush(BackColor), ClientRectangle);
-                        // draw default border
-                        ControlPaint.DrawBorder3D(e.Graphics, ClientRectangle, Border3DStyle.Sunken);
+                        // draw fixed single border
+                        ControlPaint.DrawBorder(e.Graphics, ClientRectangle, Color.Black, ButtonBorderStyle.Solid);
+                        break;
                     }
-                    break;
-                }
-                case BorderStyle.FixedSingle: {
-                    // draw background
-                    e.Graphics.FillRectangle(new SolidBrush(BackColor), ClientRectangle);
-                    // draw fixed single border
-                    ControlPaint.DrawBorder(e.Graphics, ClientRectangle, Color.Black, ButtonBorderStyle.Solid);
-                    break;
-                }
             }
         }
 
@@ -1836,9 +1761,9 @@ namespace Be.Windows.Forms {
             base.OnPaint(e);
             if (_byteProvider == null)
                 return;
-            System.Diagnostics.Debug.WriteLine("OnPaint " + DateTime.Now.ToString(), "HexBox");
+            Debug.WriteLine("OnPaint " + DateTime.Now, "HexBox");
             // draw only in the content rectangle, so exclude the border and the scrollbar.
-            Region r = new Region(ClientRectangle);
+            var r = new Region(ClientRectangle);
             r.Exclude(_recContent);
             e.Graphics.ExcludeClip(r);
             UpdateVisibilityBytes();
@@ -1855,16 +1780,16 @@ namespace Be.Windows.Forms {
         private void PaintLineInfo(Graphics g, long startByte, long endByte) {
             // Ensure endByte isn't > length of array.
             endByte = Math.Min(_byteProvider.Length - 1, endByte);
-            Brush brush = SystemBrushes.ControlText;
-            int maxLine = GetGridBytePoint(endByte - startByte).Y + 1;
-            g.FillRectangle(SystemBrushes.ControlLight, new Rectangle(0, 0, 70, this.Height));
-            g.DrawRectangle(SystemPens.ControlDark, new Rectangle(0, 0, 70, this.Height));
-            for (int i = 0; i < maxLine; i++) {
-                long firstLineByte = startByte + (_iHexMaxHBytes)*i;
-                PointF bytePointF = GetBytePointF(new Point(0, 0 + i));
-                string info = firstLineByte.ToString(_hexStringFormat,
-                                                     System.Threading.Thread.CurrentThread.CurrentCulture);
-                int nulls = 8 - info.Length;
+            var brush = SystemBrushes.ControlText;
+            var maxLine = GetGridBytePoint(endByte - startByte).Y + 1;
+            g.FillRectangle(SystemBrushes.ControlLight, new Rectangle(0, 0, 70, Height));
+            g.DrawRectangle(SystemPens.ControlDark, new Rectangle(0, 0, 70, Height));
+            for (var i = 0; i < maxLine; i++) {
+                var firstLineByte = startByte + (HorizontalByteCount) * i;
+                var bytePointF = GetBytePointF(new Point(0, 0 + i));
+                var info = firstLineByte.ToString(_hexStringFormat,
+                                                  Thread.CurrentThread.CurrentCulture);
+                var nulls = 8 - info.Length;
                 string formattedInfo;
                 if (nulls > -1) formattedInfo = new string('0', 8 - info.Length) + info;
                 else formattedInfo = new string('~', 8);
@@ -1876,41 +1801,42 @@ namespace Be.Windows.Forms {
             Brush brush = new SolidBrush(GetDefaultForeColor());
             Brush selBrush = new SolidBrush(_selectionForeColor);
             Brush selBrushBack = new SolidBrush(_selectionBackColor);
-            int counter = -1;
-            long intern_endByte = Math.Min(_byteProvider.Length - 1, endByte + _iHexMaxHBytes);
-            bool isKeyInterpreterActive = _keyInterpreter == null ||
-                                          _keyInterpreter.GetType() == typeof (KeyInterpreter);
-            for (long i = startByte; i < intern_endByte + 1; i++) {
+            var counter = -1;
+            var internalEndByte = Math.Min(_byteProvider.Length - 1, endByte + HorizontalByteCount);
+            var isKeyInterpreterActive = _keyInterpreter == null ||
+                                         _keyInterpreter.GetType() == typeof(KeyInterpreter);
+            for (var i = startByte; i < internalEndByte + 1; i++) {
                 counter++;
-                Point gridPoint = GetGridBytePoint(counter);
-                byte b = _byteProvider.ReadByte(i);
-                bool isSelectedByte = i >= _bytePos && i <= (_bytePos + _selectionLength - 1) && _selectionLength != 0;
+                var gridPoint = GetGridBytePoint(counter);
+                var b = _byteProvider.ReadByte(i);
+                var isSelectedByte = i >= _bytePos && i <= (_bytePos + _selectionLength - 1) && _selectionLength != 0;
                 if (isSelectedByte && isKeyInterpreterActive)
                     PaintHexStringSelected(g, b, selBrush, selBrushBack, gridPoint);
                 else {
-                    PointF pf = GetBytePointF(gridPoint);
-                    g.FillRectangle(new SolidBrush(_byteProvider.GetByteColor(i)), pf.X, pf.Y, (int) _charSize.Width*2,
-                                    (int) _charSize.Height);
+                    var pf = GetBytePointF(gridPoint);
+                    g.FillRectangle(new SolidBrush(_byteProvider.GetByteColor(i)), pf.X, pf.Y, (int)_charSize.Width * 2,
+                                    (int)_charSize.Height);
                     PaintHexString(g, b, brush, gridPoint);
                 }
             }
         }
 
         private void PaintHexString(Graphics g, byte b, Brush brush, Point gridPoint) {
-            PointF bytePointF = GetBytePointF(gridPoint);
-            string sB = ConvertByteToHex(b);
+            var bytePointF = GetBytePointF(gridPoint);
+            var sB = ConvertByteToHex(b);
             g.DrawString(sB.Substring(0, 1), Font, brush, bytePointF, _stringFormat);
             bytePointF.X += _charSize.Width;
             g.DrawString(sB.Substring(1, 1), Font, brush, bytePointF, _stringFormat);
         }
 
         private void PaintHexStringSelected(Graphics g, byte b, Brush brush, Brush brushBack, Point gridPoint) {
-            string sB = b.ToString(_hexStringFormat, System.Threading.Thread.CurrentThread.CurrentCulture);
+            //TODO
+            var sB = b.ToString(_hexStringFormat, Thread.CurrentThread.CurrentCulture);
             if (sB.Length == 1)
                 sB = "0" + sB;
-            PointF bytePointF = GetBytePointF(gridPoint);
-            bool isLastLineChar = true; // (gridPoint.X + 1 == _iHexMaxHBytes);
-            float bcWidth = (isLastLineChar) ? _charSize.Width*2 : _charSize.Width*3;
+            var bytePointF = GetBytePointF(gridPoint);
+            const bool isLastLineChar = true; // (gridPoint.X + 1 == _iHexMaxHBytes);
+            var bcWidth = (isLastLineChar) ? _charSize.Width * 2 : _charSize.Width * 3;
             g.FillRectangle(brushBack, bytePointF.X, bytePointF.Y, bcWidth, _charSize.Height);
             g.DrawString(sB.Substring(0, 1), Font, brush, bytePointF, _stringFormat);
             bytePointF.X += _charSize.Width;
@@ -1921,23 +1847,23 @@ namespace Be.Windows.Forms {
             Brush brush = new SolidBrush(GetDefaultForeColor());
             Brush selBrush = new SolidBrush(_selectionForeColor);
             Brush selBrushBack = new SolidBrush(_selectionBackColor);
-            int counter = -1;
-            long intern_endByte = Math.Min(_byteProvider.Length - 1, endByte + _iHexMaxHBytes);
-            bool isKeyInterpreterActive = _keyInterpreter == null ||
-                                          _keyInterpreter.GetType() == typeof (KeyInterpreter);
-            bool isStringKeyInterpreterActive = _keyInterpreter != null &&
-                                                _keyInterpreter.GetType() == typeof (StringKeyInterpreter);
-            for (long i = startByte; i < intern_endByte + 1; i++) {
+            var counter = -1;
+            var internalEndByte = Math.Min(_byteProvider.Length - 1, endByte + HorizontalByteCount);
+            var isKeyInterpreterActive = _keyInterpreter == null ||
+                                         _keyInterpreter.GetType() == typeof(KeyInterpreter);
+            var isStringKeyInterpreterActive = _keyInterpreter != null &&
+                                               _keyInterpreter.GetType() == typeof(StringKeyInterpreter);
+            for (var i = startByte; i < internalEndByte + 1; i++) {
                 counter++;
-                Point gridPoint = GetGridBytePoint(counter);
-                PointF byteStringPointF = GetByteStringPointF(gridPoint);
-                byte b = _byteProvider.ReadByte(i);
-                bool isSelectedByte = i >= _bytePos && i <= (_bytePos + _selectionLength - 1) && _selectionLength != 0;
+                var gridPoint = GetGridBytePoint(counter);
+                var byteStringPointF = GetByteStringPointF(gridPoint);
+                var b = _byteProvider.ReadByte(i);
+                var isSelectedByte = i >= _bytePos && i <= (_bytePos + _selectionLength - 1) && _selectionLength != 0;
                 if (isSelectedByte && isKeyInterpreterActive)
                     PaintHexStringSelected(g, b, selBrush, selBrushBack, gridPoint);
                 else PaintHexString(g, b, brush, gridPoint);
                 string s;
-                if (b > 0x1F && !(b > 0x7E && b < 0xA0)) s = ((char) b).ToString();
+                if (b > 0x1F && !(b > 0x7E && b < 0xA0)) s = ((char)b).ToString();
                 else s = ".";
                 if (isSelectedByte && isStringKeyInterpreterActive) {
                     g.FillRectangle(selBrushBack, byteStringPointF.X, byteStringPointF.Y, _charSize.Width,
@@ -1949,114 +1875,113 @@ namespace Be.Windows.Forms {
 
         private void PaintCurrentBytesSign(Graphics g) {
             if (_keyInterpreter != null && Focused && _bytePos != -1 && Enabled)
-                if (_keyInterpreter.GetType() == typeof (KeyInterpreter))
+                if (_keyInterpreter.GetType() == typeof(KeyInterpreter))
                     if (_selectionLength == 0) {
-                        Point gp = GetGridBytePoint(_bytePos - _startByte);
-                        PointF pf = GetByteStringPointF(gp);
-                        Size s = new Size((int) _charSize.Width, (int) _charSize.Height);
-                        Rectangle r = new Rectangle((int) pf.X, (int) pf.Y, s.Width, s.Height);
+                        var gp = GetGridBytePoint(_bytePos - _startByte);
+                        var pf = GetByteStringPointF(gp);
+                        var s = new Size((int)_charSize.Width, (int)_charSize.Height);
+                        var r = new Rectangle((int)pf.X, (int)pf.Y, s.Width, s.Height);
                         if (r.IntersectsWith(_recStringView)) {
                             r.Intersect(_recStringView);
                             PaintCurrentByteSign(g, r);
                         }
                     } else {
-                        int lineWidth = (int) (_recStringView.Width - _charSize.Width);
-                        Point startSelGridPoint = GetGridBytePoint(_bytePos - _startByte);
-                        PointF startSelPointF = GetByteStringPointF(startSelGridPoint);
-                        Point endSelGridPoint = GetGridBytePoint(_bytePos - _startByte + _selectionLength - 1);
-                        PointF endSelPointF = GetByteStringPointF(endSelGridPoint);
-                        int multiLine = endSelGridPoint.Y - startSelGridPoint.Y;
+                        var lineWidth = (int)(_recStringView.Width - _charSize.Width);
+                        var startSelGridPoint = GetGridBytePoint(_bytePos - _startByte);
+                        var startSelPointF = GetByteStringPointF(startSelGridPoint);
+                        var endSelGridPoint = GetGridBytePoint(_bytePos - _startByte + _selectionLength - 1);
+                        var endSelPointF = GetByteStringPointF(endSelGridPoint);
+                        var multiLine = endSelGridPoint.Y - startSelGridPoint.Y;
                         if (multiLine == 0) {
-                            Rectangle singleLine = new Rectangle(
-                                (int) startSelPointF.X,
-                                (int) startSelPointF.Y,
-                                (int) (endSelPointF.X - startSelPointF.X + _charSize.Width),
-                                (int) _charSize.Height);
+                            var singleLine = new Rectangle(
+                                (int)startSelPointF.X,
+                                (int)startSelPointF.Y,
+                                (int)(endSelPointF.X - startSelPointF.X + _charSize.Width),
+                                (int)_charSize.Height);
                             if (singleLine.IntersectsWith(_recStringView)) {
                                 singleLine.Intersect(_recStringView);
                                 PaintCurrentByteSign(g, singleLine);
                             }
                         } else {
-                            Rectangle firstLine = new Rectangle(
-                                (int) startSelPointF.X,
-                                (int) startSelPointF.Y,
-                                (int) (_recStringView.X + lineWidth - startSelPointF.X + _charSize.Width),
-                                (int) _charSize.Height);
+                            var firstLine = new Rectangle(
+                                (int)startSelPointF.X,
+                                (int)startSelPointF.Y,
+                                (int)(_recStringView.X + lineWidth - startSelPointF.X + _charSize.Width),
+                                (int)_charSize.Height);
                             if (firstLine.IntersectsWith(_recStringView)) {
                                 firstLine.Intersect(_recStringView);
                                 PaintCurrentByteSign(g, firstLine);
                             }
                             if (multiLine > 1) {
-                                Rectangle betweenLines = new Rectangle(
+                                var betweenLines = new Rectangle(
                                     _recStringView.X,
-                                    (int) (startSelPointF.Y + _charSize.Height),
-                                    (int) (_recStringView.Width),
-                                    (int) (_charSize.Height*(multiLine - 1)));
+                                    (int)(startSelPointF.Y + _charSize.Height),
+                                    (_recStringView.Width),
+                                    (int)(_charSize.Height * (multiLine - 1)));
                                 if (betweenLines.IntersectsWith(_recStringView)) {
                                     betweenLines.Intersect(_recStringView);
                                     PaintCurrentByteSign(g, betweenLines);
                                 }
                             }
-                            Rectangle lastLine = new Rectangle(
+                            var lastLine = new Rectangle(
                                 _recStringView.X,
-                                (int) endSelPointF.Y,
-                                (int) (endSelPointF.X - _recStringView.X + _charSize.Width),
-                                (int) _charSize.Height);
+                                (int)endSelPointF.Y,
+                                (int)(endSelPointF.X - _recStringView.X + _charSize.Width),
+                                (int)_charSize.Height);
                             if (lastLine.IntersectsWith(_recStringView)) {
                                 lastLine.Intersect(_recStringView);
                                 PaintCurrentByteSign(g, lastLine);
                             }
                         }
-                    }
-                else if (_selectionLength == 0) {
-                    Point gp = GetGridBytePoint(_bytePos - _startByte);
-                    PointF pf = GetBytePointF(gp);
-                    Size s = new Size((int) _charSize.Width*2, (int) _charSize.Height);
-                    Rectangle r = new Rectangle((int) pf.X, (int) pf.Y, s.Width, s.Height);
+                    } else if (_selectionLength == 0) {
+                    var gp = GetGridBytePoint(_bytePos - _startByte);
+                    var pf = GetBytePointF(gp);
+                    var s = new Size((int)_charSize.Width * 2, (int)_charSize.Height);
+                    var r = new Rectangle((int)pf.X, (int)pf.Y, s.Width, s.Height);
                     PaintCurrentByteSign(g, r);
                 } else {
-                    int lineWidth = (int) (_recHex.Width - _charSize.Width*5);
-                    Point startSelGridPoint = GetGridBytePoint(_bytePos - _startByte);
-                    PointF startSelPointF = GetBytePointF(startSelGridPoint);
-                    Point endSelGridPoint = GetGridBytePoint(_bytePos - _startByte + _selectionLength - 1);
-                    PointF endSelPointF = GetBytePointF(endSelGridPoint);
-                    int multiLine = endSelGridPoint.Y - startSelGridPoint.Y;
+                    var lineWidth = (int)(_recHex.Width - _charSize.Width * 5);
+                    var startSelGridPoint = GetGridBytePoint(_bytePos - _startByte);
+                    var startSelPointF = GetBytePointF(startSelGridPoint);
+                    var endSelGridPoint = GetGridBytePoint(_bytePos - _startByte + _selectionLength - 1);
+                    var endSelPointF = GetBytePointF(endSelGridPoint);
+                    var multiLine = endSelGridPoint.Y - startSelGridPoint.Y;
                     if (multiLine == 0) {
-                        Rectangle singleLine = new Rectangle(
-                            (int) startSelPointF.X,
-                            (int) startSelPointF.Y,
-                            (int) (endSelPointF.X - startSelPointF.X + _charSize.Width*2),
-                            (int) _charSize.Height);
+                        var singleLine = new Rectangle(
+                            (int)startSelPointF.X,
+                            (int)startSelPointF.Y,
+                            (int)(endSelPointF.X - startSelPointF.X + _charSize.Width * 2),
+                            (int)_charSize.Height);
                         if (singleLine.IntersectsWith(_recHex)) {
                             singleLine.Intersect(_recHex);
                             PaintCurrentByteSign(g, singleLine);
                         }
                     } else {
-                        Rectangle firstLine = new Rectangle(
-                            (int) startSelPointF.X,
-                            (int) startSelPointF.Y,
-                            (int) (_recHex.X + lineWidth - startSelPointF.X + _charSize.Width*2),
-                            (int) _charSize.Height);
+                        var firstLine = new Rectangle(
+                            (int)startSelPointF.X,
+                            (int)startSelPointF.Y,
+                            (int)(_recHex.X + lineWidth - startSelPointF.X + _charSize.Width * 2),
+                            (int)_charSize.Height);
                         if (firstLine.IntersectsWith(_recHex)) {
                             firstLine.Intersect(_recHex);
                             PaintCurrentByteSign(g, firstLine);
                         }
                         if (multiLine > 1) {
-                            Rectangle betweenLines = new Rectangle(
+                            var betweenLines = new Rectangle(
                                 _recHex.X,
-                                (int) (startSelPointF.Y + _charSize.Height),
-                                (int) (lineWidth + _charSize.Width*2),
-                                (int) (_charSize.Height*(multiLine - 1)));
+                                (int)(startSelPointF.Y + _charSize.Height),
+                                (int)(lineWidth + _charSize.Width * 2),
+                                (int)(_charSize.Height * (multiLine - 1)));
                             if (betweenLines.IntersectsWith(_recHex)) {
                                 betweenLines.Intersect(_recHex);
                                 PaintCurrentByteSign(g, betweenLines);
                             }
                         }
-                        Rectangle lastLine = new Rectangle(
+                        var lastLine = new Rectangle(
                             _recHex.X,
-                            (int) endSelPointF.Y,
-                            (int) (endSelPointF.X - _recHex.X + _charSize.Width*2),
-                            (int) _charSize.Height);
+                            (int)endSelPointF.Y,
+                            (int)(endSelPointF.X - _recHex.X + _charSize.Width * 2),
+                            (int)_charSize.Height);
                         if (lastLine.IntersectsWith(_recHex)) {
                             lastLine.Intersect(_recHex);
                             PaintCurrentByteSign(g, lastLine);
@@ -2069,35 +1994,32 @@ namespace Be.Windows.Forms {
             // stack overflowexception on big files - workaround
             if (rec.Top < 0 || rec.Left < 0 || rec.Width <= 0 || rec.Height <= 0)
                 return;
-            Bitmap myBitmap = new Bitmap(rec.Width, rec.Height);
-            Graphics bitmapGraphics = Graphics.FromImage(myBitmap);
-            SolidBrush greenBrush = new SolidBrush(_shadowSelectionColor);
+            var myBitmap = new Bitmap(rec.Width, rec.Height);
+            var bitmapGraphics = Graphics.FromImage(myBitmap);
+            var greenBrush = new SolidBrush(_shadowSelectionColor);
             bitmapGraphics.FillRectangle(greenBrush, 0,
                                          0, rec.Width, rec.Height);
-            g.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.GammaCorrected;
+            g.CompositingQuality = CompositingQuality.GammaCorrected;
             g.DrawImage(myBitmap, rec.Left, rec.Top);
         }
 
         private Color GetDefaultForeColor() {
-            if (Enabled)
-                return ForeColor;
-            else
-                return Color.Gray;
+            return Enabled ? ForeColor : Color.Gray;
         }
 
         private void UpdateVisibilityBytes() {
             if (_byteProvider == null || _byteProvider.Length == 0)
                 return;
-            _startByte = (_scrollVpos + 1)*_iHexMaxHBytes - _iHexMaxHBytes;
-            _endByte = (long) Math.Min(_byteProvider.Length - 1, _startByte + _iHexMaxBytes);
+            _startByte = (_scrollVpos + 1) * HorizontalByteCount - HorizontalByteCount;
+            _endByte = Math.Min(_byteProvider.Length - 1, _startByte + _iHexMaxBytes);
         }
         #endregion
 
         #region Positioning methods
         private void UpdateRectanglePositioning() {
             // calc char size
-            SizeF charSize = this.CreateGraphics().MeasureString("A", Font, 100, _stringFormat);
-            _charSize = new SizeF((float) Math.Ceiling(charSize.Width), (float) Math.Ceiling(charSize.Height));
+            var charSize = CreateGraphics().MeasureString("A", Font, 100, _stringFormat);
+            _charSize = new SizeF((float)Math.Ceiling(charSize.Width), (float)Math.Ceiling(charSize.Height));
             // calc content bounds
             _recContent = ClientRectangle;
             _recContent.X += _recBorderLeft;
@@ -2110,12 +2032,12 @@ namespace Be.Windows.Forms {
                 _vScrollBar.Top = _recContent.Y;
                 _vScrollBar.Height = _recContent.Height;
             }
-            int marginLeft = 4;
+            const int marginLeft = 4; //TODO
             // calc line info bounds
             if (_lineInfoVisible)
                 _recLineInfo = new Rectangle(_recContent.X + marginLeft,
                                              _recContent.Y,
-                                             (int) (_charSize.Width*10),
+                                             (int)(_charSize.Width * 10),
                                              _recContent.Height);
             else {
                 _recLineInfo = Rectangle.Empty;
@@ -2128,49 +2050,48 @@ namespace Be.Windows.Forms {
                                     _recContent.Height);
             if (UseFixedBytesPerLine) {
                 SetHorizontalByteCount(_bytesPerLine);
-                _recHex.Width = (int) Math.Floor(((double) _iHexMaxHBytes)*_charSize.Width*3 + (2*_charSize.Width));
+                _recHex.Width = (int)Math.Floor(((double)HorizontalByteCount) * _charSize.Width * 3 + (2 * _charSize.Width));
             } else {
-                int hmax = (int) Math.Floor((double) _recHex.Width/(double) _charSize.Width);
+                var hmax = (int)Math.Floor(_recHex.Width / (double)_charSize.Width);
                 if (hmax > 1)
-                    SetHorizontalByteCount((int) Math.Floor((double) hmax/3));
+                    SetHorizontalByteCount((int)Math.Floor((double)hmax / 3));
                 else
                     SetHorizontalByteCount(hmax);
             }
             if (_stringViewVisible)
                 _recStringView = new Rectangle(_recHex.X + _recHex.Width,
                                                _recHex.Y,
-                                               (int) (_charSize.Width*_iHexMaxHBytes),
+                                               (int)(_charSize.Width * HorizontalByteCount),
                                                _recHex.Height);
             else _recStringView = Rectangle.Empty;
-            int vmax = (int) Math.Floor((double) _recHex.Height/(double) _charSize.Height);
+            var vmax = (int)Math.Floor(_recHex.Height / (double)_charSize.Height);
             SetVerticalByteCount(vmax);
-            _iHexMaxBytes = _iHexMaxHBytes*_iHexMaxVBytes;
+            _iHexMaxBytes = HorizontalByteCount * VerticalByteCount;
             UpdateScrollSize();
         }
 
         private PointF GetBytePointF(long byteIndex) {
-            Point gp = GetGridBytePoint(byteIndex);
+            var gp = GetGridBytePoint(byteIndex);
             return GetBytePointF(gp);
         }
 
         private PointF GetBytePointF(Point gp) {
-            float x = (2*_charSize.Width)*gp.X + _recHex.X; //TODO PAINT HERE
-            float y = (gp.Y + 1)*_charSize.Height - _charSize.Height + _recHex.Y;
+            var x = (2 * _charSize.Width) * gp.X + _recHex.X; //TODO PAINT HERE
+            var y = (gp.Y + 1) * _charSize.Height - _charSize.Height + _recHex.Y;
             return new PointF(x, y);
         }
 
         private PointF GetByteStringPointF(Point gp) {
-            float x = (_charSize.Width)*gp.X + _recStringView.X;
-            float y = (gp.Y + 1)*_charSize.Height - _charSize.Height + _recStringView.Y;
+            var x = (_charSize.Width) * gp.X + _recStringView.X;
+            var y = (gp.Y + 1) * _charSize.Height - _charSize.Height + _recStringView.Y;
             return new PointF(x, y);
         }
 
         private Point GetGridBytePoint(long byteIndex) {
-            int row = (int) Math.Floor((double) byteIndex/(double) _iHexMaxHBytes);
-            int column = (int) (byteIndex + _iHexMaxHBytes - _iHexMaxHBytes*(row + 1));
-            column += column/4;
-            Point res = new Point(column, row);
-            return res;
+            var row = (int)Math.Floor((double)byteIndex / HorizontalByteCount);
+            var column = (int)(byteIndex + HorizontalByteCount - HorizontalByteCount * (row + 1));
+            column += column / 4;
+            return new Point(column, row);
         }
         #endregion
 
@@ -2178,7 +2099,7 @@ namespace Be.Windows.Forms {
         /// <summary>
         ///   Gets or sets the background color for the control.
         /// </summary>
-        [DefaultValue(typeof (Color), "White")]
+        [DefaultValue(typeof(Color), "White")]
         public override Color BackColor {
             get { return base.BackColor; }
             set { base.BackColor = value; }
@@ -2187,7 +2108,7 @@ namespace Be.Windows.Forms {
         /// <summary>
         ///   The font used to display text in the hexbox.
         /// </summary>
-        [Editor(typeof (HexFontEditor), typeof (System.Drawing.Design.UITypeEditor))]
+        [Editor(typeof(HexFontEditor), typeof(UITypeEditor))]
         public override Font Font {
             get { return base.Font; }
             set { base.Font = value; }
@@ -2218,7 +2139,7 @@ namespace Be.Windows.Forms {
         /// <summary>
         ///   Gets or sets the background color for the disabled control.
         /// </summary>
-        [Category("Appearance"), DefaultValue(typeof (Color), "WhiteSmoke")]
+        [Category("Appearance"), DefaultValue(typeof(Color), "WhiteSmoke")]
         public Color BackColorDisabled {
             get { return _backColorDisabled; }
             set { _backColorDisabled = value; }
@@ -2293,7 +2214,7 @@ namespace Be.Windows.Forms {
         /// </summary>
         [DefaultValue(false), Category("Hex"), Description("Gets or sets the visibility of a vertical scroll bar.")]
         public bool VScrollBarVisible {
-            get { return this._vScrollBarVisible; }
+            get { return _vScrollBarVisible; }
             set {
                 if (_vScrollBarVisible == value)
                     return;
@@ -2324,10 +2245,10 @@ namespace Be.Windows.Forms {
                 else
                     ActivateKeyInterpreter();
                 if (_byteProvider != null)
-                    _byteProvider.LengthChanged -= new EventHandler(_byteProvider_LengthChanged);
+                    _byteProvider.LengthChanged -= ByteProviderLengthChanged;
                 _byteProvider = value;
                 if (_byteProvider != null)
-                    _byteProvider.LengthChanged += new EventHandler(_byteProvider_LengthChanged);
+                    _byteProvider.LengthChanged += ByteProviderLengthChanged;
                 OnByteProviderChanged(EventArgs.Empty);
                 if (value == null) // do not raise events if value is null
                 {
@@ -2375,7 +2296,7 @@ namespace Be.Windows.Forms {
         /// <summary>
         ///   Gets or sets the hex box´s border style.
         /// </summary>
-        [DefaultValue(typeof (BorderStyle), "Fixed3D"), Category("Hex"),
+        [DefaultValue(typeof(BorderStyle), "Fixed3D"), Category("Hex"),
          Description("Gets or sets the hex box´s border style.")]
         public BorderStyle BorderStyle {
             get { return _borderStyle; }
@@ -2423,21 +2344,14 @@ namespace Be.Windows.Forms {
         /// <summary>
         ///   Gets or sets whether the HexBox control displays the hex characters in upper or lower case.
         /// </summary>
-        [DefaultValue(typeof (HexCasing), "Upper"), Category("Hex"),
+        [DefaultValue(typeof(HexCasing), "Upper"), Category("Hex"),
          Description("Gets or sets whether the HexBox control displays the hex characters in upper or lower case.")]
         public HexCasing HexCasing {
             get {
-                if (_hexStringFormat == "X")
-                    return HexCasing.Upper;
-                else
-                    return HexCasing.Lower;
+                return _hexStringFormat == "X" ? HexCasing.Upper : HexCasing.Lower;
             }
             set {
-                string format;
-                if (value == HexCasing.Upper)
-                    format = "X";
-                else
-                    format = "x";
+                var format = value == HexCasing.Upper ? "X" : "x";
                 if (_hexStringFormat == format)
                     return;
                 _hexStringFormat = format;
@@ -2477,7 +2391,7 @@ namespace Be.Windows.Forms {
         /// <summary>
         ///   Gets or sets the line info color. When this property is null, then ForeColor property is used.
         /// </summary>
-        [DefaultValue(typeof (Color), "Empty"), Category("Hex"),
+        [DefaultValue(typeof(Color), "Empty"), Category("Hex"),
          Description("Gets or sets the line info color. When this property is null, then ForeColor property is used.")]
         public Color LineInfoForeColor {
             get { return _lineInfoForeColor; }
@@ -2492,7 +2406,7 @@ namespace Be.Windows.Forms {
         /// <summary>
         ///   Gets or sets the background color for the selected bytes.
         /// </summary>
-        [DefaultValue(typeof (Color), "Blue"), Category("Hex"),
+        [DefaultValue(typeof(Color), "Blue"), Category("Hex"),
          Description("Gets or sets the background color for the selected bytes.")]
         public Color SelectionBackColor {
             get { return _selectionBackColor; }
@@ -2507,7 +2421,7 @@ namespace Be.Windows.Forms {
         /// <summary>
         ///   Gets or sets the foreground color for the selected bytes.
         /// </summary>
-        [DefaultValue(typeof (Color), "White"), Category("Hex"),
+        [DefaultValue(typeof(Color), "White"), Category("Hex"),
          Description("Gets or sets the foreground color for the selected bytes.")]
         public Color SelectionForeColor {
             get { return _selectionForeColor; }
@@ -2557,27 +2471,19 @@ namespace Be.Windows.Forms {
         ///   Gets the number bytes drawn horizontally.
         /// </summary>
         [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public int HorizontalByteCount {
-            get { return _iHexMaxHBytes; }
-        }
+        public int HorizontalByteCount { get; private set; }
 
         /// <summary>
         ///   Gets the number bytes drawn vertically.
         /// </summary>
         [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public int VerticalByteCount {
-            get { return _iHexMaxVBytes; }
-        }
+        public int VerticalByteCount { get; private set; }
 
         /// <summary>
         ///   Gets the current line
         /// </summary>
         [Browsable(false), DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public long CurrentLine {
-            get { return _currentLine; }
-        }
-
-        private long _currentLine;
+        public long CurrentLine { get; private set; }
 
         /// <summary>
         ///   Gets the current position in the current line
@@ -2615,7 +2521,7 @@ namespace Be.Windows.Forms {
             get { return _builtInContextMenu; }
         }
 
-        private BuiltInContextMenu _builtInContextMenu;
+        private readonly BuiltInContextMenu _builtInContextMenu;
         #endregion
 
         #region Misc
@@ -2624,17 +2530,12 @@ namespace Be.Windows.Forms {
         /// </summary>
         /// <param name = "data">the byte array</param>
         /// <returns>the hex string</returns>
-        private string ConvertBytesToHex(byte[] data) {
-            StringBuilder sb = new StringBuilder();
-            foreach (byte b in data) {
-                string hex = ConvertByteToHex(b);
-                sb.Append(hex);
-                sb.Append(" ");
-            }
+        private string ConvertBytesToHex(IEnumerable<byte> data) {
+            var sb = new StringBuilder();
+            foreach (var b in data) sb.Append(ConvertByteToHex(b)).Append(" ");
             if (sb.Length > 0)
                 sb.Remove(sb.Length - 1, 1);
-            string result = sb.ToString();
-            return result;
+            return sb.ToString();
         }
 
         /// <summary>
@@ -2643,7 +2544,7 @@ namespace Be.Windows.Forms {
         /// <param name = "b">the byte to format</param>
         /// <returns>the hex string</returns>
         private string ConvertByteToHex(byte b) {
-            string sB = b.ToString(_hexStringFormat, System.Threading.Thread.CurrentThread.CurrentCulture);
+            var sB = b.ToString(_hexStringFormat, Thread.CurrentThread.CurrentCulture);
             if (sB.Length == 1)
                 sB = "0" + sB;
             return sB;
@@ -2654,13 +2555,13 @@ namespace Be.Windows.Forms {
         /// </summary>
         /// <param name = "hex">the hex string separated by ' '. For example: "0A 0B 0C"</param>
         /// <returns>the byte array. null if hex is invalid or empty</returns>
-        private byte[] ConvertHexToBytes(string hex) {
+        private static byte[] ConvertHexToBytes(string hex) {
             if (string.IsNullOrEmpty(hex))
                 return null;
             hex = hex.Trim();
             var hexArray = hex.Split(' ');
             var byteArray = new byte[hexArray.Length];
-            for (int i = 0; i < hexArray.Length; i++) {
+            for (var i = 0; i < hexArray.Length; i++) {
                 var hexValue = hexArray[i];
                 byte b;
                 var isByte = ConvertHexToByte(hexValue, out b);
@@ -2671,10 +2572,9 @@ namespace Be.Windows.Forms {
             return byteArray;
         }
 
-        private bool ConvertHexToByte(string hex, out byte b) {
-            bool isByte = byte.TryParse(hex, System.Globalization.NumberStyles.HexNumber,
-                                        System.Threading.Thread.CurrentThread.CurrentCulture, out b);
-            return isByte;
+        private static bool ConvertHexToByte(string hex, out byte b) {
+            return byte.TryParse(hex, NumberStyles.HexNumber,
+                                 Thread.CurrentThread.CurrentCulture, out b);
         }
 
         private void SetPosition(long bytePos) {
@@ -2682,50 +2582,48 @@ namespace Be.Windows.Forms {
         }
 
         private void SetPosition(long bytePos, int byteCharacterPos) {
-            if (_byteCharacterPos != byteCharacterPos) _byteCharacterPos = byteCharacterPos;
-            if (bytePos != _bytePos) {
-                _bytePos = bytePos;
-                CheckCurrentLineChanged();
-                CheckCurrentPositionInLineChanged();
-                OnSelectionStartChanged(EventArgs.Empty);
-            }
+            _byteCharacterPos = byteCharacterPos;
+            if (bytePos == _bytePos) return;
+            _bytePos = bytePos;
+            CheckCurrentLineChanged();
+            CheckCurrentPositionInLineChanged();
+            OnSelectionStartChanged(EventArgs.Empty);
         }
 
         private void SetSelectionLength(long selectionLength) {
-            if (selectionLength != _selectionLength) {
-                _selectionLength = selectionLength;
-                OnSelectionLengthChanged(EventArgs.Empty);
-            }
+            if (selectionLength == _selectionLength) return;
+            _selectionLength = selectionLength;
+            OnSelectionLengthChanged(EventArgs.Empty);
         }
 
         private void SetHorizontalByteCount(int value) {
-            if (_iHexMaxHBytes == value)
+            if (HorizontalByteCount == value)
                 return;
-            _iHexMaxHBytes = value;
+            HorizontalByteCount = value;
             OnHorizontalByteCountChanged(EventArgs.Empty);
         }
 
         private void SetVerticalByteCount(int value) {
-            if (_iHexMaxVBytes == value)
+            if (VerticalByteCount == value)
                 return;
-            _iHexMaxVBytes = value;
+            VerticalByteCount = value;
             OnVerticalByteCountChanged(EventArgs.Empty);
         }
 
         private void CheckCurrentLineChanged() {
-            long currentLine = (long) Math.Floor((double) _bytePos/(double) _iHexMaxHBytes) + 1;
-            if (_byteProvider == null && _currentLine != 0) {
-                _currentLine = 0;
+            var currentLine = (long)Math.Floor((double)_bytePos / HorizontalByteCount) + 1; //TODO wtf
+            if (_byteProvider == null && CurrentLine != 0) {
+                CurrentLine = 0;
                 OnCurrentLineChanged(EventArgs.Empty);
-            } else if (currentLine != _currentLine) {
-                _currentLine = currentLine;
+            } else if (currentLine != CurrentLine) {
+                CurrentLine = currentLine;
                 OnCurrentLineChanged(EventArgs.Empty);
             }
         }
 
         private void CheckCurrentPositionInLineChanged() {
-            Point gb = GetGridBytePoint(_bytePos);
-            int currentPositionInLine = gb.X + 1;
+            var gb = GetGridBytePoint(_bytePos);
+            var currentPositionInLine = gb.X + 1;
             if (_byteProvider == null && _currentPositionInLine != 0) {
                 _currentPositionInLine = 0;
                 OnCurrentPositionInLineChanged(EventArgs.Empty);
@@ -2902,7 +2800,7 @@ namespace Be.Windows.Forms {
         /// </summary>
         /// <param name = "e">An EventArgs that contains the event data.</param>
         protected override void OnMouseDown(MouseEventArgs e) {
-            System.Diagnostics.Debug.WriteLine("OnMouseDown()", "HexBox");
+            Debug.WriteLine("OnMouseDown()", "HexBox");
             if (!Focused)
                 Focus();
             if (e.Button == MouseButtons.Left)
@@ -2915,8 +2813,8 @@ namespace Be.Windows.Forms {
         /// </summary>
         /// <param name = "e">An EventArgs that contains the event data.</param>
         protected override void OnMouseWheel(MouseEventArgs e) {
-            int linesToScroll = -(e.Delta*SystemInformation.MouseWheelScrollLines/120);
-            this.PerformScrollLines(linesToScroll);
+            var linesToScroll = -(e.Delta * SystemInformation.MouseWheelScrollLines / 120);
+            PerformScrollLines(linesToScroll);
             base.OnMouseWheel(e);
         }
 
@@ -2934,7 +2832,7 @@ namespace Be.Windows.Forms {
         /// </summary>
         /// <param name = "e">An EventArgs that contains the event data.</param>
         protected override void OnGotFocus(EventArgs e) {
-            System.Diagnostics.Debug.WriteLine("OnGotFocus()", "HexBox");
+            Debug.WriteLine("OnGotFocus()", "HexBox");
             base.OnGotFocus(e);
             CreateCaret();
         }
@@ -2944,12 +2842,12 @@ namespace Be.Windows.Forms {
         /// </summary>
         /// <param name = "e">An EventArgs that contains the event data.</param>
         protected override void OnLostFocus(EventArgs e) {
-            System.Diagnostics.Debug.WriteLine("OnLostFocus()", "HexBox");
+            Debug.WriteLine("OnLostFocus()", "HexBox");
             base.OnLostFocus(e);
             DestroyCaret();
         }
 
-        private void _byteProvider_LengthChanged(object sender, EventArgs e) {
+        private void ByteProviderLengthChanged(object sender, EventArgs e) {
             UpdateScrollSize();
         }
         #endregion
