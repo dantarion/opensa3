@@ -1,7 +1,5 @@
 using System;
 using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Security.Permissions;
 using System.Runtime.InteropServices;
 
 //
@@ -9,6 +7,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 //
+
 [assembly: AssemblyTitle("Be.Windows.Forms.HexBox")]
 [assembly: AssemblyDescription("hex edit control (C# DOTNET)")]
 [assembly: AssemblyConfiguration("")]
@@ -16,8 +15,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyProduct("Be.Windows.Forms.HexBox")]
 [assembly: AssemblyCopyright("")]
 [assembly: AssemblyTrademark("")]
-[assembly: AssemblyCulture("")]		
-
+[assembly: AssemblyCulture("")]
 //
 // Version information for an assembly consists of the following four values:
 //
@@ -30,7 +28,6 @@ using System.Runtime.InteropServices;
 // by using the '*' as shown below:
 
 [assembly: AssemblyVersion("1.4.2.*")]
-
 //
 // In order to sign your assembly you must specify a key to use. Refer to the 
 // Microsoft .NET Framework documentation for more information on assembly signing.
@@ -56,15 +53,13 @@ using System.Runtime.InteropServices;
 //   (*) Delay Signing is an advanced option - see the Microsoft .NET Framework
 //       documentation for more information on this.
 //
-[assembly: AssemblyDelaySign(false)]
 
+[assembly: AssemblyDelaySign(false)]
 //[assembly: AssemblyKeyFile("../../HexBox.snk")]
 //[assembly: AssemblyKeyName("")]
-
 //[assembly:IsolatedStorageFilePermission(SecurityAction.RequestRefuse, UserQuota=1048576)]
 //[assembly:SecurityPermission(SecurityAction.RequestRefuse, UnmanagedCode=true)]
 //[assembly:FileIOPermission(SecurityAction.RequestOptional, Unrestricted=true)]
 
-[assembly:CLSCompliant(true)]
-
-[assembly:ComVisible(false)]
+[assembly: CLSCompliant(true)]
+[assembly: ComVisible(false)]

@@ -4,9 +4,9 @@ using OpenSALib3;
 
 namespace Tabuu.UI {
     /// <summary>
-    /// Interaction logic for ScriptWindow.xaml
+    ///   Interaction logic for ScriptWindow.xaml
     /// </summary>
-    public partial class ScriptWindow : Window {
+    public partial class ScriptWindow {
         public ScriptWindow() {
             InitializeComponent();
         }
