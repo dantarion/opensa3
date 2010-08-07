@@ -1,22 +1,19 @@
-﻿<Application x:Class="Tabuu.App"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:Tabuu.UI" StartupUri="UI/MainWindow.xaml">
-    <Application.Resources>
-        <ResourceDictionary>
-            <ContextMenu x:Key="DatFileContextMenu">
-                <MenuItem Header="Open Hex View..."  Command="{x:Static local:MainWindow.HexOpenCommand}" CommandParameter="{Binding}"/>
-                <MenuItem Header="Load Bone Names"  Command="{x:Static local:MainWindow.LoadBoneCommand}" CommandParameter="{Binding}"/>
-                <MenuItem Header="Save File" Command="{x:Static local:MainWindow.SaveFileCommand}" CommandParameter="{Binding}"/>
-                <MenuItem Header="Save File As..." Command="{x:Static local:MainWindow.SaveFileAsCommand}" CommandParameter="{Binding}"/>
-                <MenuItem Header="Close File" Command="{x:Static local:MainWindow.CloseFileCommand}" CommandParameter="{Binding}"/>
-            </ContextMenu>
-            <ContextMenu x:Key="DatElementContextMenu">
-                <MenuItem Header="Open Hex View..."  Command="{x:Static local:MainWindow.HexOpenCommand}" CommandParameter="{Binding}"/>
-            </ContextMenu>
-            <ContextMenu x:Key="NamedListContextMenu">
-                <MenuItem Header="Examine..."  Command="{x:Static local:MainWindow.ExamineCommand}" CommandParameter="{Binding}"/>
-            </ContextMenu>
-        </ResourceDictionary>
-    </Application.Resources>
+﻿<Application x:Class="Tabuu.App" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:local="clr-namespace:Tabuu.UI" StartupUri="UI/MainWindow.xaml">
+	<Application.Resources>
+		<ResourceDictionary>
+			<ContextMenu x:Key="DatFileContextMenu">
+				<MenuItem Header="Open Hex View..." Command="{x:Static local:MainWindow.HexOpenCommand}" CommandParameter="{Binding}" />
+				<MenuItem Header="Load Bone Names" Command="{x:Static local:MainWindow.LoadBoneCommand}" CommandParameter="{Binding}" />
+				<MenuItem Header="Save File" Command="{x:Static local:MainWindow.SaveFileCommand}" CommandParameter="{Binding}" />
+				<MenuItem Header="Save File As..." Command="{x:Static local:MainWindow.SaveFileAsCommand}" CommandParameter="{Binding}" />
+				<MenuItem Header="Close File" Command="{x:Static local:MainWindow.CloseFileCommand}" CommandParameter="{Binding}" />
+			</ContextMenu>
+			<ContextMenu x:Key="DatElementContextMenu">
+				<MenuItem Header="Open Hex View..." Command="{x:Static local:MainWindow.HexOpenCommand}" CommandParameter="{Binding}" />
+			</ContextMenu>
+			<ContextMenu x:Key="NamedListContextMenu">
+				<MenuItem Header="Examine..." Command="{x:Static local:MainWindow.ExamineCommand}" CommandParameter="{Binding}" />
+			</ContextMenu>
+		</ResourceDictionary>
+	</Application.Resources>
 </Application>

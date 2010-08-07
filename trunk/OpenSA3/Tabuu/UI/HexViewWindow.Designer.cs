@@ -77,7 +77,7 @@
             this.textBox3.Name = "textBox3";
             this.textBox3.Size = new System.Drawing.Size(100, 20);
             this.textBox3.TabIndex = 4;
-            this.textBox3.TextChanged += new System.EventHandler(this.textBox3_TextChanged);
+            this.textBox3.TextChanged += new System.EventHandler(this.TextBox3TextChanged);
             // 
             // textBox2
             // 
@@ -128,7 +128,7 @@
             this.hexBox1.TabIndex = 0;
             this.hexBox1.UseFixedBytesPerLine = true;
             this.hexBox1.VScrollBarVisible = true;
-            this.hexBox1.SelectionStartChanged += new System.EventHandler(this.hexBox1_SelectionStartChanged);
+            this.hexBox1.SelectionStartChanged += new System.EventHandler(this.HexBox1SelectionStartChanged);
             // 
             // label4
             // 
@@ -154,7 +154,7 @@
             this.button1.TabIndex = 8;
             this.button1.Text = "Jump!";
             this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.button1.Click += new System.EventHandler(this.Button1Click);
             // 
             // HexViewWindow
             // 

@@ -1,19 +1,19 @@
-﻿using System.Windows;
+﻿using System.Linq;
+using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
+using BrawlLib.IO;
 using OpenSALib3;
 using OpenSALib3.DatHandler;
-using Tabuu.Utility;
-using BrawlLib.IO;
-using System.Windows.Data;
 using OpenSALib3.Moveset;
-namespace Tabuu.UI
-{
+using Tabuu.Utility;
+
+namespace Tabuu.UI {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    ///   Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow
-    {
+    public partial class MainWindow {
         public static RoutedCommand HexOpenCommand = new RoutedCommand();
         public static RoutedCommand ExamineCommand = new RoutedCommand();
         public static RoutedCommand LoadBoneCommand = new RoutedCommand();
@@ -21,190 +21,176 @@ namespace Tabuu.UI
         public static RoutedCommand SaveFileAsCommand = new RoutedCommand();
         public static RoutedCommand CloseFileCommand = new RoutedCommand();
 
-        public MainWindow()
-        {
+        public MainWindow() {
             InitializeComponent();
             CommandBindings.Add(new CommandBinding(HexOpenCommand, HexOpenCommandExecuted, AlwaysExecute));
             CommandBindings.Add(new CommandBinding(CloseFileCommand, CloseFileCommandExecuted, AlwaysExecute));
             CommandBindings.Add(new CommandBinding(SaveFileCommand, SaveFileCommandExecuted, AlwaysExecute));
             CommandBindings.Add(new CommandBinding(LoadBoneCommand, LoadBoneCommandExecuted, AlwaysExecute));
-
             RunScript.LoadAssembly(typeof(DatElementWrapper).Assembly);
             Focus();
-
         }
 
-        private void MenuItemClickOpen(object sender, RoutedEventArgs e)
-        {
+        private void MenuItemClickOpen(object sender, RoutedEventArgs e) {
             var dialog = new Microsoft.Win32.OpenFileDialog();
             if (!dialog.ShowDialog().Value)
                 return;
-            loadFilename(dialog.FileName);
-
+            LoadFilename(dialog.FileName);
         }
-        private void MenuItemClickOpen2(object sender, RoutedEventArgs e)
-        {
+
+        private void MenuItemClickOpen2(object sender, RoutedEventArgs e) {
             var dialog = new System.Windows.Forms.FolderBrowserDialog();
             var result = dialog.ShowDialog();
             if (result != System.Windows.Forms.DialogResult.OK)
                 return;
-            string[] paths = {  @"captain\FitCaptain.pac",
-                                @"dedede\FitDedede.pac",
-                                @"diddy\FitDiddy.pac",
-                                @"donkey\FitDonkey.pac",
-                                @"falco\FitFalco.pac",
-                                @"fox\FitFox.pac",
-                                @"gamewatch\FitGameWatch.pac",
-                                @"ganon\FitGanon.pac",
-                                @"gkoopa\FitGKoopa.pac",
-                                @"ike\FitIke.pac",
-                                @"kirby\FitKirby.pac",
-                                @"koopa\FitKoopa.pac",
-                                @"link\FitLink.pac",
-                                @"lucario\FitLucario.pac",
-                                @"lucas\FitLucas.pac",
-                                @"luigi\FitLuigi.pac",
-                                @"mario\FitMario.pac",
-                                @"marth\FitMarth.pac",
-                                @"metaknight\FitMetaknight.pac",
-                                @"ness\FitNess.pac",
-                                @"peach\FitPeach.pac",
-                                @"pikachu\FitPikachu.pac",
-                                @"pikmin\FitPikmin.pac",
-                                @"pit\FitPit.pac",
-                                @"pokefushigisou\FitPokeFushigisou.pac",
-                                @"pokelizardon\FitPokeLizardon.pac",
-                                @"poketrainer\FitPokeTrainer.pac",
-                                @"pokezenigame\FitPokeZenigame.pac",
-                                @"popo\FitPopo.pac",
-                                @"purin\FitPurin.pac",
-                                @"robot\FitRobot.pac",
-                                @"samus\FitSamus.pac",
-                                @"sheik\FitSheik.pac",
-                                @"snake\FitSnake.pac",
-                                @"sonic\FitSonic.pac",
-                                @"szerosuit\FitSZerosuit.pac",
-                                @"toonlink\FitToonLink.pac",
-                                @"wario\FitWario.pac",
-                                @"warioman\FitWarioMan.pac",
-                                @"wolf\FitWolf.pac",
-                                @"yoshi\FitYoshi.pac",
-                                @"zakoball\FitZakoBall.pac",
-                                @"zakoboy\FitZakoBoy.pac",
-                                @"zakochild\FitZakoChild.pac",
-                                @"zakogirl\FitZakoGirl.pac",
-                                @"zelda\FitZelda.pac"};
-            foreach(string filename in paths)
-                if(System.IO.File.Exists(dialog.SelectedPath+@"\" +filename))
-                    loadFilename(dialog.SelectedPath + @"\" + filename);
-
+            string[] paths = {
+                                 @"captain\FitCaptain.pac",
+                                 @"dedede\FitDedede.pac",
+                                 @"diddy\FitDiddy.pac",
+                                 @"donkey\FitDonkey.pac",
+                                 @"falco\FitFalco.pac",
+                                 @"fox\FitFox.pac",
+                                 @"gamewatch\FitGameWatch.pac",
+                                 @"ganon\FitGanon.pac",
+                                 @"gkoopa\FitGKoopa.pac",
+                                 @"ike\FitIke.pac",
+                                 @"kirby\FitKirby.pac",
+                                 @"koopa\FitKoopa.pac",
+                                 @"link\FitLink.pac",
+                                 @"lucario\FitLucario.pac",
+                                 @"lucas\FitLucas.pac",
+                                 @"luigi\FitLuigi.pac",
+                                 @"mario\FitMario.pac",
+                                 @"marth\FitMarth.pac",
+                                 @"metaknight\FitMetaknight.pac",
+                                 @"ness\FitNess.pac",
+                                 @"peach\FitPeach.pac",
+                                 @"pikachu\FitPikachu.pac",
+                                 @"pikmin\FitPikmin.pac",
+                                 @"pit\FitPit.pac",
+                                 @"pokefushigisou\FitPokeFushigisou.pac",
+                                 @"pokelizardon\FitPokeLizardon.pac",
+                                 @"poketrainer\FitPokeTrainer.pac",
+                                 @"pokezenigame\FitPokeZenigame.pac",
+                                 @"popo\FitPopo.pac",
+                                 @"purin\FitPurin.pac",
+                                 @"robot\FitRobot.pac",
+                                 @"samus\FitSamus.pac",
+                                 @"sheik\FitSheik.pac",
+                                 @"snake\FitSnake.pac",
+                                 @"sonic\FitSonic.pac",
+                                 @"szerosuit\FitSZerosuit.pac",
+                                 @"toonlink\FitToonLink.pac",
+                                 @"wario\FitWario.pac",
+                                 @"warioman\FitWarioMan.pac",
+                                 @"wolf\FitWolf.pac",
+                                 @"yoshi\FitYoshi.pac",
+                                 @"zakoball\FitZakoBall.pac",
+                                 @"zakoboy\FitZakoBoy.pac",
+                                 @"zakochild\FitZakoChild.pac",
+                                 @"zakogirl\FitZakoGirl.pac",
+                                 @"zelda\FitZelda.pac"
+                             };
+            foreach (var filename in paths.Where(filename => System.IO.File.Exists(dialog.SelectedPath + @"\" + filename)))
+                LoadFilename(dialog.SelectedPath + @"\" + filename);
         }
-        private void loadFilename(string s)
-        {
+
+        private void LoadFilename(string s) {
             var fp = FileMap.FromFile(s, FileMapProtect.ReadWrite);
             var ds = new BrawlLib.SSBB.ResourceNodes.DataSource(fp);
             var rs = BrawlLib.SSBB.ResourceNodes.NodeFactory.FromSource(null, ds);
             TreeView.Items.Add(DatFile.FromNode(rs));
         }
-        private void LoadBoneCommandExecuted(object sender, ExecutedRoutedEventArgs e)
-        {
+
+        private static void LoadBoneCommandExecuted(object sender, ExecutedRoutedEventArgs e) {
             var dialog = new Microsoft.Win32.OpenFileDialog();
             if (!dialog.ShowDialog().Value)
                 return;
-            var d = e.Parameter as DatFile;
-            d.readBoneNames(dialog.FileName);
+            var d = (DatFile)e.Parameter;
+            d.ReadBoneNames(dialog.FileName);
         }
-        private void HexOpenCommandExecuted(object sender, ExecutedRoutedEventArgs e)
-        {
+
+        private static void HexOpenCommandExecuted(object sender, ExecutedRoutedEventArgs e) {
             e.Parameter.ToString();
-            var d = e.Parameter as DatElement;
+            var d = (DatElement)e.Parameter;
             new HexViewWindow(new DatElementWrapper(d), d.Name).Show();
         }
-        private void CloseFileCommandExecuted(object sender, ExecutedRoutedEventArgs e)
-        {
+
+        private void CloseFileCommandExecuted(object sender, ExecutedRoutedEventArgs e) {
             e.Parameter.ToString();
-            var d = e.Parameter as DatFile;
-            if (d.Changed == true)
-            {
-                var result = MessageBox.Show("Unsaved changes detected! Are you sure you want to close this file?", "Close file?", MessageBoxButton.OKCancel);
+            var d = (DatFile)e.Parameter;
+            if (d.Changed) {
+                var result = MessageBox.Show("Unsaved changes detected! Are you sure you want to close this file?",
+                                             "Close file?", MessageBoxButton.OKCancel);
                 if (result != MessageBoxResult.OK)
                     return;
             }
-            d._node.Rebuild(true);
-            d._node.RootNode.Merge();
+            d.Node.Rebuild(true);
+            d.Node.RootNode.Merge();
             TreeView.Items.Remove(e.Parameter);
         }
-        private void SaveFileCommandExecuted(object sender, ExecutedRoutedEventArgs e)
-        {
+
+        private static void SaveFileCommandExecuted(object sender, ExecutedRoutedEventArgs e) {
             e.Parameter.ToString();
-            var d = e.Parameter as DatFile;
-            if (d.Changed == true)
-            {
-                var result = MessageBox.Show("This will overrite the file! Are you sure you want to save this file?", "Save file?", MessageBoxButton.OKCancel);
+            var d = (DatFile)e.Parameter;
+            if (d.Changed) {
+                var result = MessageBox.Show("This will overrite the file! Are you sure you want to save this file?",
+                                             "Save file?", MessageBoxButton.OKCancel);
                 if (result != MessageBoxResult.OK)
                     return;
             }
-            var filename = d._node.RootNode.OriginalSource.Map.FilePath;
-
-            d._node.Rebuild(true);
-            d._node.RootNode.Merge();
-            d._node.RootNode.Export(filename);
+            var filename = d.Node.RootNode.OriginalSource.Map.FilePath;
+            d.Node.Rebuild(true);
+            d.Node.RootNode.Merge();
+            d.Node.RootNode.Export(filename);
         }
-        private void AlwaysExecute(object sender, CanExecuteRoutedEventArgs e)
-        {
+
+        private static void AlwaysExecute(object sender, CanExecuteRoutedEventArgs e) {
             e.CanExecute = true;
         }
 
-        private void MenuItem_Click(object sender, RoutedEventArgs e)
-        {
-
+        private void MenuItemClick(object sender, RoutedEventArgs e) {
             RunScript.SetVar("loadedFiles", TreeView.Items);
             new ScriptWindow().Show();
         }
 
-        private void ViewPanel_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
-        {
+        private void ViewPanelDataContextChanged(object sender, DependencyPropertyChangedEventArgs e) {
             ViewPanel.Children.Clear();
-            if (ViewPanel.DataContext is OpenSALib3.Utility.NamedList<Attribute>)
-            {
-                DataGrid dg = new DataGrid();
-                dg.ItemsSource = ViewPanel.DataContext as System.Collections.IEnumerable;
-                dg.AutoGenerateColumns = true;
-                dg.CanUserSortColumns = false;
-                dg.CanUserResizeRows = false;
-                DataGridTextColumn col1 = new DataGridTextColumn();
-                col1.Header = "Name";
-                col1.Binding = new Binding(".");
-                dg.Columns.Add(col1);
-
-                DataGridTextColumn col2 = new DataGridTextColumn();
-                col2.Header = "Value";
-                col2.Binding = new Binding("Value");
-                dg.Columns.Add(col2);
-
+            DataGrid dg;
+            if (ViewPanel.DataContext is OpenSALib3.Utility.NamedList<Attribute>) {
+                dg = new DataGrid {
+                    ItemsSource = ViewPanel.DataContext as System.Collections.IEnumerable,
+                    AutoGenerateColumns = true,
+                    CanUserSortColumns = false,
+                    CanUserResizeRows = false
+                };
+                dg.Columns.Add(
+                    new DataGridTextColumn {
+                        Header = "Name", Binding = new Binding(".")
+                    });
+                dg.Columns.Add(
+                    new DataGridTextColumn {
+                        Header = "Value", Binding = new Binding("Value")
+                    });
                 dg.Margin = new Thickness(0);
                 ViewPanel.Children.Add(dg);
-            }
-            if (ViewPanel.DataContext is OpenSALib3.Utility.NamedList<int>)
-            {
-                DataGrid dg = new DataGrid();
-                dg.ItemsSource = ViewPanel.DataContext as System.Collections.IEnumerable;
-                dg.AutoGenerateColumns = true;
-                dg.CanUserSortColumns = false;
-                dg.CanUserResizeRows = false;
-                DataGridTextColumn col1 = new DataGridTextColumn();
-                col1.Header = "Value";
-                col1.Binding = new Binding(".");
-                dg.Columns.Add(col1);
+            } else if ((ViewPanel.DataContext is OpenSALib3.Utility.NamedList<int>)) {
+                dg = new DataGrid {
+                    ItemsSource = ViewPanel.DataContext as System.Collections.IEnumerable,
+                    AutoGenerateColumns = true,
+                    CanUserSortColumns = false,
+                    CanUserResizeRows = false
+                };
+                dg.Columns.Add(
+                    new DataGridTextColumn {
+                        Header = "Value",
+                        Binding = new Binding(".")
+                    });
                 dg.Margin = new Thickness(0);
                 ViewPanel.Children.Add(dg);
             }
         }
 
-        private void TreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
-        {
-            
-        }
+        private void TreeViewSelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e) { }
     }
 }
-
