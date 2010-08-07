@@ -3,21 +3,12 @@
     ///   Represents a position in the HexBox control
     /// </summary>
     internal struct BytePositionInfo {
-        public BytePositionInfo(long index, int characterPosition) {
-            _index = index;
-            _characterPosition = characterPosition;
+        public BytePositionInfo(long index, int characterPosition) : this() {
+            Index = index;
+            CharacterPosition = characterPosition;
         }
 
-        public int CharacterPosition {
-            get { return _characterPosition; }
-        }
-
-        private int _characterPosition;
-
-        public long Index {
-            get { return _index; }
-        }
-
-        private long _index;
+        public int CharacterPosition { get; private set; }
+        public long Index { get; private set; }
     }
 }

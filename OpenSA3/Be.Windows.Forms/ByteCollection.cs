@@ -73,7 +73,7 @@ namespace Be.Windows.Forms {
         /// </summary>
         /// <returns>an array of bytes.</returns>
         public byte[] GetBytes() {
-            byte[] bytes = new byte[Count];
+            var bytes = new byte[Count];
             InnerList.CopyTo(0, bytes, 0, bytes.Length);
             return bytes;
         }
@@ -113,8 +113,8 @@ namespace Be.Windows.Forms {
         /// </summary>
         /// <returns>the array containing all bytes.</returns>
         public byte[] ToArray() {
-            byte[] data = new byte[this.Count];
-            this.CopyTo(data, 0);
+            var data = new byte[Count];
+            CopyTo(data, 0);
             return data;
         }
     }

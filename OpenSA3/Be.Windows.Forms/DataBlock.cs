@@ -1,22 +1,9 @@
 namespace Be.Windows.Forms {
     internal abstract class DataBlock {
-        internal DataMap _map;
-        internal DataBlock _nextBlock;
-        internal DataBlock _previousBlock;
         public abstract long Length { get; }
-
-        public DataMap Map {
-            get { return _map; }
-        }
-
-        public DataBlock NextBlock {
-            get { return _nextBlock; }
-        }
-
-        public DataBlock PreviousBlock {
-            get { return _previousBlock; }
-        }
-
+        public DataMap Map { get; internal set; }
+        public DataBlock NextBlock { get; internal set; }
+        public DataBlock PreviousBlock { get; internal set; }
         public abstract void RemoveBytes(long position, long count);
     }
 }

@@ -1,4 +1,5 @@
 using System;
+using System.Drawing;
 
 namespace Be.Windows.Forms {
     /// <summary>
@@ -13,7 +14,7 @@ namespace Be.Windows.Forms {
         /// <summary>
         ///   Contains a byte collection.
         /// </summary>
-        private ByteCollection _bytes;
+        private readonly ByteCollection _bytes;
 
         /// <summary>
         ///   Initializes a new instance of the DynamicByteProvider class.
@@ -103,9 +104,9 @@ namespace Be.Windows.Forms {
         /// <param name = "index">the start index of the bytes to delete.</param>
         /// <param name = "length">the length of bytes to delete.</param>
         public void DeleteBytes(long index, long length) {
-            int internal_index = (int) Math.Max(0, index);
-            int internal_length = (int) Math.Min((int) Length, length);
-            _bytes.RemoveRange(internal_index, internal_length);
+            var internalIndex = (int) Math.Max(0, index);
+            var internalLength = (int) Math.Min((int) Length, length);
+            _bytes.RemoveRange(internalIndex, internalLength);
             OnLengthChanged(EventArgs.Empty);
             OnChanged(EventArgs.Empty);
         }
@@ -150,7 +151,7 @@ namespace Be.Windows.Forms {
         }
         #endregion
 
-        public System.Drawing.Color GetByteColor(long index) {
+        public Color GetByteColor(long index) {
             throw new NotImplementedException();
         }
     }

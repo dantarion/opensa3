@@ -1,4 +1,5 @@
 using System;
+using System.Drawing;
 
 namespace Be.Windows.Forms {
     /// <summary>
@@ -12,7 +13,7 @@ namespace Be.Windows.Forms {
         /// <returns>the byte to read</returns>
         byte ReadByte(long index);
 
-        System.Drawing.Color GetByteColor(long index);
+        Color GetByteColor(long index);
 
         /// <summary>
         ///   Writes a byte into the provider

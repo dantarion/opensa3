@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Drawing;
 using System.IO;
 
 namespace Be.Windows.Forms {
@@ -16,7 +17,7 @@ namespace Be.Windows.Forms {
             ///   Gets or sets a byte in the collection
             /// </summary>
             public byte this[long index] {
-                get { return (byte) this.Dictionary[index]; }
+                get { return (byte)Dictionary[index]; }
                 set { Dictionary[index] = value; }
             }
 
@@ -48,12 +49,7 @@ namespace Be.Windows.Forms {
         /// <summary>
         ///   Contains all changes
         /// </summary>
-        private WriteCollection _writes = new WriteCollection();
-
-        /// <summary>
-        ///   Contains the file name.
-        /// </summary>
-        private string _fileName;
+        private readonly WriteCollection _writes;
 
         /// <summary>
         ///   Contains the file stream.
@@ -63,25 +59,22 @@ namespace Be.Windows.Forms {
         /// <summary>
         ///   Read-only access.
         /// </summary>
-        private bool _readOnly;
+        private readonly bool _readOnly;
 
         /// <summary>
         ///   Initializes a new instance of the FileByteProvider class.
         /// </summary>
         /// <param name = "fileName"></param>
         public FileByteProvider(string fileName) {
-            _fileName = fileName;
+            _writes = new WriteCollection();
+            FileName = fileName;
             try {
                 // try to open in write mode
                 _fileStream = File.Open(fileName, FileMode.Open, FileAccess.ReadWrite, FileShare.Read);
             } catch {
                 // write mode failed, try to open in read-only and fileshare friendly mode.
-                try {
-                    _fileStream = File.Open(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-                    _readOnly = true;
-                } catch {
-                    throw;
-                }
+                _fileStream = File.Open(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                _readOnly = true;
             }
         }
 
@@ -106,9 +99,7 @@ namespace Be.Windows.Forms {
         /// <summary>
         ///   Gets the name of the file the byte provider is using.
         /// </summary>
-        public string FileName {
-            get { return _fileName; }
-        }
+        public string FileName { get; private set; }
 
         /// <summary>
         ///   Returns a value if there are some changes.
@@ -122,17 +113,16 @@ namespace Be.Windows.Forms {
         ///   Updates the file with all changes the write buffer contains.
         /// </summary>
         public void ApplyChanges() {
-            if (this._readOnly)
+            if (_readOnly)
                 throw new Exception("File is in read-only mode.");
             if (!HasChanges())
                 return;
-            IDictionaryEnumerator en = _writes.GetEnumerator();
+            var en = _writes.GetEnumerator();
             while (en.MoveNext()) {
-                long index = (long) en.Key;
-                byte value = (byte) en.Value;
-                if (_fileStream.Position != index)
-                    _fileStream.Position = index;
-                _fileStream.Write(new byte[] {value}, 0, 1);
+                var index = (long)en.Key;
+                var value = (byte)en.Value;
+                _fileStream.Position = index;
+                _fileStream.Write(new[] { value }, 0, 1);
             }
             _writes.Clear();
         }
@@ -158,10 +148,8 @@ namespace Be.Windows.Forms {
         public byte ReadByte(long index) {
             if (_writes.Contains(index))
                 return _writes[index];
-            if (_fileStream.Position != index)
-                _fileStream.Position = index;
-            byte res = (byte) _fileStream.ReadByte();
-            return res;
+            _fileStream.Position = index;
+            return (byte)_fileStream.ReadByte();
         }
 
         /// <summary>
@@ -224,7 +212,7 @@ namespace Be.Windows.Forms {
         /// </summary>
         public void Dispose() {
             if (_fileStream != null) {
-                _fileName = null;
+                FileName = null;
                 _fileStream.Close();
                 _fileStream = null;
             }
@@ -232,7 +220,7 @@ namespace Be.Windows.Forms {
         }
         #endregion
 
-        public System.Drawing.Color GetByteColor(long index) {
+        public Color GetByteColor(long index) {
             throw new NotImplementedException();
         }
     }
