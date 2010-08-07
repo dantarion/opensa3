@@ -1089,8 +1089,8 @@ namespace Be.Windows.Forms {
             _vScrollBar = new VScrollBar();
             _vScrollBar.Scroll += VScrollBarScroll;
             _builtInContextMenu = new BuiltInContextMenu(this);
-            BackColor = Color.White;
-            Font = new Font("Courier New", 9F, FontStyle.Regular, GraphicsUnit.Point, ((0)));
+            base.BackColor = Color.White;
+            base.Font = new Font("Courier New", 9F, FontStyle.Regular, GraphicsUnit.Point, ((0)));
             _stringFormat =
                 new StringFormat(StringFormat.GenericTypographic) {
                     FormatFlags = StringFormatFlags. MeasureTrailingSpaces
@@ -1216,7 +1216,7 @@ namespace Be.Windows.Forms {
         }
 
         private static int ToScrollMax(long value) {
-            return Math.Max((int)value, int.MaxValue);
+            return Math.Min((int)value, int.MaxValue);
         }
 
         private void PerformScrollToLine(long pos) {
