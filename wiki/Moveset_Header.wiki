@@ -4,6 +4,9 @@
 
 Each moveset .dat file has a section marked "data". This section contains offsets to the every section in the moveset. This section is a different length per character, and files edited with PSA sometimes give OpenSA3 some trouble here. Heres a list of data header lengths for the default files.
 
+*Dantarion says*:
+    As a funny note, the reason PSA cannot open Dedede's file is because the "data" section is not first on the list of sections in his file.
+
 || .pac Name || "data" header length || # of entries (length/4) || extra entries ||
 || FitCaptain || 156 || 39 || 7 ||
 || FitDedede || 188 || 47 || 15 ||
