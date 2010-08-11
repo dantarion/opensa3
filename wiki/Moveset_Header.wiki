@@ -1,0 +1,53 @@
+#summary Format documentation about the moveset header.
+
+= Introduction =
+
+Each moveset .dat file has a section marked "data". This section contains offsets to the every section in the moveset. This section is a different length per character, and files edited with PSA sometimes give OpenSA3 some trouble here. Heres a list of data header lengths for the default files.
+
+|| .pac Name || "data" header length || # of entries (length/4)
+|| FitCaptain || 156 || 39 ||
+|| FitDedede || 188 || 47 ||
+|| FitDiddy || 176 || 44 ||
+|| FitDonkey || 160 || 40 ||
+|| FitFalco || 168 || 42 ||
+|| FitFox || 176 || 44 ||
+|| FitGameWatch || 188 || 47 ||
+|| FitGanon || 148 || 37 ||
+|| FitGKoopa || 148 || 37 ||
+|| FitIke || 156 || 39 ||
+|| FitKirby || 396 || 99 ||
+|| FitKoopa || 144 || 36 ||
+|| FitLink || 204 || 51 ||
+|| FitLucario || 168 || 42 ||
+|| FitLucas || 176 || 44 ||
+|| FitLuigi || 156 || 39 ||
+|| FitMario || 164 || 41 ||
+|| FitMarth || 148 || 37 ||
+|| FitMetaknight || 144 || 36 ||
+|| FitNess || 180 || 45 ||
+|| FitPeach || 180 || 45 ||
+|| FitPikachu || 168 || 42 ||
+|| FitPikmin || 176 || 44 ||
+|| FitPit || 176 || 44 ||
+|| FitPokeFushigisou || 152 || 38 ||
+|| FitPokeLizardon || 156 || 39 ||
+|| FitPokeTrainer || 156 || 39 ||
+|| FitPokeZenigame || 156 || 39 ||
+|| FitPopo || 196 || 49 ||
+|| FitPurin || 136 || 34 ||
+|| FitRobot || 180 || 45 ||
+|| FitSamus || 212 || 53 ||
+|| FitSheik || 160 || 40 ||
+|| FitSnake || 204 || 51 ||
+|| FitSonic || 156 || 39 ||
+|| FitSZerosuit || 172 || 43 ||
+|| FitToonLink || 204 || 51 ||
+|| FitWario || 164 || 41 ||
+|| FitWarioMan || 160 || 40 ||
+|| FitWolf || 176 || 44 ||
+|| FitYoshi || 176 || 44 ||
+|| FitZakoBall || 128 || 32 ||
+|| FitZakoBoy || 128 || 32 ||
+|| FitZakoChild || 128 || 32 ||
+|| FitZakoGirl || 128 || 32 ||
+|| FitZelda || 164 || 41 ||
