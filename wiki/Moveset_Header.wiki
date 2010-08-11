@@ -7,6 +7,7 @@ Each moveset .dat file has a section marked "data". This section contains offset
 *Dantarion says*:
     As a funny note, the reason PSA cannot open Dedede's file is because the "data" section is not first on the list of sections in his file.
 
+== Data Section Lengths ==
 || .pac Name || "data" header length || # of entries (length/4) || extra entries ||
 || FitCaptain || 156 || 39 || 7 ||
 || FitDedede || 188 || 47 || 15 ||
@@ -54,3 +55,10 @@ Each moveset .dat file has a section marked "data". This section contains offset
 || FitZakoChild || 128 || 32 || 0 ||
 || FitZakoGirl || 128 || 32 || 0 ||
 || FitZelda || 164 || 41 || 9 ||
+
+== What does this mean? ==
+Lets take a sec and look at this. The smallest data sections belong to the Zako's, so they probably represent the minimal data needed for a character. The only character who comes close is Purin(Jigglypuff) who has two extra entries.
+
+On the other side of the equation, Kirby has waaay more than anyone else, and Samus, Link, Zelda, etc, all have higher values.
+
+Why is this? These extra values have to do with articles, which can span from things like projectiles to other random things that some characters have and some don't. Anyways, for now lets focus on the 32 values all characters share.
