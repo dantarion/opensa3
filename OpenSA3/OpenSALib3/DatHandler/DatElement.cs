@@ -15,6 +15,17 @@ namespace OpenSALib3.DatHandler {
         public DatElement Parent { get; set; }
 
         [Browsable(false)]
+        public String Path
+        {
+            get
+            {
+                if(Parent != null)
+                    return Parent.Path + "/" + Name;
+                return Name;
+            }
+        }
+
+        [Browsable(false)]
         public Color Color { get; set; }
 
         [Category("Element")]
@@ -45,5 +56,23 @@ namespace OpenSALib3.DatHandler {
         public virtual IEnumerator GetEnumerator() {
             return new List<object>().GetEnumerator();
         }
+        #region ScriptingFunctions
+        public unsafe byte ReadByte(int offset)
+        {
+            return *(byte*)(RootFile.Address + FileOffset + offset);
+        }
+        public unsafe short ReadShort(int offset)
+        {
+            return *(bshort*)(RootFile.Address + FileOffset + offset);
+        }
+        public unsafe int ReadInt(int offset)
+        {
+            return *(bint*)(RootFile.Address + FileOffset + offset);
+        }
+        public unsafe float ReadFloat(int offset)
+        {
+            return *(bfloat*)(RootFile.Address + FileOffset + offset);
+        }
+        #endregion
     }
 }

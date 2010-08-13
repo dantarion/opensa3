@@ -87,18 +87,5 @@ namespace Tabuu.Utility {
         }
         #endregion
 
-        #region Scripting Usability Functions
-        public unsafe int ReadInt(int offset) {
-            return *(bint*)(_datelement.RootFile.Address + _datelement.FileOffset + offset);
-        }
-
-        public unsafe short ReadShort(int offset) {
-            return *(bshort*)(_datelement.RootFile.Address + _datelement.FileOffset + offset);
-        }
-
-        public unsafe float ReadFloat(int offset) {
-            return *(bfloat*)(_datelement.RootFile.Address + _datelement.FileOffset + offset);
-        }
-        #endregion
     }
 }
