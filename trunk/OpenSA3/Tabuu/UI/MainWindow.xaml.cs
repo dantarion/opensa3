@@ -174,19 +174,34 @@ namespace Tabuu.UI {
                     });
                 dg.Margin = new Thickness(0);
                 ViewPanel.Children.Add(dg);
-            } else if ((ViewPanel.DataContext is OpenSALib3.Utility.NamedList<int>)) {
-                dg = new DataGrid {
+            }
+            else if ((ViewPanel.DataContext is OpenSALib3.Utility.NamedList<int>))
+            {
+                dg = new DataGrid
+                {
                     ItemsSource = ViewPanel.DataContext as System.Collections.IEnumerable,
                     AutoGenerateColumns = true,
                     CanUserSortColumns = false,
                     CanUserResizeRows = false
                 };
                 dg.Columns.Add(
-                    new DataGridTextColumn {
+                    new DataGridTextColumn
+                    {
                         Header = "Value",
                         Binding = new Binding(".")
                     });
                 dg.Margin = new Thickness(0);
+                ViewPanel.Children.Add(dg);
+            }
+            else if ((ViewPanel.DataContext is System.Collections.IEnumerable))
+            {
+                dg = new DataGrid
+                {
+                    ItemsSource = ViewPanel.DataContext as System.Collections.IEnumerable,
+                    AutoGenerateColumns = true,
+                    CanUserSortColumns = false,
+                    CanUserResizeRows = false
+                };
                 ViewPanel.Children.Add(dg);
             }
         }
