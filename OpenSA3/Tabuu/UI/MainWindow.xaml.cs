@@ -15,8 +15,9 @@ namespace Tabuu.UI {
     /// </summary>
     public partial class MainWindow {
         public static RoutedCommand HexOpenCommand = new RoutedCommand();
+        public static RoutedCommand ModelOpenCommand = new RoutedCommand();
         public static RoutedCommand ExamineCommand = new RoutedCommand();
-        public static RoutedCommand LoadBoneCommand = new RoutedCommand();
+        public static RoutedCommand LoadModelCommand = new RoutedCommand();
         public static RoutedCommand SaveFileCommand = new RoutedCommand();
         public static RoutedCommand SaveFileAsCommand = new RoutedCommand();
         public static RoutedCommand CloseFileCommand = new RoutedCommand();
@@ -24,9 +25,10 @@ namespace Tabuu.UI {
         public MainWindow() {
             InitializeComponent();
             CommandBindings.Add(new CommandBinding(HexOpenCommand, HexOpenCommandExecuted, AlwaysExecute));
+            CommandBindings.Add(new CommandBinding(ModelOpenCommand, ModelOpenCommandExecuted, AlwaysExecute));
             CommandBindings.Add(new CommandBinding(CloseFileCommand, CloseFileCommandExecuted, AlwaysExecute));
             CommandBindings.Add(new CommandBinding(SaveFileCommand, SaveFileCommandExecuted, AlwaysExecute));
-            CommandBindings.Add(new CommandBinding(LoadBoneCommand, LoadBoneCommandExecuted, AlwaysExecute));
+            CommandBindings.Add(new CommandBinding(LoadModelCommand, LoadModelCommandExecuted, AlwaysExecute));
             RunScript.LoadAssembly(typeof(DatElementWrapper).Assembly);
             Focus();
         }
@@ -102,18 +104,26 @@ namespace Tabuu.UI {
             TreeView.Items.Add(DatFile.FromNode(rs));
         }
 
-        private static void LoadBoneCommandExecuted(object sender, ExecutedRoutedEventArgs e) {
+        private static void LoadModelCommandExecuted(object sender, ExecutedRoutedEventArgs e) {
             var dialog = new Microsoft.Win32.OpenFileDialog();
             if (!dialog.ShowDialog().Value)
                 return;
             var d = (DatFile)e.Parameter;
-            d.ReadBoneNames(dialog.FileName);
+            d.LoadModel(dialog.FileName);
         }
 
         private static void HexOpenCommandExecuted(object sender, ExecutedRoutedEventArgs e) {
             e.Parameter.ToString();
             var d = (DatElement)e.Parameter;
             new HexViewWindow(new DatElementWrapper(d), d.Name).Show();
+        }
+        private static void ModelOpenCommandExecuted(object sender, ExecutedRoutedEventArgs e)
+        {
+
+            e.Parameter.ToString();
+            var d = (DatFile)e.Parameter;
+            if(d.Model != null)
+            new ModelViewerWindow(d).Show();
         }
 
         private void CloseFileCommandExecuted(object sender, ExecutedRoutedEventArgs e) {
@@ -125,8 +135,8 @@ namespace Tabuu.UI {
                 if (result != MessageBoxResult.OK)
                     return;
             }
-            d.Node.Rebuild(true);
-            d.Node.RootNode.Merge();
+            d.Node.RootNode.Dispose();
+            //d.Node.RootNode.Merge();
             TreeView.Items.Remove(e.Parameter);
         }
 
@@ -152,58 +162,6 @@ namespace Tabuu.UI {
         private void MenuItemClick(object sender, RoutedEventArgs e) {
             RunScript.SetVar("loadedFiles", TreeView.Items);
             new ScriptWindow().Show();
-        }
-
-        private void ViewPanelDataContextChanged(object sender, DependencyPropertyChangedEventArgs e) {
-            ViewPanel.Children.Clear();
-            DataGrid dg;
-            if (ViewPanel.DataContext is OpenSALib3.Utility.NamedList<Attribute>) {
-                dg = new DataGrid {
-                    ItemsSource = ViewPanel.DataContext as System.Collections.IEnumerable,
-                    AutoGenerateColumns = true,
-                    CanUserSortColumns = false,
-                    CanUserResizeRows = false
-                };
-                dg.Columns.Add(
-                    new DataGridTextColumn {
-                        Header = "Name", Binding = new Binding(".")
-                    });
-                dg.Columns.Add(
-                    new DataGridTextColumn {
-                        Header = "Value", Binding = new Binding("Value")
-                    });
-                dg.Margin = new Thickness(0);
-                ViewPanel.Children.Add(dg);
-            }
-            else if ((ViewPanel.DataContext is OpenSALib3.Utility.NamedList<int>))
-            {
-                dg = new DataGrid
-                {
-                    ItemsSource = ViewPanel.DataContext as System.Collections.IEnumerable,
-                    AutoGenerateColumns = true,
-                    CanUserSortColumns = false,
-                    CanUserResizeRows = false
-                };
-                dg.Columns.Add(
-                    new DataGridTextColumn
-                    {
-                        Header = "Value",
-                        Binding = new Binding(".")
-                    });
-                dg.Margin = new Thickness(0);
-                ViewPanel.Children.Add(dg);
-            }
-            else if ((ViewPanel.DataContext is System.Collections.IEnumerable))
-            {
-                dg = new DataGrid
-                {
-                    ItemsSource = ViewPanel.DataContext as System.Collections.IEnumerable,
-                    AutoGenerateColumns = true,
-                    CanUserSortColumns = false,
-                    CanUserResizeRows = false
-                };
-                ViewPanel.Children.Add(dg);
-            }
         }
 
         private void TreeViewSelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e) { }

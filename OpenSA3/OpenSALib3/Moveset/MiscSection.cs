@@ -18,7 +18,15 @@ namespace OpenSALib3.Moveset {
             public buint UnknownSection2Count;
             public buint BoneRef2Offset;
             public buint UnknownSection3Offset;
-            //TODO: Finish this section. should be 20 entries here
+            public buint UnknownSection4Offset;
+            public buint UnknownSection5Offset;
+            public buint MultiJumpOffset;
+            public buint GlideOffset;
+            public buint CrawlOffset;
+            public buint UnknownSection9Offset;
+            public buint TetherOffset;
+            public buint UnknownSection12Offset;
+            public buint UnknownSection13Offset;
         }
 
         private readonly Header _header;
@@ -45,13 +53,19 @@ namespace OpenSALib3.Moveset {
         public List<LedgegrabBox> LedgegrabBoxes {
             get { return _ledgegrabboxes; }
         }
+        private readonly List<BoneRef> _boneref2 = new List<BoneRef>();
 
+        public List<BoneRef> BoneRef2
+        {
+            get { return _boneref2; }
+        }
         public unsafe MiscSection(DatElement parent, uint fileoffset)
             : base(parent, fileoffset) {
             Length = 4*20;
             Name = "Misc";
             _header = *(Header*) (RootFile.Address + FileOffset);
-            for (uint i = 0; i < 0x0A; i++)
+            /* TODO: Figure out proper length of section */
+            for (uint i = 0; i < 10; i++)
                 _section1.Add(*(bint*) (RootFile.Address + _header.Section1 + i*4));
             for (uint i = 0; i < +_header.HurtBoxCount; i++)
                 _hurtboxes.Add(new Hurtbox(this, _header.HurtBoxOffset + i*4*5));
@@ -59,6 +73,8 @@ namespace OpenSALib3.Moveset {
                 _unknowntype1List.Add(new UnknownType1(this, _header.UnknownSectionOffset + i*4*8));
             for (uint i = 0; i < +_header.LedgegrabCount; i++)
                 _ledgegrabboxes.Add(new LedgegrabBox(this, _header.LedgegrabOffset + i*4*4));
+            for (uint i = _header.BoneRef2Offset; i < _header.BoneRef2Offset+4*10; i += 4)
+                _boneref2.Add(new BoneRef(this,i, "Unknown"));
         }
 
         public override IEnumerator GetEnumerator() {
@@ -86,6 +102,8 @@ namespace OpenSALib3.Moveset {
                             return new NamedList<UnknownType1>(_file._unknowntype1List, "UnknownType1");
                         case 4:
                             return new NamedList<LedgegrabBox>(_file._ledgegrabboxes, "LedgegrabBoxes");
+                        case 5:
+                            return new NamedList<BoneRef>(_file._boneref2, "BoneRef");
                     }
                     return null;
                 }
@@ -93,7 +111,7 @@ namespace OpenSALib3.Moveset {
 
             public bool MoveNext() {
                 _i++;
-                return _i <= 4;
+                return _i <= 5;
             }
 
             public void Reset() {

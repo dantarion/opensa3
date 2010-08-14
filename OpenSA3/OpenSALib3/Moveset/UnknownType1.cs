@@ -59,6 +59,7 @@ namespace OpenSALib3.Moveset {
         public unsafe UnknownType1(DatElement parent, uint offset)
             : base(parent, offset) {
             Name = "UnknownType1";
+            Length = 4 * 8;
             _data = *(Data*) (RootFile.Address + offset);
         }
     }
