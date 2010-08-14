@@ -1,21 +1,23 @@
 ﻿using System;
 using OpenSALib3.DatHandler;
-
+using System.ComponentModel;
 namespace OpenSALib3.Moveset {
     public sealed class BoneRef : DatElement {
         private bint _index;
 
-        public int Index {
+        public int BoneIndex
+        {
             get { return _index; }
             set { _index = value; }
         }
-
+        [Browsable(true)]
         public string BoneName {
-            get { return RootFile.GetBoneName(Index); }
+            get { return RootFile.GetBoneName(BoneIndex); }
         }
 
         public unsafe BoneRef(DatElement parent, uint offset, String name)
             : base(parent, offset) {
+
             Name = name;
             _index = *(bint*) (RootFile.Address + offset);
         }

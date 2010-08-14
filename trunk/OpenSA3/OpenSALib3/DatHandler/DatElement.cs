@@ -10,11 +10,16 @@ namespace OpenSALib3.DatHandler {
         public virtual DatFile RootFile {
             get { return Parent is DatFile ? (DatFile)Parent : Parent.RootFile; }
         }
-
+        private VoidPtr _address;
+        [Browsable(false)]
+        public virtual VoidPtr Address
+        {
+            get { return _address; }
+        }
         [Browsable(false)]
         public DatElement Parent { get; set; }
 
-        [Browsable(false)]
+        [Browsable(true)]
         public String Path
         {
             get
@@ -29,19 +34,24 @@ namespace OpenSALib3.DatHandler {
         public Color Color { get; set; }
 
         [Category("Element")]
+        [Browsable(true)]
         public string Name { get; protected set; }
 
         [Category("Element")]
+        [Browsable(true)]
         public uint FileOffset { get; protected set; }
 
         [Category("Element")]
+        [ReadOnly(true)]
         public uint Length { get; set; }
 
         private static readonly Random Random = new Random();
 
         protected DatElement(DatElement parent, uint fileoffset) {
+            Length = 4;
             Parent = parent;
             FileOffset = fileoffset;
+            _address = RootFile.Address + FileOffset;
             Color = Color.FromArgb(255/2, Random.Next(255), Random.Next(255), Random.Next(255));
         }
 
