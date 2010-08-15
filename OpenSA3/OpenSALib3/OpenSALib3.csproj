@@ -76,19 +76,30 @@
     <Compile Include="DatHandler\DatElement.cs" />
     <Compile Include="DatHandler\DatSection.cs" />
     <Compile Include="DatHandler\DatFile.cs" />
+    <Compile Include="DatHandler\GenericElement.cs" />
     <Compile Include="Moveset\Attribute.cs" />
     <Compile Include="Moveset\BoneRef.cs" />
+    <Compile Include="Moveset\CrawlData.cs" />
+    <Compile Include="Moveset\GlideData.cs" />
     <Compile Include="Moveset\Hurtbox.cs" />
     <Compile Include="Moveset\LedgegrabBox.cs" />
     <Compile Include="Moveset\MiscSection.cs" />
     <Compile Include="Moveset\MovesetSection.cs" />
+    <Compile Include="Moveset\MultiJumpData.cs" />
+    <Compile Include="Moveset\TetherData.cs" />
     <Compile Include="Moveset\UnknownType1.cs" />
+    <Compile Include="Moveset\UnknownType2.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="PSA\ActionOverride.cs" />
+    <Compile Include="PSA\Command.cs" />
+    <Compile Include="PSA\CommandList.cs" />
+    <Compile Include="PSA\Parameter.cs" />
+    <Compile Include="PSA\SubactionFlags.cs" />
     <Compile Include="RunScript.cs" />
     <Compile Include="Utility\NamedList.cs" />
   </ItemGroup>

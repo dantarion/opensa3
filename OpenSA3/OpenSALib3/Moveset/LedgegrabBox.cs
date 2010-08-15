@@ -41,7 +41,7 @@ namespace OpenSALib3.Moveset {
             : base(parent, offset) {
                 Length = 4 * 4;
             Name = "LedgegrabBox";
-            _data = *(Data*) (RootFile.Address + offset);
+            _data = *(Data*) (Address);
         }
     }
 }

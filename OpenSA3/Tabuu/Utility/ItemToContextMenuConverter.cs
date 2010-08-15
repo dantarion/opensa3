@@ -13,6 +13,8 @@ namespace Tabuu.Utility {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture) {
             if (value is DatFile)
                 return Application.Current.Resources["DatFileContextMenu"];
+            if (value is DatSection)
+                return Application.Current.Resources["DatSectionContextMenu"];
             if (value is DatElement)
                 return Application.Current.Resources["DatElementContextMenu"];
             if (value is System.Collections.IEnumerable)

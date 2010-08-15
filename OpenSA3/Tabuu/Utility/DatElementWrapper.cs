@@ -7,9 +7,10 @@ namespace Tabuu.Utility {
     public class DatElementWrapper : Be.Windows.Forms.IByteProvider {
         private readonly DatElement _datelement;
         private bool _changed;
-
-        public DatElementWrapper(DatElement datElement) {
+        bool contentmode = false;
+        public DatElementWrapper(DatElement datElement, bool contentmode = false) {
             _datelement = datElement;
+            this.contentmode = contentmode;
         }
 
         #region IByteProvider
@@ -28,18 +29,20 @@ namespace Tabuu.Utility {
         }
 
         public long Length {
-            get { return _datelement.Length; }
+            get { return contentmode ? (_datelement as DatSection).DataLength: _datelement.Length; }
         }
 
         public event EventHandler Changed;
         public event EventHandler LengthChanged;
 
         public unsafe byte ReadByte(long index) {
-            return *(byte*)(_datelement.RootFile.Address + _datelement.FileOffset + (uint)index);
+            uint offset = contentmode ? (_datelement as DatSection).DataOffset : _datelement.FileOffset;
+            return *(byte*)(_datelement.RootFile.Address + offset + (uint)index);
         }
 
         public System.Drawing.Color GetByteColor(long index) {
-            var ele = SearchForDatElement(_datelement, _datelement.FileOffset + index);
+            uint offset = contentmode ? (_datelement as DatSection).DataOffset : _datelement.FileOffset;
+            var ele = SearchForDatElement(_datelement, offset + index);
             return ele != null ? ele.Color : System.Drawing.Color.Transparent;
         }
 
@@ -64,7 +67,8 @@ namespace Tabuu.Utility {
         }
 
         private bool IsInDatElement(long index) {
-            return index >= _datelement.FileOffset && index < _datelement.FileOffset + Length;
+            uint offset = contentmode ? (_datelement as DatSection).DataOffset : _datelement.FileOffset;
+            return index >= offset && index < offset + Length;
         }
 
         public bool SupportsDeleteBytes() {
