@@ -30,11 +30,10 @@ namespace Tabuu.UI {
         }
 
         private void Button1Click(object sender, EventArgs e) {
-            //TODO Cleanup
-            var jumpto = -1;
-            Int32.TryParse(textBox4.Text, System.Globalization.NumberStyles.HexNumber,
+            int jumpto;
+            var success = Int32.TryParse(textBox4.Text, System.Globalization.NumberStyles.HexNumber,
                            new System.Globalization.CultureInfo("en-US"), out jumpto);
-            if (jumpto == -1 || jumpto >= hexBox1.ByteProvider.Length) return;
+            if (!success || jumpto >= hexBox1.ByteProvider.Length) return;
             hexBox1.ScrollByteIntoView(jumpto);
             hexBox1.Select(jumpto, 4);
         }

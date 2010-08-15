@@ -1,12 +1,9 @@
 ﻿using System.Linq;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Input;
 using BrawlLib.IO;
 using OpenSALib3;
 using OpenSALib3.DatHandler;
-using OpenSALib3.Moveset;
 using Tabuu.Utility;
 
 namespace Tabuu.UI {

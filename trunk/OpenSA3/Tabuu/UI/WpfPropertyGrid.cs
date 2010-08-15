@@ -63,42 +63,37 @@ namespace Tabuu.UI
         private static void OnSelectedObjectChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
         {
             var pg = o as WpfPropertyGrid;
-            if (pg != null)
+            if (pg == null) return;
+            // if we're a collection
+            // select all objects in the collection
+            // if we're an observable collection, listen for change and update our selection in that case
+            // make sure that the grid updates with changes to dependency property properties on individual objects
+
+            var objects = new List<object> {e.NewValue};
+            //var objects = e.NewValue as IEnumerable ?? new[] { e.NewValue };
+
+            if (e.OldValue is INotifyCollectionChanged)
+                ((INotifyCollectionChanged)e.OldValue).CollectionChanged -= pg.PropertyGridCollectionChanged;
+
+            if (objects is INotifyCollectionChanged)
+                ((INotifyCollectionChanged)objects).CollectionChanged += pg.PropertyGridCollectionChanged;
+
+            if (e.OldValue is IEnumerable)
+                foreach (var old in ((IEnumerable)e.OldValue).OfType<INotifyPropertyChanged>())
+                    (old).PropertyChanged -= pg.PropertyGridPropertyChanged;
+
+            var mis = new List<ModelItem>();
+            foreach (var obj in objects)
             {
-                // if we're a collection
-                // select all objects in the collection
-                // if we're an observable collection, listen for change and update our selection in that case
-                // make sure that the grid updates with changes to dependency property properties on individual objects
-
-                var objects = new List<object>();
-                objects.Add(e.NewValue);
-                //var objects = e.NewValue as IEnumerable ?? new[] { e.NewValue };
-
-                if (e.OldValue is INotifyCollectionChanged)
-                    ((INotifyCollectionChanged)e.OldValue).CollectionChanged -= pg.PropertyGridCollectionChanged;
-
-                if (objects is INotifyCollectionChanged)
-                    ((INotifyCollectionChanged)objects).CollectionChanged += pg.PropertyGridCollectionChanged;
-
-                if (e.OldValue is IEnumerable)
-                    foreach (var old in ((IEnumerable)e.OldValue).OfType<INotifyPropertyChanged>())
-                        (old).PropertyChanged -= pg.PropertyGridPropertyChanged;
-
-                var mis = new List<ModelItem>();
-                foreach (var obj in objects)
-                {
-                    if (obj is INotifyPropertyChanged)
-                        ((INotifyPropertyChanged)obj).PropertyChanged += pg.PropertyGridPropertyChanged;
-                    //if object is deleted obj is null therefore don't load and add...
-                    if (obj != null)
-                    {
-                        pg.ModelTreeManager.Load(obj);
-                        mis.Add(pg.ModelTreeManager.Root);
-                    }
-                }
-                pg.OnSelectionChanged.Invoke(pg.Inspector, new object[] { null }); // clear previous selection
-                pg.OnSelectionChanged.Invoke(pg.Inspector, new object[] { new Selection(mis) });
+                if (obj is INotifyPropertyChanged)
+                    ((INotifyPropertyChanged)obj).PropertyChanged += pg.PropertyGridPropertyChanged;
+                //if object is deleted obj is null therefore don't load and add...
+                if (obj == null) continue;
+                pg.ModelTreeManager.Load(obj);
+                mis.Add(pg.ModelTreeManager.Root);
             }
+            pg.OnSelectionChanged.Invoke(pg.Inspector, new object[] { null }); // clear previous selection
+            pg.OnSelectionChanged.Invoke(pg.Inspector, new object[] { new Selection(mis) });
         }
 
         protected void PropertyGridPropertyChanged(object sender, PropertyChangedEventArgs e)
