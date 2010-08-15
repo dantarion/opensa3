@@ -3,55 +3,68 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-
+using System.Runtime.InteropServices;
 namespace OpenSALib3.DatHandler {
-    public abstract class DatElement : IEnumerable {
+    public abstract class DatElement : IEnumerable
+    {
+        #region Node Structure
+        /* Every Node has a parent */
         [Browsable(false)]
+        
+        public DatElement Parent { get; private set; }
+        [Browsable(false)]
+        /* And a way to access the root file*/
         public virtual DatFile RootFile {
             get { return Parent is DatFile ? (DatFile)Parent : Parent.RootFile; }
         }
+        /* Hidden list of children */
+        protected IList _children = new List<IEnumerable>();
+        #endregion
+        /* Printable Path 
+         TODO: Make it so that identical paths don't exist..i.e Hurtbox#0,Hurtbox# etc
+         */
+        [Browsable(true)]
+        public String Path
+        {
+            get
+            {
+                if (Parent != null)
+                    return Parent.Path + "/" + Name;
+                return Name;
+            }
+        }
+        /* Pointer to the beginning of this element */
         private VoidPtr _address;
         [Browsable(false)]
         public virtual VoidPtr Address
         {
             get { return _address; }
         }
-        [Browsable(false)]
-        public DatElement Parent { get; set; }
-
-        [Browsable(true)]
-        public String Path
-        {
-            get
-            {
-                if(Parent != null)
-                    return Parent.Path + "/" + Name;
-                return Name;
-            }
-        }
-
+        /* Color for HexView Display */
         [Browsable(false)]
         public Color Color { get; set; }
-
+        /* Name */
         [Category("Element")]
         [Browsable(true)]
         public string Name { get; protected set; }
-
+        /* The offset inside the RootFile */
         [Category("Element")]
         [Browsable(true)]
-        public uint FileOffset { get; protected set; }
-
+        public uint FileOffset { get; private set; }
+        /* The physical length of this element, NOT its childen */
         [Category("Element")]
         [ReadOnly(true)]
-        public uint Length { get; set; }
+        public uint Length { get; internal set; }
 
+        /* Used for random colors*/
         private static readonly Random Random = new Random();
 
         protected DatElement(DatElement parent, uint fileoffset) {
             Length = 4;
             Parent = parent;
             FileOffset = fileoffset;
-            _address = RootFile.Address + FileOffset;
+            if(parent != null)/*This is so DatFiles can be instantiated */
+                _address = RootFile.Address + FileOffset;
             Color = Color.FromArgb(255/2, Random.Next(255), Random.Next(255), Random.Next(255));
         }
 
@@ -60,11 +73,7 @@ namespace OpenSALib3.DatHandler {
         }
 
         IEnumerator IEnumerable.GetEnumerator() {
-            return GetEnumerator();
-        }
-
-        public virtual IEnumerator GetEnumerator() {
-            return new List<object>().GetEnumerator();
+            return _children.GetEnumerator();
         }
         #region ScriptingFunctions
         public unsafe byte ReadByte(int offset)

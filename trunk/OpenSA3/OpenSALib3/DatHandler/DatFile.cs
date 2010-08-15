@@ -7,6 +7,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using BrawlLib.SSBB.ResourceNodes;
 using OpenSALib3.Utility;
+using System.Text;
 
 namespace OpenSALib3.DatHandler
 {
@@ -46,7 +47,7 @@ namespace OpenSALib3.DatHandler
         private MDL0Node _model = null;
         public MDL0Node Model
         {
-           get{ return _model;}
+            get { return _model; }
         }
         private Dictionary<int, string> _boneNames;
         public void LoadModel(string filename)
@@ -125,76 +126,100 @@ namespace OpenSALib3.DatHandler
             Changed = false;
             Color = System.Drawing.Color.Transparent;
             //Start Parse
-            var section = Address + _header.DataChunkSize + _header.OffsetCount * 4;
-            var stringptr = section + (_header.SectionCount + _header.ReferenceCount) * 8;
+            var section = _header.DataChunkSize + _header.OffsetCount * 4;
+            var stringBase =(int) (section + (_header.SectionCount + _header.ReferenceCount) * 8);
             //Parse sections
             for (var i = 0; i < _header.SectionCount; i++)
             {
-                var s = DatSection.Factory(section, stringptr, this);
+                var s = DatSection.Factory(this, section, stringBase);
                 Sections.Add(s);
                 section += 8;
             }
-            ComputeLengths(Sections);
+            ComputeDataLengths(Sections);
             //Parse References
             for (var i = 0; i < _header.ReferenceCount; i++)
             {
-                var s = DatSection.Factory(section, stringptr, this);
+                var s = DatSection.Factory(this, section, stringBase);
                 References.Add(s);
                 section += 8;
             }
+            //Setup Tree Structure
+            _children.Add(new NamedList(Sections, "Sections"));
+            _children.Add(new NamedList(References, "References"));
+
         }
 
-        private void ComputeLengths(IEnumerable<DatSection> sections)
+        private void ComputeDataLengths(IEnumerable<DatSection> sections)
         {
-            var sorted = sections.OrderBy(x => x.FileOffset).ToList();
+            var sorted = sections.OrderBy(x => x.DataOffset).ToList();
             for (var i = 0; i < sorted.Count; i++)
                 if (i < sorted.Count - 1)
-                    sorted[i].Length = sorted[i + 1].FileOffset - sorted[i].FileOffset;
-                else sorted[i].Length = _header.DataChunkSize - sorted[i].FileOffset;
+                    sorted[i].DataLength = sorted[i + 1].DataOffset - sorted[i].DataOffset;
+                else sorted[i].DataLength = _header.DataChunkSize - sorted[i].DataOffset;
         }
-
-        public override IEnumerator GetEnumerator()
+        public string Report()
         {
-            return new DatFileEnumerator(this);
-        }
-    }
+            var usagedata = new List<UsageData>();
+            collectUsage(this,usagedata);
+            foreach (UsageData ug in susagedata)
+                usagedata.Add(ug);
+            var sorted = usagedata.OrderBy(x => x.offset);
+            var usage = 0;
+            foreach (UsageData ug in sorted)
+                usage += ug.length;
+            var sb = new StringBuilder();
+            sb.AppendFormat("Total Size:{0}\n",Length);
+            sb.AppendFormat("Bytes Parsed:{0}\n", usage);
+            sb.AppendFormat("% Complete:{0}\n", (float)usage / Length);
 
-    internal class DatFileEnumerator : IEnumerator
-    {
-        private readonly DatFile _file;
-        private int _i = -1;
-
-        public DatFileEnumerator(DatFile f)
-        {
-            _file = f;
-        }
-
-        public object Current
-        {
-            get
+            int lastdata = 0;
+            foreach (UsageData ug in sorted)
             {
-                switch (_i)
-                {
-                    case 0:
-                        return _file.Sections[0];
-                    case 1:
-                        return new NamedList<DatSection>(_file.Sections, "Sections");
-                    case 2:
-                        return new NamedList<DatSection>(_file.References, "References");
-                }
-                return null;
+                
+                sb.AppendFormat("{0:X08} - {1:8} - {2:25}", ug.offset, ug.length,ug.ID);
+                if (ug.offset == lastdata)
+                    sb.AppendFormat(" MATCH\n");
+                else if (ug.offset < lastdata)
+                    sb.AppendFormat("OVERLAP\n");
+                else
+                    sb.AppendFormat(" HOLE - {0:X08}\n", ug.offset - lastdata);
+                lastdata = ug.offset + ug.length;
+
+            }
+            return sb.ToString();
+        }
+        public struct UsageData
+        {
+            public int offset;
+            public int length;
+            public string ID;
+        }
+        public void collectUsage(IEnumerable element,List<UsageData> list)
+        {
+            foreach (IEnumerable child in element)
+            {
+                collectUsage(child, list);//Get the child usage
+                DatElement de = child as DatElement;//If the child is actually a DatElement        
+                if(de == null)
+                    continue;
+                UsageData ud;
+                ud.offset = (int)de.FileOffset;
+                ud.length = (int)de.Length;
+                ud.ID = de.Path + " " + de.GetType().Name;
+                list.Add(ud);
             }
         }
-
-        public bool MoveNext()
+        List<UsageData> susagedata = new List<UsageData>();
+        public string ReadString(int offset)
         {
-            _i++;
-            return _i <= 2;
-        }
-
-        public void Reset()
-        {
-            _i = -1;
+            string s = new String((sbyte*)(Address + offset));
+            UsageData ud;
+            ud.offset = offset;
+            ud.length = s.Length + 1;
+            ud.ID = "String";
+            if(susagedata.Count(x=>x.offset == offset) == 0)
+                susagedata.Add(ud);
+            return s;
         }
     }
 }

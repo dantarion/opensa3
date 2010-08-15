@@ -9,7 +9,11 @@
 				<MenuItem Header="Save File As..." Command="{x:Static local:MainWindow.SaveFileAsCommand}" CommandParameter="{Binding}" />
 				<MenuItem Header="Close File" Command="{x:Static local:MainWindow.CloseFileCommand}" CommandParameter="{Binding}" />
 			</ContextMenu>
-			<ContextMenu x:Key="DatElementContextMenu">
+            <ContextMenu x:Key="DatSectionContextMenu">
+                <MenuItem Header="Open Hex View...(header)" Command="{x:Static local:MainWindow.HexOpenCommand}" CommandParameter="{Binding}" />
+                <MenuItem Header="Open Hex View...(content)" Command="{x:Static local:MainWindow.HexOpenContentCommand}" CommandParameter="{Binding}" />
+            </ContextMenu>
+            <ContextMenu x:Key="DatElementContextMenu">
 				<MenuItem Header="Open Hex View..." Command="{x:Static local:MainWindow.HexOpenCommand}" CommandParameter="{Binding}" />
 			</ContextMenu>
 			<ContextMenu x:Key="NamedListContextMenu">
