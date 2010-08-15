@@ -7,10 +7,10 @@ namespace Tabuu.Utility {
     public class DatElementWrapper : Be.Windows.Forms.IByteProvider {
         private readonly DatElement _datelement;
         private bool _changed;
-        bool contentmode = false;
+        readonly bool _contentmode;
         public DatElementWrapper(DatElement datElement, bool contentmode = false) {
             _datelement = datElement;
-            this.contentmode = contentmode;
+            _contentmode = contentmode;
         }
 
         #region IByteProvider
@@ -29,19 +29,19 @@ namespace Tabuu.Utility {
         }
 
         public long Length {
-            get { return contentmode ? (_datelement as DatSection).DataLength: _datelement.Length; }
+            get { return _contentmode ? ((DatSection) _datelement).DataLength: _datelement.Length; }
         }
 
         public event EventHandler Changed;
         public event EventHandler LengthChanged;
 
         public unsafe byte ReadByte(long index) {
-            uint offset = contentmode ? (_datelement as DatSection).DataOffset : _datelement.FileOffset;
+            var offset = _contentmode ? ((DatSection) _datelement).DataOffset : _datelement.FileOffset;
             return *(byte*)(_datelement.RootFile.Address + offset + (uint)index);
         }
 
         public System.Drawing.Color GetByteColor(long index) {
-            uint offset = contentmode ? (_datelement as DatSection).DataOffset : _datelement.FileOffset;
+            var offset = _contentmode ? ((DatSection) _datelement).DataOffset : _datelement.FileOffset;
             var ele = SearchForDatElement(_datelement, offset + index);
             return ele != null ? ele.Color : System.Drawing.Color.Transparent;
         }
@@ -67,7 +67,7 @@ namespace Tabuu.Utility {
         }
 
         private bool IsInDatElement(long index) {
-            uint offset = contentmode ? (_datelement as DatSection).DataOffset : _datelement.FileOffset;
+            var offset = _contentmode ? ((DatSection) _datelement).DataOffset : _datelement.FileOffset;
             return index >= offset && index < offset + Length;
         }
 
