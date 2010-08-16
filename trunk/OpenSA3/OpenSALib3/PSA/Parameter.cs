@@ -1,18 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Drawing;
 using OpenSALib3.DatHandler;
+
 namespace OpenSALib3.PSA
 {
-    public enum ParameterType : int
-    {
-        VALUE = 0,
-        SCALAR = 1,
-        OFFSET = 2,
-        BOOLEAN = 3,
-        VARIABLE = 5,
-        REQUIREMENT = 6,
+    public enum ParameterType {
+        Value = 0,
+        Scalar = 1,
+        Offset = 2,
+        Boolean = 3,
+        Variable = 5,
+        Requirement = 6,
     }
     public class Parameter : DatElement
     {
@@ -21,18 +19,18 @@ namespace OpenSALib3.PSA
             public ParameterType Type;
             public bint rawData;
         }
-        private Data data;
+        private Data _data;
         public int RawData
         {
-            get { return data.rawData; }
+            get { return _data.rawData; }
         }
         public unsafe Parameter(DatElement parent, uint offset)
             : base(parent, offset)
         {
-            data = *(Data*)Address;
+            _data = *(Data*)Address;
             Length = 8;
             Name = "Parameter";
-            Color = System.Drawing.Color.BlueViolet;
+            Color = Color.BlueViolet;
         }
     }
 }

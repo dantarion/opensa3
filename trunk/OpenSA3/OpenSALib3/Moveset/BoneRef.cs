@@ -1,6 +1,7 @@
 ﻿using System;
-using OpenSALib3.DatHandler;
 using System.ComponentModel;
+using OpenSALib3.DatHandler;
+
 namespace OpenSALib3.Moveset {
     public sealed class BoneRef : DatElement {
         private bint _index;

@@ -2,14 +2,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using OpenSALib3.DatHandler;
-using OpenSALib3.Utility;
-using System.Runtime.InteropServices;
 using OpenSALib3.PSA;
-namespace OpenSALib3.Moveset
-{
-    public sealed class MovesetSection : DatSection
-    {
+using OpenSALib3.Utility;
+
+namespace OpenSALib3.Moveset {
+    public sealed class MovesetSection : DatSection {
         /* TODO
          private const int SUBACTION_FLAG_START = 0;
         private const int SOMETHING = 1;
@@ -25,8 +24,7 @@ namespace OpenSALib3.Moveset
         private const int SUBACTION_OTHER_OFFSETS_START = 15;
          */
 
-        private struct MovesetHeader
-        {
+        private struct MovesetHeader {
             public buint SubactionFlagsStart;
             public buint Unknown1;//UnknownB
             public buint AttributeStart;
@@ -49,11 +47,11 @@ namespace OpenSALib3.Moveset
             public buint Unknown19;
             public buint Unknown20;
             public buint Unknown21;
-            public buint Unknown22;//Bone References?
+            public buint Unknown22; //Bone References?
             public buint Unknown23;
             public buint Unknown24;
             public buint Unknown25;
-            public buint Unknown26;//Entry Article
+            public buint Unknown26; //Entry Article
             public buint Unknown27;
         }
 
@@ -61,42 +59,38 @@ namespace OpenSALib3.Moveset
         private readonly List<Attribute> _attributes = new List<Attribute>();
 
         [Browsable(false)]
-        public List<Attribute> Attributes
-        {
+        public List<Attribute> Attributes {
             get { return _attributes; }
         }
 
         private readonly List<Attribute> _sseattributes = new List<Attribute>();
 
         [Browsable(false)]
-        public List<Attribute> SSEAttributes
-        {
+        public List<Attribute> SSEAttributes {
             get { return _sseattributes; }
         }
 
         private readonly MiscSection _miscsection;
 
         [Browsable(false)]
-        public MiscSection MiscSection
-        {
+        public MiscSection MiscSection {
             get { return _miscsection; }
         }
-        private List<UnknownElement> _unknowna = new List<UnknownElement>();
-        private List<UnknownElement> _unknownb = new List<UnknownElement>();
-        private List<UnknownElement> _unknownc = new List<UnknownElement>();
-        private List<ActionOverride> _overrides = new List<ActionOverride>();
-        private List<ActionOverride> _overrides2 = new List<ActionOverride>();
-        private List<CommandList> _actions = new List<CommandList>();
-        private List<CommandList> _actions2 = new List<CommandList>();
-        private List<SubactionFlags> _subactionflags = new List<SubactionFlags>();
-        private List<CommandList> _subactionmain = new List<CommandList>();
-        private List<CommandList> _subactiongfx = new List<CommandList>();
-        private List<CommandList> _subactionsfx = new List<CommandList>();
-        private List<CommandList> _subactionother = new List<CommandList>();
-        private Dictionary<int, List<Command>> _subroutines = new Dictionary<int, List<Command>>();
+        private readonly List<UnknownElement> _unknowna = new List<UnknownElement>();
+        private readonly List<UnknownElement> _unknownb = new List<UnknownElement>();
+        private readonly List<UnknownElement> _unknownc = new List<UnknownElement>();
+        private readonly List<ActionOverride> _overrides = new List<ActionOverride>();
+        private readonly List<ActionOverride> _overrides2 = new List<ActionOverride>();
+        private readonly List<CommandList> _actions = new List<CommandList>();
+        private readonly List<CommandList> _actions2 = new List<CommandList>();
+        private readonly List<SubactionFlags> _subactionflags = new List<SubactionFlags>();
+        private readonly List<CommandList> _subactionmain = new List<CommandList>();
+        private readonly List<CommandList> _subactiongfx = new List<CommandList>();
+        private readonly List<CommandList> _subactionsfx = new List<CommandList>();
+        private readonly List<CommandList> _subactionother = new List<CommandList>();
+        private readonly Dictionary<int, List<Command>> _subroutines = new Dictionary<int, List<Command>>();
         public unsafe MovesetSection(DatElement parent, uint offset, VoidPtr stringPtr)
-            : base(parent, offset, stringPtr)
-        {
+            : base(parent, offset, stringPtr) {
             _header = *(MovesetHeader*)(RootFile.Address + DataOffset);
             _miscsection = new MiscSection(this, _header.MiscSectionOffset);
             for (uint i = _header.AttributeStart; i < _header.SSEAttributeStart; i += 4)
@@ -112,24 +106,20 @@ namespace OpenSALib3.Moveset
                 _unknownc.Add(new UnknownElement(this, i, "UnknownC", 16));
             var unknownd = new UnknownElement(this, _header.Unknown8, "UnknownD", 8);
             //PSA Stuffs
-            if (_header.Unknown20 != 0)
-            {
+            if (_header.Unknown20 != 0) {
                 var o = _header.Unknown20;
                 var ao = new ActionOverride(this, o);
-                while (ao.SubactionID > 0)
-                {
+                while (ao.SubactionID > 0) {
                     _overrides.Add(ao);
                     o += 8;
                     ao = new ActionOverride(this, o);
                 }
                 _overrides.Add(ao);
             }
-            if (_header.Unknown21 != 0)
-            {
+            if (_header.Unknown21 != 0) {
                 var o = _header.Unknown21;
                 var ao = new ActionOverride(this, o);
-                while (ao.SubactionID > 0)
-                {
+                while (ao.SubactionID > 0) {
                     _overrides2.Add(ao);
                     o += 8;
                     ao = new ActionOverride(this, o);
@@ -152,30 +142,27 @@ namespace OpenSALib3.Moveset
                 _subactionother.Add(new CommandList(this, i, _subroutines));
 
             //Setup Tree Structure
-            _children.Add(new NamedList(Attributes, "Attributes"));
-            _children.Add(new NamedList(SSEAttributes, "SSE Attributes"));
-            _children.Add(new NamedList(_unknowna, "UnknownA(Action Flag?)"));
-            _children.Add(new NamedList(_unknownb, "UnknownB(Action Flag?)"));
-            _children.Add(new NamedList(_unknownc, "UnknownC(Action?)"));
-            _children.Add(unknownd);
-            _children.Add(MiscSection);
-            _children.Add(new NamedList(_overrides, "Overrides"));
-            _children.Add(new NamedList(_overrides2, "Overrides2"));
-            _children.Add(new NamedList(_actions, "Actions"));
-            _children.Add(new NamedList(_actions2, "Actions2?"));
-            var subactions = new List<IEnumerable>();
-            for (int i = 0; i < _subactionflags.Count; i++)
-            {
-                var subaction = new List<IEnumerable>();
-                subaction.Add(new NamedList(_subactionflags[i], "Flags"));
-                subaction.Add(new NamedList(_subactionmain[i], "Main"));
-                subaction.Add(new NamedList(_subactiongfx[i], "GFX"));
-                subaction.Add(new NamedList(_subactionsfx[i], "SFX"));
-                subaction.Add(new NamedList(_subactionother[i], "Other"));
-                subactions.Add(new NamedList(subaction, string.Format("{0:x03}", i)));
-            }
-            _children.Add(new NamedList(subactions, "Subactions"));
-            _children.Add(new NamedList(_subroutines.Values, "Subroutines"));
+            Children.Add(new NamedList(Attributes, "Attributes"));
+            Children.Add(new NamedList(SSEAttributes, "SSE Attributes"));
+            Children.Add(new NamedList(_unknowna, "UnknownA(Action Flag?)"));
+            Children.Add(new NamedList(_unknownb, "UnknownB(Action Flag?)"));
+            Children.Add(new NamedList(_unknownc, "UnknownC(Action?)"));
+            Children.Add(unknownd);
+            Children.Add(MiscSection);
+            Children.Add(new NamedList(_overrides, "Overrides"));
+            Children.Add(new NamedList(_overrides2, "Overrides2"));
+            Children.Add(new NamedList(_actions, "Actions"));
+            Children.Add(new NamedList(_actions2, "Actions2?"));
+            var subactions = _subactionflags.Select((t, i) =>
+                new List<IEnumerable> {
+                    new NamedList(t, "Flags"),
+                    new NamedList(_subactionmain[i], "Main"),
+                    new NamedList(_subactiongfx[i], "GFX"),
+                    new NamedList(_subactionsfx[i], "SFX"),
+                    new NamedList(_subactionother[i], "Other")
+                }).Select((subaction, i) => new NamedList(subaction, string.Format("{0:x03}", i))).Cast<IEnumerable>().ToList();
+            Children.Add(new NamedList(subactions, "Subactions"));
+            Children.Add(new NamedList(_subroutines.Values, "Subroutines"));
         }
 
     }
