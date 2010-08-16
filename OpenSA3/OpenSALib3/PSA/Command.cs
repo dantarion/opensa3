@@ -32,11 +32,12 @@ namespace OpenSALib3.PSA
                     int ParamOffset = c.data.ParameterOffset+ 4;
                     var ext = c.RootFile.References.Exists(x => x.DataOffset == ParamOffset);
                     if (!ext)
-                        suboff = (c._children[0] as Parameter).RawData;
-                        subroutinelist[(c._children[0] as Parameter).RawData] = (ReadCommands(parent, (c._children[0] as Parameter).RawData, subroutinelist));
+                        suboff = (c.Children[0] as Parameter).RawData;
+                        if(suboff > 0)
+                        subroutinelist[(c.Children[0] as Parameter).RawData] = (ReadCommands(parent, (c.Children[0] as Parameter).RawData, subroutinelist));
                 }
                 if (c.Module == 0x0D && c.ID == 0x00 && subroutinelist != null)
-                    suboff = (c._children[1] as Parameter).RawData;
+                    suboff = (c.Children[1] as Parameter).RawData;
                 if(suboff > 0 && !subroutinelist.ContainsKey(suboff))
                 subroutinelist[suboff] = (ReadCommands(parent, suboff, subroutinelist));
             }
@@ -70,10 +71,10 @@ namespace OpenSALib3.PSA
             Length = 8;
             Color = System.Drawing.Color.Blue;
             Name = String.Format("{0:X02}{1:X02}{2:X02}{3:X02}", Module, ID, data.ParameterCount, data.Unknown);
-            if (Module == 0xFF || data.ParameterCount > 0x10)
+            if (Module == 0xFF || data.ParameterCount > 0x10|| data.Unknown > 4)
                 return;
             for (int i = 0; i < data.ParameterCount; i++)
-                _children.Add(new Parameter(this, (int)(data.ParameterOffset + i * 8)));
+                Children.Add(new Parameter(this, (int)(data.ParameterOffset + i * 8)));
         }
     }
 

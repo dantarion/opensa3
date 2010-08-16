@@ -144,10 +144,13 @@ namespace OpenSALib3.DatHandler
                 section += 8;
             }
             ComputeDataLengths(Sections);
+            foreach (DatSection s in Sections)
+                s.Parse();
+
 
             //Setup Tree Structure
-            _children.Add(new NamedList(Sections, "Sections"));
-            _children.Add(new NamedList(References, "References"));
+            Children.Add(new NamedList(Sections, "Sections"));
+            Children.Add(new NamedList(References, "References"));
 
         }
 
@@ -165,6 +168,11 @@ namespace OpenSALib3.DatHandler
             collectUsage(this,usagedata);
             foreach (UsageData ug in susagedata)
                 usagedata.Add(ug);
+            UsageData offsetchunk;
+            offsetchunk.length = _header.OffsetCount * 4;
+            offsetchunk.offset = _header.DataChunkSize;
+            offsetchunk.ID = "Offset Chunk";
+            usagedata.Add(offsetchunk);
             usagedata.Sort();
             var usage = 0;
             foreach (UsageData ug in usagedata)

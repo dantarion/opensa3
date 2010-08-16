@@ -9,14 +9,21 @@ namespace OpenSALib3.DatHandler {
         public bint DataOffset;
         public bint StringOffset;
     }
-    public unsafe class DatSection : DatElement
+    public unsafe abstract class DatSection : DatElement
     {
         private DatSectionHeader _header;
         public static DatSection Factory(DatElement parent, int offset, int stringBase)
         {
-            var ds = new DatSection(parent, offset, stringBase);
-            return ds.Name == "data" ? new MovesetSection(parent, offset, stringBase) : ds;
+            var ds = new GenericSection(parent, offset, stringBase);
+            if (ds.Name == "data")
+                return new MovesetSection(parent, offset, stringBase);
+            if (ds.Name.StartsWith("statusAnimCmdDisguiseList"))
+                return new CommandOverrideSection(parent, offset, stringBase);
+            if (ds.Name.StartsWith("statusAnimCmdExitDisguiseList"))
+                return new CommandOverrideSection(parent, offset, stringBase);
+            return ds;
         }
+        public abstract void Parse();
         [Browsable(false)]
         public int StringOffset {
             get { return _header.StringOffset; }

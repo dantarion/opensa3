@@ -114,13 +114,13 @@ namespace Tabuu.UI {
         private static void HexOpenCommandExecuted(object sender, ExecutedRoutedEventArgs e) {
             e.Parameter.ToString();
             var d = (DatElement)e.Parameter;
-            new HexViewWindow(new DatElementWrapper(d), d.Name).Show();
+            new HexViewWindow(new DatElementWrapper(d), d.Path).Show();
         }
         private static void HexOpenContentCommandExecuted(object sender, ExecutedRoutedEventArgs e)
         {
             e.Parameter.ToString();
             var d = (DatElement)e.Parameter;
-            new HexViewWindow(new DatElementWrapper(d,true), d.Name).Show();
+            new HexViewWindow(new DatElementWrapper(d, true), d.Path).Show();
         }
         private static void ModelOpenCommandExecuted(object sender, ExecutedRoutedEventArgs e)
         {
