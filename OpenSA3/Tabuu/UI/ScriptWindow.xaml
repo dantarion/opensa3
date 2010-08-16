@@ -16,6 +16,6 @@
 		<Button Margin="5" Grid.Row="0" Grid.Column="2" Click="Button2Click">Clear Output</Button>
 		<GridSplitter Grid.Row="2" Grid.ColumnSpan="2" HorizontalAlignment="Stretch" />
 		<TextBox Grid.Row="3" Grid.ColumnSpan="2" Margin="5" Name="OutputTextBox" MinHeight="200" FontFamily="Consolas" Foreground="#FF00FF35" Background="Black" IsReadOnly="True" VerticalScrollBarVisibility="Visible" SelectionBrush="#FF626262" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch" TextWrapping="Wrap" />
-		<TextBox Name="CommandTextBox" Grid.Row="4" Grid.ColumnSpan="2" Foreground="White" Background="Black" Margin="5" KeyDown="TextBoxKeyDown"></TextBox>
+        <TextBox Name="CommandTextBox" Grid.Row="4" Grid.ColumnSpan="2" Foreground="White" Background="Black" Margin="5" KeyDown="TextBoxKeyDown"></TextBox>
 	</Grid>
 </Window>

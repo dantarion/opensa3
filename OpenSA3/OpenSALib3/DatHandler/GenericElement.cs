@@ -8,7 +8,7 @@ namespace OpenSALib3.DatHandler
         {
             get { return typeof(T); }
         }
-        public unsafe GenericElement(DatElement parent, uint fileOffset,String name)
+        public unsafe GenericElement(DatElement parent, int fileOffset,String name)
             : base(parent, fileOffset)
         {
             Length = 4;

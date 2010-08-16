@@ -2,10 +2,8 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Globalization;
 using System.IO;
 using OpenSALib3.DatHandler;
-using OpenSALib3.Properties;
 
 namespace OpenSALib3.Moveset {
     public class Attribute : DatElement {
@@ -16,13 +14,13 @@ namespace OpenSALib3.Moveset {
             public Type Type;
         }
 
-        private static Dictionary<uint, Metadata> _db;
+        private static Dictionary<int, Metadata> _db;
 
         private static void SetupDB() {
             if (_db != null)
                 return;
-            _db = new Dictionary<uint, Metadata>();
-            var sr = new StringReader(Resources.Attributes);
+            _db = new Dictionary<int, Metadata>();
+            var sr = new StringReader(Properties.Resources.Attributes);
             while (sr.Peek() != -1) {
                 var line1 = sr.ReadLine();
                 Debug.Assert(line1 != null);
@@ -32,7 +30,7 @@ namespace OpenSALib3.Moveset {
                     am.Type = typeof (int);
                 } else
                     am.Type = typeof (float);
-                var offset = uint.Parse(line1.Substring(2, 3), NumberStyles.HexNumber);
+                var offset = int.Parse(line1.Substring(2, 3), System.Globalization.NumberStyles.HexNumber);
                 am.Name = line1.Length > 6
                     ? line1.Substring(6)
                     : String.Format("0x{0:X03}", offset);
@@ -44,7 +42,7 @@ namespace OpenSALib3.Moveset {
         }
         #endregion
 
-        public Attribute(DatElement parent, uint fileOffset) : base(parent, fileOffset) {
+        public Attribute(DatElement parent, int fileOffset) : base(parent, fileOffset) {
             Length = 4;
             SetupDB();
             Name = _db.ContainsKey(fileOffset)

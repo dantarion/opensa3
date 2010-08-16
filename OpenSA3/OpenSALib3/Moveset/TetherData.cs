@@ -22,7 +22,7 @@ namespace OpenSALib3.Moveset
             get { return _data.Unknown; }
             set { _data.Unknown = value; }
         }
-        public unsafe TetherData(DatElement parent, uint offset)
+        public unsafe TetherData(DatElement parent, int offset)
             : base(parent, offset)
         {
             _data = *(Data*)Address;

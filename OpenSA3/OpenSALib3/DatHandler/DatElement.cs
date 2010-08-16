@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 
+using OpenSALib3.Utility;
+using System.Activities.Presentation.PropertyEditing;
 namespace OpenSALib3.DatHandler {
     public abstract class DatElement : IEnumerable
     {
@@ -24,6 +26,7 @@ namespace OpenSALib3.DatHandler {
          TODO: Make it so that identical paths don't exist..i.e Hurtbox#0,Hurtbox# etc
          */
         [Browsable(true)]
+        [Category("Element")]
         public String Path
         {
             get
@@ -50,16 +53,18 @@ namespace OpenSALib3.DatHandler {
         /* The offset inside the RootFile */
         [Category("Element")]
         [Browsable(true)]
-        public uint FileOffset { get; private set; }
+        [Editor(typeof(HexPropertyEditor), typeof(PropertyValueEditor))]
+        public int FileOffset { get; private set; }
         /* The physical length of this element, NOT its childen */
         [Category("Element")]
+        [Browsable(true)]
         [ReadOnly(true)]
-        public uint Length { get; internal set; }
+        public int Length { get; internal set; }
 
         /* Used for random colors*/
         private static readonly Random Random = new Random();
 
-        protected DatElement(DatElement parent, uint fileoffset) {
+        protected DatElement(DatElement parent, int fileoffset) {
             Length = 4;
             Parent = parent;
             FileOffset = fileoffset;

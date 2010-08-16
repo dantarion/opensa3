@@ -11,7 +11,7 @@ namespace OpenSALib3.Moveset {
             public bfloat Float5;
             public bfloat Float6;
             public bfloat Float7;
-            public uint Flags;
+            public int Flags;
         }
 
         public float Float1 {
@@ -49,14 +49,14 @@ namespace OpenSALib3.Moveset {
             set { _data.Float7 = value; }
         }
 
-        public uint Flags {
+        public int Flags {
             get { return _data.Flags; }
             set { _data.Flags = value; }
         }
 
         private Data _data;
 
-        public unsafe UnknownType1(DatElement parent, uint offset)
+        public unsafe UnknownType1(DatElement parent, int offset)
             : base(parent, offset) {
             Name = "UnknownType1";
             Length = 4 * 8;

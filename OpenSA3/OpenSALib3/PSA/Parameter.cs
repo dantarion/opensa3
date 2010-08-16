@@ -1,36 +1,48 @@
 ﻿using System;
-using System.Drawing;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using OpenSALib3.DatHandler;
-
+using System.ComponentModel;
+using System.Diagnostics;
 namespace OpenSALib3.PSA
 {
-    public enum ParameterType {
-        Value = 0,
-        Scalar = 1,
-        Offset = 2,
-        Boolean = 3,
-        Variable = 5,
-        Requirement = 6,
+    public enum ParameterType : int
+    {
+        VALUE = 0,
+        SCALAR = 1,
+        OFFSET = 2,
+        BOOLEAN = 3,
+        VARIABLE = 5,
+        REQUIREMENT = 6,
     }
     public class Parameter : DatElement
     {
         struct Data
         {
-            public ParameterType Type;
+            public bint type;
             public bint rawData;
         }
-        private Data _data;
+        private Data data;
+        [Category("Parameter")]
+        public ParameterType Type
+        {
+            get { return (ParameterType)(int)data.type; }
+        }
+        [Category("Parameter")]
         public int RawData
         {
-            get { return _data.rawData; }
+            get { return data.rawData; }
         }
-        public unsafe Parameter(DatElement parent, uint offset)
+        public unsafe Parameter(DatElement parent, int offset)
             : base(parent, offset)
         {
-            _data = *(Data*)Address;
+            data = *(Data*)Address;
             Length = 8;
-            Name = "Parameter";
-            Color = Color.BlueViolet;
+            if ((int)(this.Type) > 6)
+                throw new Exception("Improper Parameter");
+            Name = Type + " Parameter";
+            Color = System.Drawing.Color.BlueViolet;
         }
     }
 }

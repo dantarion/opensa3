@@ -11,26 +11,26 @@ namespace OpenSALib3.Moveset
     {
         private struct Header
         {
-            public buint Section1;
-            public buint HurtBoxOffset;
-            public buint HurtBoxCount;
-            public buint UnknownSectionOffset;
-            public buint UnknownSectionCount;
-            public buint LedgegrabOffset;
-            public buint LedgegrabCount;
-            public buint UnknownSection2Offset;
-            public buint UnknownSection2Count;
-            public buint BoneRef2Offset;
-            public buint UnknownSection3Offset;
-            public buint UnknownSection4Offset;
-            public buint UnknownSection5Offset;
-            public buint MultiJumpOffset;
-            public buint GlideOffset;
-            public buint CrawlOffset;
-            public buint UnknownSection9Offset;
-            public buint TetherOffset;
-            public buint UnknownSection12Offset;
-            public buint UnknownSection13Offset;
+            public bint Section1;
+            public bint HurtBoxOffset;
+            public bint HurtBoxCount;
+            public bint UnknownSectionOffset;
+            public bint UnknownSectionCount;
+            public bint LedgegrabOffset;
+            public bint LedgegrabCount;
+            public bint UnknownSection2Offset;
+            public bint UnknownSection2Count;
+            public bint BoneRef2Offset;
+            public bint UnknownSection3Offset;
+            public bint UnknownSection4Offset;
+            public bint UnknownSection5Offset;
+            public bint MultiJumpOffset;
+            public bint GlideOffset;
+            public bint CrawlOffset;
+            public bint UnknownSection9Offset;
+            public bint TetherOffset;
+            public bint UnknownSection12Offset;
+            public bint UnknownSection13Offset;
         }
 
         private readonly Header _header;
@@ -71,22 +71,22 @@ namespace OpenSALib3.Moveset
         private readonly GlideData _glidedata;
         private readonly CrawlData _crawldata;
         private readonly TetherData _tetherdata;
-        public unsafe MiscSection(DatElement parent, uint fileoffset)
-            : base(parent, fileoffset)
+        public unsafe MiscSection(DatElement parent, int fileOffset)
+            : base(parent, fileOffset)
         {
             Length = 4 * 19;
             Name = "Misc";
             _header = *(Header*)(Address);
             /* TODO: Figure out proper length of section */
-            for (uint i = 0; i < 10; i++)
+            for (int i = 0; i < 10; i++)
                 _section1.Add(new GenericElement<int>(this, _header.Section1 + i * 4, "Unknown"));
-            for (uint i = 0; i < +_header.HurtBoxCount; i++)
+            for (int i = 0; i < +_header.HurtBoxCount; i++)
                 _hurtboxes.Add(new Hurtbox(this, _header.HurtBoxOffset + i * 4 * 5));
-            for (uint i = 0; i < +_header.UnknownSectionCount; i++)
+            for (int i = 0; i < +_header.UnknownSectionCount; i++)
                 _unknowntype1List.Add(new UnknownType1(this, _header.UnknownSectionOffset + i * 4 * 8));
-            for (uint i = 0; i < +_header.LedgegrabCount; i++)
+            for (int i = 0; i < +_header.LedgegrabCount; i++)
                 _ledgegrabboxes.Add(new LedgegrabBox(this, _header.LedgegrabOffset + i * 4 * 4));
-            for (uint i = _header.BoneRef2Offset; i < _header.BoneRef2Offset + 4 * 10; i += 4)
+            for (int i = _header.BoneRef2Offset; i < _header.BoneRef2Offset + 4 * 10; i += 4)
                 _boneref2.Add(new BoneRef(this, i, "Unknown"));
             if (_header.MultiJumpOffset != 0)
                 _multijumpdata = new MultiJumpData(this, _header.MultiJumpOffset);
