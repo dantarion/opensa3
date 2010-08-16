@@ -67,10 +67,10 @@ namespace OpenSALib3.Moveset
         {
             get { return _boneref2; }
         }
-        private MultiJumpData _multijumpdata;
-        private GlideData _glidedata;
-        private CrawlData _crawldata;
-        private TetherData _tetherdata;
+        private readonly MultiJumpData _multijumpdata;
+        private readonly GlideData _glidedata;
+        private readonly CrawlData _crawldata;
+        private readonly TetherData _tetherdata;
         public unsafe MiscSection(DatElement parent, uint fileoffset)
             : base(parent, fileoffset)
         {
@@ -97,16 +97,16 @@ namespace OpenSALib3.Moveset
             if (_header.TetherOffset != 0)
                 _tetherdata = new TetherData(this, _header.TetherOffset);
             //Setup Tree Structure
-            _children.Add(new NamedList(_section1, "Section1"));
-            _children.Add(new NamedList(_hurtboxes, "Hurtboxes"));
-            _children.Add(new NamedList(_unknowntype1List, "UnknownType1"));
-            _children.Add(new NamedList(_ledgegrabboxes, "LedgegrabBoxes"));
-            _children.Add(new NamedList(_boneref2, "BoneRef"));
-            _children.Add(_multijumpdata);
-            _children.Add(_glidedata);
-            _children.Add(_crawldata);
-            _children.Add(_tetherdata);
-            (_children as List<IEnumerable>).RemoveAll(x => x == null);
+            Children.Add(new NamedList(_section1, "Section1"));
+            Children.Add(new NamedList(_hurtboxes, "Hurtboxes"));
+            Children.Add(new NamedList(_unknowntype1List, "UnknownType1"));
+            Children.Add(new NamedList(_ledgegrabboxes, "LedgegrabBoxes"));
+            Children.Add(new NamedList(_boneref2, "BoneRef"));
+            Children.Add(_multijumpdata);
+            Children.Add(_glidedata);
+            Children.Add(_crawldata);
+            Children.Add(_tetherdata);
+            (Children as List<IEnumerable>).RemoveAll(x => x == null);
         }
     }
 }

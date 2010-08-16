@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using System.Runtime.InteropServices;
+
 namespace OpenSALib3.DatHandler {
     public abstract class DatElement : IEnumerable
     {
@@ -18,7 +18,7 @@ namespace OpenSALib3.DatHandler {
             get { return Parent is DatFile ? (DatFile)Parent : Parent.RootFile; }
         }
         /* Hidden list of children */
-        protected IList _children = new List<IEnumerable>();
+        protected IList Children = new List<IEnumerable>();
         #endregion
         /* Printable Path 
          TODO: Make it so that identical paths don't exist..i.e Hurtbox#0,Hurtbox# etc
@@ -34,7 +34,7 @@ namespace OpenSALib3.DatHandler {
             }
         }
         /* Pointer to the beginning of this element */
-        private VoidPtr _address;
+        private readonly VoidPtr _address;
         [Browsable(false)]
         public virtual VoidPtr Address
         {
@@ -73,7 +73,7 @@ namespace OpenSALib3.DatHandler {
         }
 
         IEnumerator IEnumerable.GetEnumerator() {
-            return _children.GetEnumerator();
+            return Children.GetEnumerator();
         }
         #region ScriptingFunctions
         public unsafe byte ReadByte(int offset)

@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using OpenSALib3.DatHandler;
+using OpenSALib3.Properties;
 
 namespace OpenSALib3.Moveset {
     public class Attribute : DatElement {
@@ -20,7 +22,7 @@ namespace OpenSALib3.Moveset {
             if (_db != null)
                 return;
             _db = new Dictionary<uint, Metadata>();
-            var sr = new StringReader(Properties.Resources.Attributes);
+            var sr = new StringReader(Resources.Attributes);
             while (sr.Peek() != -1) {
                 var line1 = sr.ReadLine();
                 Debug.Assert(line1 != null);
@@ -30,7 +32,7 @@ namespace OpenSALib3.Moveset {
                     am.Type = typeof (int);
                 } else
                     am.Type = typeof (float);
-                var offset = uint.Parse(line1.Substring(2, 3), System.Globalization.NumberStyles.HexNumber);
+                var offset = uint.Parse(line1.Substring(2, 3), NumberStyles.HexNumber);
                 am.Name = line1.Length > 6
                     ? line1.Substring(6)
                     : String.Format("0x{0:X03}", offset);

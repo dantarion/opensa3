@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace OpenSALib3.DatHandler
 {
@@ -16,25 +13,25 @@ namespace OpenSALib3.DatHandler
         {
             Length = 4;
             Name = name;
-            intval = *(bint*)Address;
-            floatval = *(bfloat*)Address;
+            _intval = *(bint*)base.Address;
+            _floatval = *(bfloat*)base.Address;
         }
-        private bint intval;
-        private bfloat floatval;
-        public unsafe object Value
+        private bint _intval;
+        private bfloat _floatval;
+        public object Value
         {
             get
             {
                 if (Type == typeof(float))
-                    return (float)floatval;
-                return (int)intval;
+                    return (float)_floatval;
+                return (int)_intval;
             }
             set
             {
                 if (Type == typeof(float))
-                    floatval = Convert.ToSingle(value);
+                    _floatval = Convert.ToSingle(value);
                 else
-                    intval = Convert.ToInt32(value);
+                    _intval = Convert.ToInt32(value);
             }
         }
     }

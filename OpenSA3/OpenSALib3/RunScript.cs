@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Globalization;
 using System.IO;
+using System.Reflection;
 using System.Text;
 using BrawlLib.SSBB.ResourceNodes;
+using IronPython.Hosting;
 using Microsoft.Scripting.Hosting;
 using OpenSALib3.DatHandler;
 
@@ -9,14 +12,14 @@ namespace OpenSALib3 {
     public static class RunScript {
         private static ScriptRuntime _runtime;
         private static ScriptScope _scope;
-        private static readonly ScriptEngine Engine = IronPython.Hosting.Python.CreateEngine();
+        private static readonly ScriptEngine Engine = Python.CreateEngine();
         private static readonly StringBuilder SB = new StringBuilder();
 
         public static void ResetScope() {
             _scope = null;
         }
 
-        public static void LoadAssembly(System.Reflection.Assembly asm) {
+        public static void LoadAssembly(Assembly asm) {
             Engine.Runtime.LoadAssembly(asm);
             _scope = null;
         }
@@ -39,7 +42,7 @@ namespace OpenSALib3 {
                 SetupScope();
                 var ms = new MemoryStream();
                 SB.Clear();
-                _runtime.IO.SetOutput(ms, new StringWriter(SB, new System.Globalization.CultureInfo("en-US")));
+                _runtime.IO.SetOutput(ms, new StringWriter(SB, new CultureInfo("en-US")));
                 _scope.SetVariable("currentDat", file);
                 var compiledscript = Engine.CreateScriptSourceFromString(script);
                 compiledscript.Execute(_scope);
