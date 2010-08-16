@@ -1,18 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
+using System.Linq;
+using System.Text;
 using OpenSALib3.DatHandler;
-
 namespace OpenSALib3.PSA
 {
 
     public class Command : DatElement
     {
-        public static List<Command> ReadCommands(DatElement parent, uint offset, Dictionary<int, List<Command>> subroutinelist)
+        public static List<Command> ReadCommands(DatElement parent, int offset, Dictionary<int, List<Command>> subroutinelist)
         {
+ 
             var list = new List<Command>();
-            var command = new Command(parent, offset);
-            while (command.Module != 0 || command.ID != 0)
+            if (offset == -1)
+                return list;
+            Command command = new Command(parent, offset);
+            while ((command.Module != 0 || command.ID != 0) && command.Module != 255)
             {
                 offset += 8;
                 list.Add(command);
@@ -21,17 +24,22 @@ namespace OpenSALib3.PSA
             list.Add(command);
 
             //Search for subroutines
-            /*
             foreach (Command c in list)
             {
-                if (c.Module == 0x00 && c.ID == 0x07)
-                    if (c.RootFile.References.Count(x => x.DataOffset.Equals(c.data.ParameterOffset + 4)) == 0)
-                        if ((c._children[0] as Parameter).RawData > 0)
-                            subroutinelist[(c._children[0] as Parameter).RawData] = (ReadCommands(parent, (uint)(c._children[0] as Parameter).RawData, subroutinelist));
-                if (c.Module == 0x0D && c.ID == 0x00)
-                    subroutinelist[(c._children[1] as Parameter).RawData] = (ReadCommands(parent, (uint)(c._children[1] as Parameter).RawData, subroutinelist));
+                int suboff = -1;
+                if (c.Module == 0x00 && c.ID == 0x07 && subroutinelist != null)
+                {
+                    int ParamOffset = c.data.ParameterOffset+ 4;
+                    var ext = c.RootFile.References.Exists(x => x.DataOffset == ParamOffset);
+                    if (!ext)
+                        suboff = (c._children[0] as Parameter).RawData;
+                        subroutinelist[(c._children[0] as Parameter).RawData] = (ReadCommands(parent, (c._children[0] as Parameter).RawData, subroutinelist));
+                }
+                if (c.Module == 0x0D && c.ID == 0x00 && subroutinelist != null)
+                    suboff = (c._children[1] as Parameter).RawData;
+                if(suboff > 0 && !subroutinelist.ContainsKey(suboff))
+                subroutinelist[suboff] = (ReadCommands(parent, suboff, subroutinelist));
             }
-             */
             return list;
         }
 
@@ -45,26 +53,28 @@ namespace OpenSALib3.PSA
         }
         public byte Module
         {
-            get { return _data.Module; }
-            set { _data.Module = value; }
+            get { return data.Module; }
+            set { data.Module = value; }
         }
         public byte ID
         {
-            get { return _data.ID; }
-            set { _data.ID = value; }
+            get { return data.ID; }
+            set { data.ID = value; }
         }
 
-        private Data _data;
-        public unsafe Command(DatElement parent, uint offset)
+        private Data data;
+        public unsafe Command(DatElement parent, int offset)
             : base(parent, offset)
         {
-            _data = *(Data*)(Address);
+            data = *(Data*)(Address);
             Length = 8;
-            Color = Color.Blue;
-            Name = String.Format("{0:X02}{1:X02}{2:X02}{3:X02}", Module, ID, _data.ParameterCount, _data.Unknown);
-            if (Module != 0 || ID != 0)
-                for (var i = 0; i < _data.ParameterCount; i++)
-                    Children.Add(new Parameter(this, (uint)(_data.ParameterOffset + i * 8)));
+            Color = System.Drawing.Color.Blue;
+            Name = String.Format("{0:X02}{1:X02}{2:X02}{3:X02}", Module, ID, data.ParameterCount, data.Unknown);
+            if (Module == 0xFF || data.ParameterCount > 0x10)
+                return;
+            for (int i = 0; i < data.ParameterCount; i++)
+                _children.Add(new Parameter(this, (int)(data.ParameterOffset + i * 8)));
         }
     }
+
 }

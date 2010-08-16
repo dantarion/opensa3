@@ -36,12 +36,12 @@ namespace Tabuu.Utility {
         public event EventHandler LengthChanged;
 
         public unsafe byte ReadByte(long index) {
-            var offset = _contentmode ? ((DatSection) _datelement).DataOffset : _datelement.FileOffset;
+            int offset = _contentmode ? (_datelement as DatSection).DataOffset : _datelement.FileOffset;
             return *(byte*)(_datelement.RootFile.Address + offset + (uint)index);
         }
 
         public System.Drawing.Color GetByteColor(long index) {
-            var offset = _contentmode ? ((DatSection) _datelement).DataOffset : _datelement.FileOffset;
+            int offset = _contentmode ? (_datelement as DatSection).DataOffset : _datelement.FileOffset;
             var ele = SearchForDatElement(_datelement, offset + index);
             return ele != null ? ele.Color : System.Drawing.Color.Transparent;
         }
@@ -67,7 +67,7 @@ namespace Tabuu.Utility {
         }
 
         private bool IsInDatElement(long index) {
-            var offset = _contentmode ? ((DatSection) _datelement).DataOffset : _datelement.FileOffset;
+            int offset = _contentmode ? (_datelement as DatSection).DataOffset : _datelement.FileOffset;
             return index >= offset && index < offset + Length;
         }
 

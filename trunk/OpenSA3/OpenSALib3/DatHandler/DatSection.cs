@@ -6,13 +6,13 @@ namespace OpenSALib3.DatHandler {
 
     public struct DatSectionHeader
     {
-        public buint DataOffset;
+        public bint DataOffset;
         public bint StringOffset;
     }
     public unsafe class DatSection : DatElement
     {
         private DatSectionHeader _header;
-        public static DatSection Factory(DatElement parent, uint offset, int stringBase)
+        public static DatSection Factory(DatElement parent, int offset, int stringBase)
         {
             var ds = new DatSection(parent, offset, stringBase);
             return ds.Name == "data" ? new MovesetSection(parent, offset, stringBase) : ds;
@@ -22,17 +22,20 @@ namespace OpenSALib3.DatHandler {
             get { return _header.StringOffset; }
             set { _header.StringOffset = value; }
         }
-        public uint DataOffset
+        [Editor(typeof(OpenSALib3.Utility.HexPropertyEditor), typeof(System.Activities.Presentation.PropertyEditing.PropertyValueEditor))]
+        [Category("Section")]
+        public int DataOffset
         {
             get { return _header.DataOffset; }
             set { _header.DataOffset = value; }
         }
-        public uint DataLength
+        [Category("Section")]
+        public int DataLength
         {
             get;
             set;
         }
-        protected DatSection(DatElement parent, uint offset, int stringbase)
+        protected DatSection(DatElement parent, int offset, int stringbase)
             : base(parent, offset)
         {
             _header = *(DatSectionHeader*)Address;

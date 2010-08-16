@@ -1,30 +1,43 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using OpenSALib3.DatHandler;
-
+using System.ComponentModel;
+using OpenSALib3.Utility;
+using System.Activities.Presentation.PropertyEditing;
 namespace OpenSALib3.PSA
 {
-    class ActionOverride : DatElement
+    public class ActionOverride : DatElement
     {
-        private Data _data;
-
-         struct Data
+        private Data data;
+        unsafe struct Data
         {
-            public bint SubactionID;
+            public bint ActionID;
             public bint CommandListOffset;
         }
-        public int SubactionID
+        [Category("Override")]
+        [Editor(typeof(HexPropertyEditor), typeof(PropertyValueEditor))]
+        public int ActionID
         {
-            get { return _data.SubactionID; }
-            set { _data.SubactionID = value; }
+            get { return data.ActionID; }
+            set { data.ActionID = value; }
         }
-        public unsafe ActionOverride(DatElement parent, uint offset)
+        [Category("Override")]
+        [Editor(typeof(HexPropertyEditor), typeof(PropertyValueEditor))]
+        public int CommandListOffset
+        {
+            get { return data.CommandListOffset; }
+            set { data.CommandListOffset = value; }
+        }
+        public unsafe ActionOverride(DatElement parent, int offset)
             : base(parent, offset)
         {
-            _data = *(Data*)Address;
+            data = *(Data*)Address;
             Name = "ActionOverride";
             Length = 8;
-            if(_data.CommandListOffset > 0)
-            Children = Command.ReadCommands(this, (uint)_data.CommandListOffset,null);
+            if(data.CommandListOffset > 0)
+            _children = Command.ReadCommands(this, (int)data.CommandListOffset,null);
 
         }
     }

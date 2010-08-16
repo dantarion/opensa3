@@ -59,7 +59,7 @@ namespace OpenSALib3.Moveset
             get { return RootFile.GetBoneName(BoneIndex); }
         }
 
-        public unsafe Hurtbox(DatElement parent, uint offset)
+        public unsafe Hurtbox(DatElement parent, int offset)
             : base(parent, offset)
         {
             Length = 5 * 4;

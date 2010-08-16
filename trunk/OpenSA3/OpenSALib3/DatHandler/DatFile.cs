@@ -3,26 +3,25 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Drawing;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
 using BrawlLib.SSBB.ResourceNodes;
 using OpenSALib3.Utility;
+using System.Text;
 
 namespace OpenSALib3.DatHandler
 {
     [StructLayout(LayoutKind.Sequential, Pack = 1)]
     public struct DatFileHeader
     {
-        public buint FileSize;
-        public buint DataChunkSize;
-        public buint OffsetCount;
-        public buint SectionCount;
-        public buint ReferenceCount;
-        public buint Unknown1;
-        public buint Unknown2;
-        public buint Unknown3;
+        public bint FileSize;
+        public bint DataChunkSize;
+        public bint OffsetCount;
+        public bint SectionCount;
+        public bint ReferenceCount;
+        public bint Unknown1;
+        public bint Unknown2;
+        public bint Unknown3;
     }
 
     public unsafe class DatFile : DatElement
@@ -45,7 +44,11 @@ namespace OpenSALib3.DatHandler
         }
         #endregion
 
-        public MDL0Node Model { get; private set; }
+        private MDL0Node _model = null;
+        public MDL0Node Model
+        {
+            get { return _model; }
+        }
         private Dictionary<int, string> _boneNames;
         public void LoadModel(string filename)
         {
@@ -53,9 +56,8 @@ namespace OpenSALib3.DatHandler
             {
                 _boneNames = new Dictionary<int, string>();
                 var node = NodeFactory.FromFile(null, filename);
-                Model = node.Children[0].Children[0].Children[0] as MDL0Node;
-                Debug.Assert(Model != null);
-                foreach (MDL0BoneNode innernode in Model.FindChildrenByType("", ResourceType.MDL0Bone))
+                _model = node.Children[0].Children[0].Children[0] as MDL0Node;
+                foreach (MDL0BoneNode innernode in _model.FindChildrenByType("", ResourceType.MDL0Bone))
                 {
                     //Debug.Assert(_boneNames.ContainsKey(innernode.BoneIndex));
                     _boneNames[innernode.BoneIndex] = innernode.Name;
@@ -63,7 +65,7 @@ namespace OpenSALib3.DatHandler
             }
             catch (Exception)
             {
-                Model = null;
+                _model = null;
                 _boneNames = null;
             }
         }
@@ -71,7 +73,9 @@ namespace OpenSALib3.DatHandler
         {
             if (_boneNames == null)
                 return "No Model Ref Loaded";
-            return !_boneNames.ContainsKey(boneIndex) ? "????" : _boneNames[boneIndex];
+            if (!_boneNames.ContainsKey(boneIndex))
+                return "????";
+            return _boneNames[boneIndex];
         }
 
         private DatFileHeader _header;
@@ -118,12 +122,20 @@ namespace OpenSALib3.DatHandler
             Sections = new List<DatSection>();
             References = new List<DatSection>();
             Name = node.RootNode.Name;
-            Length = (uint)(_header.FileSize - Marshal.SizeOf(_header));
+            Length = (int)(_header.FileSize - Marshal.SizeOf(_header));
             Changed = false;
-            Color = Color.Transparent;
+            Color = System.Drawing.Color.Transparent;
             //Start Parse
-            var section = _header.DataChunkSize + _header.OffsetCount * 4;
+            var section = _header.DataChunkSize + _header.OffsetCount * 4 ;
             var stringBase =(int) (section + (_header.SectionCount + _header.ReferenceCount) * 8);
+            var section2 = section + _header.SectionCount * 8;
+            //Parse References FIRST
+            for (var i = 0; i < _header.ReferenceCount; i++)
+            {
+                var s = DatSection.Factory(this, section2, stringBase);
+                References.Add(s);
+                section2 += 8;
+            }
             //Parse sections
             for (var i = 0; i < _header.SectionCount; i++)
             {
@@ -132,16 +144,10 @@ namespace OpenSALib3.DatHandler
                 section += 8;
             }
             ComputeDataLengths(Sections);
-            //Parse References
-            for (var i = 0; i < _header.ReferenceCount; i++)
-            {
-                var s = DatSection.Factory(this, section, stringBase);
-                References.Add(s);
-                section += 8;
-            }
+
             //Setup Tree Structure
-            Children.Add(new NamedList(Sections, "Sections"));
-            Children.Add(new NamedList(References, "References"));
+            _children.Add(new NamedList(Sections, "Sections"));
+            _children.Add(new NamedList(References, "References"));
 
         }
 
@@ -156,63 +162,70 @@ namespace OpenSALib3.DatHandler
         public string Report()
         {
             var usagedata = new List<UsageData>();
-            CollectUsage(this,usagedata);
-            usagedata.AddRange(_sectionUsageData);
-            var sorted = usagedata.OrderBy(x => x.Offset);
-            var usage = sorted.Sum(ug => ug.Length);
+            collectUsage(this,usagedata);
+            foreach (UsageData ug in susagedata)
+                usagedata.Add(ug);
+            usagedata.Sort();
+            var usage = 0;
+            foreach (UsageData ug in usagedata)
+                usage += ug.length;
             var sb = new StringBuilder();
             sb.AppendFormat("Total Size:{0}\n",Length);
             sb.AppendFormat("Bytes Parsed:{0}\n", usage);
             sb.AppendFormat("% Complete:{0}\n", (float)usage / Length);
 
-            var lastdata = 0;
-            foreach (var ug in sorted)
+            int lastdata = 0;
+            foreach (UsageData ug in usagedata)
             {
                 
-                sb.AppendFormat("{0:X08} - {1:8} - {2:25}", ug.Offset, ug.Length,ug.ID);
-                if (ug.Offset == lastdata)
+                sb.AppendFormat("@0x{0:X08} - len {1:X08} - {2:25}", ug.offset, ug.length,ug.ID);
+                if (ug.offset == lastdata)
                     sb.AppendFormat(" MATCH\n");
-                else if (ug.Offset < lastdata)
+                else if (ug.offset < lastdata)
                     sb.AppendFormat("OVERLAP\n");
                 else
-                    sb.AppendFormat(" HOLE - {0:X08}\n", ug.Offset - lastdata);
-                lastdata = ug.Offset + ug.Length;
+                    sb.AppendFormat("^ HOLE - {0:X08}\n", ug.offset - lastdata);
+                lastdata = ug.offset + ug.length;
 
             }
             return sb.ToString();
         }
-        public struct UsageData
+        public struct UsageData : IComparable<UsageData>
         {
-            public int Offset;
-            public int Length;
+            public int offset;
+            public int length;
             public string ID;
+
+            public int CompareTo(UsageData other)
+            {
+                return offset - other.offset;
+            }
         }
-        public void CollectUsage(IEnumerable element,List<UsageData> list)
+        public void collectUsage(IEnumerable element,List<UsageData> list)
         {
             foreach (IEnumerable child in element)
             {
-                CollectUsage(child, list);//Get the child usage
-                var de = child as DatElement;//If the child is actually a DatElement        
+                collectUsage(child, list);//Get the child usage
+                DatElement de = child as DatElement;//If the child is actually a DatElement        
                 if(de == null)
                     continue;
                 UsageData ud;
-                ud.Offset = (int)de.FileOffset;
-                ud.Length = (int)de.Length;
+                ud.offset = (int)de.FileOffset;
+                ud.length = (int)de.Length;
                 ud.ID = de.Path + " " + de.GetType().Name;
                 list.Add(ud);
             }
         }
-
-        private readonly List<UsageData> _sectionUsageData = new List<UsageData>();
+        List<UsageData> susagedata = new List<UsageData>();
         public string ReadString(int offset)
         {
-            var s = new String((sbyte*)(Address + offset));
+            string s = new String((sbyte*)(Address + offset));
             UsageData ud;
-            ud.Offset = offset;
-            ud.Length = s.Length + 1;
+            ud.offset = offset;
+            ud.length = s.Length + 1;
             ud.ID = "String";
-            if(_sectionUsageData.Count(x=>x.Offset == offset) == 0)
-                _sectionUsageData.Add(ud);
+            if(susagedata.Count(x=>x.offset == offset) == 0)
+                susagedata.Add(ud);
             return s;
         }
     }

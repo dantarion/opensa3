@@ -22,7 +22,7 @@ namespace OpenSALib3.Moveset
             get { return _data.BackwardAccel; }
             set { _data.BackwardAccel = value; }
         }
-        public unsafe CrawlData(DatElement parent, uint offset)
+        public unsafe CrawlData(DatElement parent, int offset)
             : base(parent, offset)
         {
             _data = *(Data*)Address;

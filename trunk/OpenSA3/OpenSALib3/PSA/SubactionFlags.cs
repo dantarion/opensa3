@@ -36,13 +36,13 @@ namespace OpenSALib3.PSA
                 return _string;
             }
         }
-        public unsafe SubactionFlags(DatElement parent, uint offset)
+        public unsafe SubactionFlags(DatElement parent, int offset)
             : base(parent, offset)
         {
             _data = *(Data*)base.Address;
-            Name = AnimationName;
             Length = 8;
             _string = _data.AnimationStringOffset > 0 ? base.RootFile.ReadString(_data.AnimationStringOffset) : "N/A";
+            Name = AnimationName;
         }
     }
 }

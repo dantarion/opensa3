@@ -16,7 +16,7 @@ namespace OpenSALib3.Moveset {
             get { return RootFile.GetBoneName(BoneIndex); }
         }
 
-        public unsafe BoneRef(DatElement parent, uint offset, String name)
+        public unsafe BoneRef(DatElement parent, int offset, String name)
             : base(parent, offset) {
 
             Name = name;
