@@ -81,8 +81,10 @@
     <Compile Include="DatHandler\DatSection.cs" />
     <Compile Include="DatHandler\DatFile.cs" />
     <Compile Include="DatHandler\GenericElement.cs" />
+    <Compile Include="DatHandler\GenericSection.cs" />
     <Compile Include="Moveset\Attribute.cs" />
     <Compile Include="Moveset\BoneRef.cs" />
+    <Compile Include="Moveset\CommandOverrideSection.cs" />
     <Compile Include="Moveset\CrawlData.cs" />
     <Compile Include="Moveset\GlideData.cs" />
     <Compile Include="Moveset\Hurtbox.cs" />

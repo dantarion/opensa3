@@ -37,7 +37,7 @@ namespace OpenSALib3.PSA
             Name = "ActionOverride";
             Length = 8;
             if(data.CommandListOffset > 0)
-            _children = Command.ReadCommands(this, (int)data.CommandListOffset,null);
+            Children = Command.ReadCommands(this, (int)data.CommandListOffset,null);
 
         }
     }

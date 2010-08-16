@@ -55,6 +55,10 @@ namespace OpenSALib3.Moveset
             public bint Unknown25;
             public bint Unknown26;//Entry Article
             public bint Unknown27;
+            public bint Unknown28;
+            public bint Unknown29;
+            public bint Unknown30;
+            public bint Unknown31;
         }
 
         private readonly MovesetHeader _header;
@@ -74,7 +78,7 @@ namespace OpenSALib3.Moveset
             get { return _sseattributes; }
         }
 
-        private readonly MiscSection _miscsection;
+        private MiscSection _miscsection;
 
         [Browsable(false)]
         public MiscSection MiscSection
@@ -85,8 +89,6 @@ namespace OpenSALib3.Moveset
         private List<UnknownElement> _unknownb = new List<UnknownElement>();
         private List<UnknownElement> _unknownc = new List<UnknownElement>();
         private List<UnknownElement> _unknowne = new List<UnknownElement>();
-        private List<ActionOverride> _overrides = new List<ActionOverride>();
-        private List<ActionOverride> _overrides2 = new List<ActionOverride>();
         private List<CommandList> _actions = new List<CommandList>();
         private List<CommandList> _actions2 = new List<CommandList>();
         private List<SubactionFlags> _subactionflags = new List<SubactionFlags>();
@@ -99,6 +101,10 @@ namespace OpenSALib3.Moveset
             : base(parent, offset, stringPtr)
         {
             _header = *(MovesetHeader*)(RootFile.Address + DataOffset);
+
+        }
+        public override void Parse()
+        {
             _miscsection = new MiscSection(this, _header.MiscSectionOffset);
             for (int i = _header.AttributeStart; i < _header.SSEAttributeStart; i += 4)
                 _attributes.Add(new Attribute(this, i));
@@ -107,88 +113,56 @@ namespace OpenSALib3.Moveset
 
             for (int i = _header.Unknown5Start; i < _header.Unknown7; i += 16)
                 _unknowna.Add(new UnknownElement(this, i, "UnknownA", 16));
-            for (int i = _header.Unknown7; i < _header.Unknown7+8*_unknowna.Count; i += 8)
+            for (int i = _header.Unknown6Start; i < _header.ActionsStart; i += 16)
+                _unknownc.Add(new UnknownElement(this, i, "UnknownC", 16));
+            for (int i = _header.Unknown7; i < _header.Unknown7 + 8 * (_unknowna.Count+_unknownc.Count); i += 8)
                 _unknowne.Add(new UnknownElement(this, i, "UnknownE", 8));
             for (int i = _header.Unknown1; i < _header.Unknown19; i += 8)
                 _unknownb.Add(new UnknownElement(this, i, "UnknownB", 8));
-            for (int i = _header.Unknown6Start; i < _header.ActionsStart; i += 16)
-                _unknownc.Add(new UnknownElement(this, i, "UnknownC", 16));
+
             var unknownd = new UnknownElement(this, _header.Unknown8, "UnknownD", 8);
-            //PSA Stuffs
-            if (_header.Unknown20 != 0)
-            {
-                var o = _header.Unknown20;
-                var ao = new ActionOverride(this, o);
-                while (ao.ActionID > 0)
-                {
-                    _overrides.Add(ao);
-                    o += 8;
-                    ao = new ActionOverride(this, o);
-                }
-                _overrides.Add(ao);
-            }
-            if (_header.Unknown21 != 0)
-            {
-                var o = _header.Unknown21;
-                var ao = new ActionOverride(this, o);
-                while (ao.ActionID > 0)
-                {
-                    _overrides2.Add(ao);
-                    o += 8;
-                    ao = new ActionOverride(this, o);
-                }
-                _overrides2.Add(ao);
-            }
-            int count = 112;
+            int count = 0x112;
             for (int i = _header.ActionsStart; i < _header.Actions2Start; i += 4)
-                _actions.Add(new CommandList(this, i,"Action "+String.Format("0x{0:X}",count++), _subroutines));
+                _actions.Add(new CommandList(this, i, "Action " + String.Format("0x{0:X}", count++), _subroutines));
             count = 0;
             for (int i = _header.Actions2Start; i < _header.Unknown11; i += 4)
-                _actions2.Add(new CommandList(this, i, "Action2 " + String.Format("0x{0:X}",count++), _subroutines));
+                _actions2.Add(new CommandList(this, i, "Action2 " + String.Format("0x{0:X}", count++), _subroutines));
             for (int i = _header.SubactionFlagsStart; i < _header.SubactionMainStart; i += 8)
                 _subactionflags.Add(new SubactionFlags(this, i));
             count = 0;
             for (int i = _header.SubactionMainStart; i < _header.SubactionGFXStart; i += 4)
-                _subactionmain.Add(new CommandList(this, i, "Subaction Main " + String.Format("0x{0:X}",count++), _subroutines));
+                _subactionmain.Add(new CommandList(this, i, "Subaction Main " + String.Format("0x{0:X}", count++), _subroutines));
             count = 0;
             for (int i = _header.SubactionGFXStart; i < _header.SubactionSFXStart; i += 4)
-                _subactiongfx.Add(new CommandList(this, i,"Subaction GFX " + String.Format("0x{0:X}",count++), _subroutines));
+                _subactiongfx.Add(new CommandList(this, i, "Subaction GFX " + String.Format("0x{0:X}", count++), _subroutines));
             count = 0;
             for (int i = _header.SubactionSFXStart; i < _header.SubactionOtherStart; i += 4)
-                _subactionsfx.Add(new CommandList(this, i, "Subaction SFX " + String.Format("0x{0:X}",count++), _subroutines));
+                _subactionsfx.Add(new CommandList(this, i, "Subaction SFX " + String.Format("0x{0:X}", count++), _subroutines));
             count = 0;
             for (int i = _header.SubactionOtherStart; i < _header.SubactionOtherStart + _subactiongfx.Count * 4; i += 4)
-                _subactionother.Add(new CommandList(this, i, "Subaction Other " + String.Format("0x{0:X}",count++), _subroutines));
+                _subactionother.Add(new CommandList(this, i, "Subaction Other " + String.Format("0x{0:X}", count++), _subroutines));
 
             //Setup Tree Structure
-            _children.Add(new NamedList(Attributes, "Attributes"));
-            _children.Add(new NamedList(SSEAttributes, "SSE Attributes"));
-            _children.Add(new NamedList(_unknowna, "UnknownA(Global Action Flag?)"));
-            _children.Add(new NamedList(_unknowne, "UnknownE(Global Action Flag2?)"));
-            _children.Add(new NamedList(_unknownc, "UnknownC(Local Action Flag2?)"));
-            _children.Add(new NamedList(_unknownb, "UnknownB(Local Action Flag?)"));
+            Children.Add(new UnknownElement(this, DataOffset, "Header", 32 * 4));
+            Children.Add(new NamedList(Attributes, "Attributes"));
+            Children.Add(new NamedList(SSEAttributes, "SSE Attributes"));
+            Children.Add(new NamedList(_unknowna, "UnknownA(Global Action Flag?)"));
+            Children.Add(new NamedList(_unknownc, "UnknownC(Local Action Flag2?)"));
+            Children.Add(new NamedList(_unknowne, "UnknownE(Action Flag2?)"));
             
-            
-            _children.Add(unknownd);
-            _children.Add(MiscSection);
-            _children.Add(new NamedList(_overrides, "Overrides"));
-            _children.Add(new NamedList(_overrides2, "Overrides2"));
-            _children.Add(new NamedList(_actions, "Actions"));
-            _children.Add(new NamedList(_actions2, "Actions2?"));
-            _children.Add(new NamedList(_subactionflags, "Flags"));
-            var subactions = new List<IEnumerable>();
-            for (int i = 0; i < _subactionflags.Count; i++)
-            {
-                var subaction = new List<IEnumerable>();
-                
-                subaction.Add(new NamedList(_subactionmain[i], "Main"));
-                subaction.Add(new NamedList(_subactiongfx[i], "GFX"));
-                subaction.Add(new NamedList(_subactionsfx[i], "SFX"));
-                subaction.Add(new NamedList(_subactionother[i], "Other"));
-                subactions.Add(new NamedList(subaction, string.Format("{0:x03}", i)));
-            }
-            _children.Add(new NamedList(subactions, "Subactions"));
-            _children.Add(new NamedList(_subroutines.Values, "Subroutines"));
+            Children.Add(new NamedList(_unknownb, "UnknownB(Local Action Flag?)"));
+
+
+            Children.Add(unknownd);
+            Children.Add(MiscSection);
+            Children.Add(new NamedList(_actions, "Actions"));
+            Children.Add(new NamedList(_actions2, "Actions2?"));
+            Children.Add(new NamedList(_subactionflags, "Subaction Flags"));
+            Children.Add(new NamedList(_subactionmain, "Subaction Main"));
+            Children.Add(new NamedList(_subactiongfx, "Subaction GFX"));
+            Children.Add(new NamedList(_subactionsfx, "Subaction SFX"));
+            Children.Add(new NamedList(_subactionother, "Subaction Other"));
+            Children.Add(new NamedList(_subroutines.Values, "Subroutines"));
         }
 
     }

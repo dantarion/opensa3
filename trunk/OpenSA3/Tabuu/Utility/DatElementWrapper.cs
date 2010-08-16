@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Linq;
 using OpenSALib3.DatHandler;
-
+using System.Collections.Generic;
 namespace Tabuu.Utility {
     public class DatElementWrapper : Be.Windows.Forms.IByteProvider {
         private readonly DatElement _datelement;
@@ -12,7 +12,7 @@ namespace Tabuu.Utility {
             _datelement = datElement;
             _contentmode = contentmode;
         }
-
+        private Dictionary<long, System.Drawing.Color> _colorCache = new Dictionary<long, System.Drawing.Color>();
         #region IByteProvider
         public void ApplyChanges() { }
 
@@ -41,9 +41,16 @@ namespace Tabuu.Utility {
         }
 
         public System.Drawing.Color GetByteColor(long index) {
-            int offset = _contentmode ? (_datelement as DatSection).DataOffset : _datelement.FileOffset;
-            var ele = SearchForDatElement(_datelement, offset + index);
-            return ele != null ? ele.Color : System.Drawing.Color.Transparent;
+
+            long offset = _contentmode ? (_datelement as DatSection).DataOffset : _datelement.FileOffset;
+            offset += index;
+            offset -= index % 4;
+            if (!_colorCache.ContainsKey(offset))
+            {
+                var ele = SearchForDatElement(_datelement, offset);
+                _colorCache[offset] =  ele != null ? ele.Color : System.Drawing.Color.Transparent;
+            }
+            return _colorCache[offset];
         }
 
         private static DatElement SearchForDatElement(IEnumerable node, long index) {
@@ -51,24 +58,21 @@ namespace Tabuu.Utility {
             foreach (var searchableChild in node.OfType<IEnumerable>()) {
                 found = SearchForDatElement(searchableChild, index); //Search child nodes
                 if (found != null)
-                    break; //If we find it, stop searching
+                    return found; //If we find it, stop searching>	Tabuu.exe!Tabuu.Utility.DatElementWrapper.SearchForDatElement(System.Collections.IEnumerable node, long index) Line 59 + 0x70 bytes	C#
             }
-            if (found != null)
-                return found; //Return the found result
             //If its not in any of the children, maybe this is it!
             var asDatElement = node as DatElement;
             if (asDatElement == null) //If its not a DatElement though, the search failed
                 return null;
-            return new DatElementWrapper(asDatElement).IsInDatElement(index)
+            return IsIndexInDatElement(index,asDatElement)
                 ? asDatElement //But if it is, and we are in there, we found it!
                 : null;        //But if its not we failed
 
 
         }
-
-        private bool IsInDatElement(long index) {
-            int offset = _contentmode ? (_datelement as DatSection).DataOffset : _datelement.FileOffset;
-            return index >= offset && index < offset + Length;
+        private static bool IsIndexInDatElement(long index, DatElement element)
+        {
+            return element.FileOffset <= index && index < element.FileOffset + element.Length;
         }
 
         public bool SupportsDeleteBytes() {
