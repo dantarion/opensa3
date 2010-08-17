@@ -28,6 +28,7 @@ namespace OpenSALib3.PSA
         private Data _data;
         public byte InTransitionTime { get { return _data.InTransitionTime; } set { _data.InTransitionTime = value; } }
         public AnimationFlags Flags { get { return _data.Flags; } set { _data.Flags = value; } }
+        public int AnimationStringOffset { get { return _data.AnimationStringOffset; } set { _data.AnimationStringOffset = value; } }
         private readonly string _string;
         public String AnimationName
         {
