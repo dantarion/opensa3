@@ -9,7 +9,7 @@ namespace OpenSALib3.PSA
 
     public class Command : DatElement
     {
-        public static List<Command> ReadCommands(DatElement parent, int offset, Dictionary<int, List<Command>> subroutinelist)
+        public static List<Command> ReadCommands(DatElement parent, int offset, List<List<Command>> subroutinelist)
         {
  
             var list = new List<Command>();
@@ -28,21 +28,23 @@ namespace OpenSALib3.PSA
             foreach (Command c in list)
             {
                 int suboff = -1;
-                if (c.Module == 0x00 && c.ID == 0x07 && subroutinelist != null)
+                if (c.Module == 0x00 && (c.ID == 0x07||c.ID ==0x09) && subroutinelist != null)
                 {
                     int ParamOffset = c.data.ParameterOffset+ 4;
-                    var ext = c.RootFile.References.Exists(x => x.DataOffset == ParamOffset);
+                    var ext = c.RootFile.isExternal(ParamOffset);
                     if (!ext)
                         suboff = (c.Children[0] as Parameter).RawData;
-                        if(suboff > 0 && c.RootFile.ReadInt(suboff) != -1)
-                            subroutinelist[suboff] = (ReadCommands(parent, suboff, subroutinelist));
+                    if (suboff > 0 && list[0].FileOffset != suboff && !subroutinelist.Exists(x => x[0].FileOffset == suboff))
+                    {
+                        subroutinelist.Add(ReadCommands(parent, suboff, subroutinelist));
+                    }
                 }
                 else
                     if (c.Module == 0x0D && c.ID == 0x00 && subroutinelist != null)
                     {
                         suboff = (c.Children[1] as Parameter).RawData;
-                        if (suboff > 0 && !subroutinelist.ContainsKey(suboff))
-                            subroutinelist[suboff] = (ReadCommands(parent, suboff, subroutinelist));
+                        if (suboff > 0 && !subroutinelist.Exists(x => x[0].FileOffset == suboff))
+                            subroutinelist.Add(ReadCommands(parent, suboff, subroutinelist));
                     }
             }
             return list;

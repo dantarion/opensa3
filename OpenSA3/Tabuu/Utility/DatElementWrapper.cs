@@ -44,7 +44,7 @@ namespace Tabuu.Utility {
 
             long offset = _contentmode ? (_datelement as DatSection).DataOffset : _datelement.FileOffset;
             offset += index;
-            offset -= index % 4;
+            offset -= offset % 4;
             if (!_colorCache.ContainsKey(offset))
             {
                 var ele = SearchForDatElement(_datelement, offset);
