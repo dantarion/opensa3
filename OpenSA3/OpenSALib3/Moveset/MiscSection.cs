@@ -75,11 +75,11 @@ namespace OpenSALib3.Moveset
         public unsafe MiscSection(DatElement parent, int fileOffset)
             : base(parent, fileOffset)
         {
-            Length = 4 * 19;
+            Length = 4 * 20;
             Name = "Misc";
             _header = *(Header*)(Address);
             /* TODO: Figure out proper length of section */
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < 14; i++)
                 _section1.Add(new GenericElement<int>(this, _header.Section1 + i * 4, "Unknown"));
             for (int i = 0; i < +_header.HurtBoxCount; i++)
                 _hurtboxes.Add(new Hurtbox(this, _header.HurtBoxOffset + i * 4 * 5));
@@ -87,7 +87,7 @@ namespace OpenSALib3.Moveset
                 _unknowntype1List.Add(new UnknownType1(this, _header.UnknownSectionOffset + i * 4 * 8));
             for (int i = 0; i < +_header.LedgegrabCount; i++)
                 _ledgegrabboxes.Add(new LedgegrabBox(this, _header.LedgegrabOffset + i * 4 * 4));
-            for (int i = _header.BoneRef2Offset; i < _header.BoneRef2Offset + 4 * 10; i += 4)
+            for (int i = _header.BoneRef2Offset; i < _header.BoneRef2Offset + 4 * 14; i += 4)
                 _boneref2.Add(new BoneRef(this, i, "Unknown"));
             if (_header.MultiJumpOffset != 0)
                 _multijumpdata = new MultiJumpData(this, _header.MultiJumpOffset);

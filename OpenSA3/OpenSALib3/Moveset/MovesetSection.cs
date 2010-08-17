@@ -160,7 +160,12 @@ namespace OpenSALib3.Moveset
                 }
 
             }
-
+            List<UnknownElement> unknownV = new List<UnknownElement>();
+            for(int i = _header.Unknown16; i < _header.Unknown18; i +=0x1c)
+                unknownV.Add(new UnknownElement(this,i,"UnknownV",0x1c));
+            List<GenericElement<int>> unknownAO = new List<GenericElement<int>>();
+            for (int i = _header.Unknown11; i < _header.Unknown11+4*0x116; i += 0x4)
+                unknownAO.Add(new GenericElement<int>(this, i, "UnknownV"));
             //Setup Tree Structure
             Children.Add(new UnknownElement(this, DataOffset, "Header", 32 * 4));
             Children.Add(new NamedList(Attributes, "Attributes"));
@@ -168,8 +173,9 @@ namespace OpenSALib3.Moveset
             Children.Add(new NamedList(_unknowna, "UnknownA(Global Action Flag?)"));
             Children.Add(new NamedList(_unknownc, "UnknownC(Local Action Flag2?)"));
             Children.Add(new NamedList(_unknowne, "UnknownE(Action Flag2?)"));
-            
-            Children.Add(new NamedList(_unknownb, "UnknownB(Local Action Flag?)"));
+            Children.Add(new NamedList(unknownV, "UnknownV"));
+            Children.Add(new NamedList(unknownAO, "UnknownAO"));
+            //Children.Add(new NamedList(_unknownb, "UnknownB(Local Action Flag?)"));
 
 
             Children.Add(unknownd);
