@@ -8,6 +8,7 @@ using System.Runtime.InteropServices;
 using BrawlLib.SSBB.ResourceNodes;
 using OpenSALib3.Utility;
 using System.Text;
+using OpenSALib3.Moveset;
 
 namespace OpenSALib3.DatHandler
 {
@@ -126,8 +127,8 @@ namespace OpenSALib3.DatHandler
             Changed = false;
             Color = System.Drawing.Color.Transparent;
             //Start Parse
-            var section = _header.DataChunkSize + _header.OffsetCount * 4 ;
-            var stringBase =(int) (section + (_header.SectionCount + _header.ReferenceCount) * 8);
+            var section = _header.DataChunkSize + _header.OffsetCount * 4;
+            var stringBase = (int)(section + (_header.SectionCount + _header.ReferenceCount) * 8);
             var section2 = section + _header.SectionCount * 8;
             //Parse References FIRST
             for (var i = 0; i < _header.ReferenceCount; i++)
@@ -143,14 +144,18 @@ namespace OpenSALib3.DatHandler
                 Sections.Add(s);
                 section += 8;
             }
+            var offsetchunk = new UnknownElement(this, _header.DataChunkSize, "OffsetChunk", _header.OffsetCount*4);
             ComputeDataLengths(Sections);
             foreach (DatSection s in Sections)
                 s.Parse();
+            var stringChunk = new UnknownElement(this, Sections[0].StringOffset, "StringChunk", _header.FileSize - Sections[0].StringOffset);
 
 
             //Setup Tree Structure
             Children.Add(new NamedList(Sections, "Sections"));
             Children.Add(new NamedList(References, "References"));
+            Children.Add(offsetchunk);
+            Children.Add(stringChunk);
 
         }
 
@@ -165,34 +170,27 @@ namespace OpenSALib3.DatHandler
         public string Report()
         {
             var usagedata = new List<UsageData>();
-            collectUsage(this,usagedata);
+            collectUsage(this, usagedata);
             foreach (UsageData ug in susagedata)
                 usagedata.Add(ug);
-            UsageData offsetchunk;
-            offsetchunk.length = _header.OffsetCount * 4;
-            offsetchunk.offset = _header.DataChunkSize;
-            offsetchunk.ID = "Offset Chunk";
-            usagedata.Add(offsetchunk);
             usagedata.Sort();
             var usage = 0;
             foreach (UsageData ug in usagedata)
                 usage += ug.length;
-            var sb = new StringBuilder();
-            sb.AppendFormat("Total Size:{0}\n",Length);
+            var sb = new StringBuilder(0x150000);
+            sb.AppendFormat("{0}\n", this.Name);
+            sb.AppendFormat("Total Size:{0}\n", Length);
             sb.AppendFormat("Bytes Parsed:{0}\n", usage);
             sb.AppendFormat("% Complete:{0}\n", (float)usage / Length);
 
             int lastdata = 0;
             foreach (UsageData ug in usagedata)
             {
-                
-                sb.AppendFormat("@0x{0:X08} - len {1:X08} - {2:25}", ug.offset, ug.length,ug.ID);
-                if (ug.offset == lastdata)
-                    sb.AppendFormat(" MATCH\n");
-                else if (ug.offset < lastdata)
+                if (ug.offset < lastdata)
                     sb.AppendFormat("OVERLAP\n");
-                else
-                    sb.AppendFormat("^ HOLE - {0:X08}\n", ug.offset - lastdata);
+                else if (ug.offset > lastdata)
+                    sb.AppendFormat("{1:X08} HOLE - {0:X08}\n", ug.offset - lastdata, lastdata);
+                    sb.AppendFormat("@0x{0:X08} - len {1:X08} - {2:25}\n", ug.offset, ug.length, ug.ID);
                 lastdata = ug.offset + ug.length;
 
             }
@@ -209,19 +207,22 @@ namespace OpenSALib3.DatHandler
                 return offset - other.offset;
             }
         }
-        public void collectUsage(IEnumerable element,List<UsageData> list)
+        public void collectUsage(IEnumerable element, List<UsageData> list)
         {
+
             foreach (IEnumerable child in element)
-            {
                 collectUsage(child, list);//Get the child usage
+            foreach (object child in element)
+            {          
                 DatElement de = child as DatElement;//If the child is actually a DatElement        
-                if(de == null)
+                if (de == null)
                     continue;
                 UsageData ud;
                 ud.offset = (int)de.FileOffset;
                 ud.length = (int)de.Length;
                 ud.ID = de.Path + " " + de.GetType().Name;
-                list.Add(ud);
+                if(list.Count(x => x.offset == ud.offset) == 0)
+                    list.Add(ud);
             }
         }
         List<UsageData> susagedata = new List<UsageData>();
@@ -231,9 +232,10 @@ namespace OpenSALib3.DatHandler
             UsageData ud;
             ud.offset = offset;
             ud.length = s.Length + 1;
+            ud.length += ud.length % 8;
             ud.ID = "String";
-            if(susagedata.Count(x=>x.offset == offset) == 0)
-                susagedata.Add(ud);
+           // if (susagedata.Count(x => x.offset == offset) == 0)
+           //     susagedata.Add(ud);
             return s;
         }
     }

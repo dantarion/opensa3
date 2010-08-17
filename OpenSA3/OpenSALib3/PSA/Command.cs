@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using OpenSALib3.DatHandler;
+using System.Diagnostics;
 namespace OpenSALib3.PSA
 {
 
@@ -15,7 +16,7 @@ namespace OpenSALib3.PSA
             if (offset == -1)
                 return list;
             Command command = new Command(parent, offset);
-            while ((command.Module != 0 || command.ID != 0) && command.Module != 255)
+            while (command.Module != 0 || command.ID != 0)
             {
                 offset += 8;
                 list.Add(command);
@@ -33,13 +34,16 @@ namespace OpenSALib3.PSA
                     var ext = c.RootFile.References.Exists(x => x.DataOffset == ParamOffset);
                     if (!ext)
                         suboff = (c.Children[0] as Parameter).RawData;
-                        if(suboff > 0)
-                        subroutinelist[(c.Children[0] as Parameter).RawData] = (ReadCommands(parent, (c.Children[0] as Parameter).RawData, subroutinelist));
+                        if(suboff > 0 && c.RootFile.ReadInt(suboff) != -1)
+                            subroutinelist[suboff] = (ReadCommands(parent, suboff, subroutinelist));
                 }
-                if (c.Module == 0x0D && c.ID == 0x00 && subroutinelist != null)
-                    suboff = (c.Children[1] as Parameter).RawData;
-                if(suboff > 0 && !subroutinelist.ContainsKey(suboff))
-                subroutinelist[suboff] = (ReadCommands(parent, suboff, subroutinelist));
+                else
+                    if (c.Module == 0x0D && c.ID == 0x00 && subroutinelist != null)
+                    {
+                        suboff = (c.Children[1] as Parameter).RawData;
+                        if (suboff > 0 && !subroutinelist.ContainsKey(suboff))
+                            subroutinelist[suboff] = (ReadCommands(parent, suboff, subroutinelist));
+                    }
             }
             return list;
         }
@@ -71,8 +75,8 @@ namespace OpenSALib3.PSA
             Length = 8;
             Color = System.Drawing.Color.Blue;
             Name = String.Format("{0:X02}{1:X02}{2:X02}{3:X02}", Module, ID, data.ParameterCount, data.Unknown);
-            if (Module == 0xFF || data.ParameterCount > 0x10|| data.Unknown > 4)
-                return;
+            if (Module == 0xFF)
+                Debug.Fail("Command Module 0xFF");
             for (int i = 0; i < data.ParameterCount; i++)
                 Children.Add(new Parameter(this, (int)(data.ParameterOffset + i * 8)));
         }
