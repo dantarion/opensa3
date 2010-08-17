@@ -67,20 +67,31 @@ namespace OpenSALib3.PSA
         private List<CommandList> _subactiongfx = new List<CommandList>();
         private List<CommandList> _subactionsfx = new List<CommandList>();
         private List<CommandList> _subactionother = new List<CommandList>();
-        private Dictionary<int, List<Command>> _subroutines = new Dictionary<int, List<Command>>();
+        private List<List<Command>> _subroutines = new List<List<Command>>();
         public unsafe Article(MovesetSection parent, int offset)
             : base(parent, offset)
         {
             _data = *(Data*)Address;
             Name = "Article";
             Length = 4 * 10;
-
+            if (
+                _data.ActionsStart > RootFile.Length || _data.ActionsStart % 4 != 0 ||
+                _data.SubactionFlagsStart > RootFile.Length||_data.SubactionFlagsStart % 4 != 0 ||
+                _data.SubactionGFXStart > RootFile.Length || _data.SubactionGFXStart % 4 != 0 ||
+                _data.SubactionSFXStart > RootFile.Length || _data.SubactionSFXStart % 4 != 0 ||
+                _data.OtherStart > RootFile.Length || _data.OtherStart % 4 != 0
+                )
+                throw new Exception("Not actually a Article, lol");
             int actions = 0;
             int subactions = (FileOffset-_data.SubactionFlagsStart)/8;
             if (_data.ActionFlagsStart > 0)
                 actions = (_data.ActionsStart - _data.ActionFlagsStart) / 0x10;
             if (_data.SubactionFlagsStart > 0 && _data.SubactionMainStart > 0)
                 subactions = (_data.SubactionMainStart - _data.SubactionFlagsStart) / 0x8;
+            if (subactions > 0x1000|| actions > 0x1000)
+                throw new Exception("Not actually a Article, lol");
+
+
 
             
             //Parse
@@ -102,7 +113,7 @@ namespace OpenSALib3.PSA
                    _subactionsfx.Add(new CommandList(this, _data.SubactionSFXStart + i * 4, "Subaction SFX " + String.Format("0x{0:X}", count++), _subroutines));
             if (_data.OtherStart > 0)
                 for (int i = 0; i < subactions; i++)
-                    _subactionother.Add(new CommandList(this, _data.OtherStart + i * 4, "Subaction Other " + String.Format("0x{0:X}", count++), _subroutines));
+                    ;//_subactionother.Add(new CommandList(this, _data.OtherStart + i * 4, "Subaction Other " + String.Format("0x{0:X}", count++), _subroutines));
             /*
             count = 0;
             for (int i = _data.SubactionMainStart; i < _data.SubactionGFXStart; i += 4)
@@ -124,7 +135,7 @@ namespace OpenSALib3.PSA
             Children.Add(new NamedList(_subactiongfx, "Subaction GFX"));
             Children.Add(new NamedList(_subactionsfx, "Subaction SFX"));
             Children.Add(new NamedList(_subactionother, "Subaction Other"));
-            Children.Add(new NamedList(_subroutines.Values, "Subroutines"));
+            Children.Add(new NamedList(_subroutines, "Subroutines"));
         }
     }
 }

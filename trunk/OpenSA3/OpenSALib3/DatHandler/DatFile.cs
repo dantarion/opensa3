@@ -111,7 +111,11 @@ namespace OpenSALib3.DatHandler
         {
             get { return this; }
         }
-
+        private List<int> external = new List<int>();
+        public bool isExternal(int offset)
+        {
+            return external.Contains(offset);
+        }
         protected DatFile(ResourceNode node)
             : base(null, 0)
         {
@@ -131,10 +135,18 @@ namespace OpenSALib3.DatHandler
             var stringBase = (int)(section + (_header.SectionCount + _header.ReferenceCount) * 8);
             var section2 = section + _header.SectionCount * 8;
             //Parse References FIRST
+
             for (var i = 0; i < _header.ReferenceCount; i++)
             {
                 var s = DatSection.Factory(this, section2, stringBase);
                 References.Add(s);
+                var tmp = s.DataOffset;
+                do
+                {
+                    external.Add(tmp);
+                    tmp = ReadInt(tmp);
+                }
+                while (tmp != -1);
                 section2 += 8;
             }
             //Parse sections
@@ -144,12 +156,11 @@ namespace OpenSALib3.DatHandler
                 Sections.Add(s);
                 section += 8;
             }
-            var offsetchunk = new UnknownElement(this, _header.DataChunkSize, "OffsetChunk", _header.OffsetCount*4);
+            var offsetchunk = new UnknownElement(this, _header.DataChunkSize, "OffsetChunk", _header.OffsetCount * 4);
             ComputeDataLengths(Sections);
             foreach (DatSection s in Sections)
                 s.Parse();
-            var stringChunk = new UnknownElement(this, Sections[0].StringOffset, "StringChunk", _header.FileSize - Sections[0].StringOffset);
-
+            var stringChunk = new UnknownElement(this, stringBase, "StringChunk", _header.FileSize - stringBase);
 
             //Setup Tree Structure
             Children.Add(new NamedList(Sections, "Sections"));
@@ -170,7 +181,8 @@ namespace OpenSALib3.DatHandler
         public string Report()
         {
             var usagedata = new List<UsageData>();
-            collectUsage(this, usagedata);
+            foreach (IEnumerable child in Children)
+                collectUsage(child, ref usagedata);
             foreach (UsageData ug in susagedata)
                 usagedata.Add(ug);
             usagedata.Sort();
@@ -190,7 +202,7 @@ namespace OpenSALib3.DatHandler
                     sb.AppendFormat("OVERLAP\n");
                 else if (ug.offset > lastdata)
                     sb.AppendFormat("{1:X08} HOLE - {0:X08}\n", ug.offset - lastdata, lastdata);
-                    sb.AppendFormat("@0x{0:X08} - len {1:X08} - {2:25}\n", ug.offset, ug.length, ug.ID);
+                sb.AppendFormat("@0x{0:X08} - len {1:X08} - {2:25}\n", ug.offset, ug.length, ug.ID);
                 lastdata = ug.offset + ug.length;
 
             }
@@ -207,21 +219,18 @@ namespace OpenSALib3.DatHandler
                 return offset - other.offset;
             }
         }
-        public void collectUsage(IEnumerable element, List<UsageData> list)
+        public void collectUsage(IEnumerable element, ref List<UsageData> list)
         {
-
             foreach (IEnumerable child in element)
-                collectUsage(child, list);//Get the child usage
-            foreach (object child in element)
-            {          
-                DatElement de = child as DatElement;//If the child is actually a DatElement        
-                if (de == null)
-                    continue;
+                collectUsage(child, ref list);//Get the child usage
+            DatElement de = element as DatElement;
+            if (de != null)
+            {
                 UsageData ud;
-                ud.offset = (int)de.FileOffset;
-                ud.length = (int)de.Length;
+                ud.offset = de.FileOffset;
+                ud.length = de.Length;
                 ud.ID = de.Path + " " + de.GetType().Name;
-                if(list.Count(x => x.offset == ud.offset) == 0)
+                if (!list.Exists(x => x.offset == de.FileOffset))
                     list.Add(ud);
             }
         }
@@ -234,8 +243,8 @@ namespace OpenSALib3.DatHandler
             ud.length = s.Length + 1;
             ud.length += ud.length % 8;
             ud.ID = "String";
-           // if (susagedata.Count(x => x.offset == offset) == 0)
-           //     susagedata.Add(ud);
+            // if (susagedata.Count(x => x.offset == offset) == 0)
+            //     susagedata.Add(ud);
             return s;
         }
     }

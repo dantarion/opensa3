@@ -8,7 +8,7 @@ namespace OpenSALib3.PSA
     class CommandList : DatElement
     {
         bint _offset;
-        public unsafe CommandList(DatElement parent, int offset,string name, Dictionary<int,List<Command>>subroutines)
+        public unsafe CommandList(DatElement parent, int offset, string name, List<List<Command>> subroutines)
             : base(parent, offset)
         {
             Name = name;

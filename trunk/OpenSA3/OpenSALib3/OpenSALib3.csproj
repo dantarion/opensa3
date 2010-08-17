@@ -92,6 +92,7 @@
     <Compile Include="Moveset\MiscSection.cs" />
     <Compile Include="Moveset\MovesetSection.cs" />
     <Compile Include="Moveset\MultiJumpData.cs" />
+    <Compile Include="Moveset\SoundData.cs" />
     <Compile Include="Moveset\TetherData.cs" />
     <Compile Include="Moveset\UnknownType1.cs" />
     <Compile Include="Moveset\UnknownType2.cs" />

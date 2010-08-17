@@ -97,7 +97,7 @@ namespace OpenSALib3.Moveset
         private List<CommandList> _subactionsfx = new List<CommandList>();
         private List<CommandList> _subactionother = new List<CommandList>();
         private List<Article> _articles = new List<Article>();
-        private Dictionary<int, List<Command>> _subroutines = new Dictionary<int, List<Command>>();
+        private List<List<Command>> _subroutines = new List<List<Command>>();
         public unsafe MovesetSection(DatElement parent, int offset, VoidPtr stringPtr)
             : base(parent, offset, stringPtr)
         {
@@ -131,7 +131,7 @@ namespace OpenSALib3.Moveset
             count = 0;
             for (int i = _header.SubactionFlagsStart; i < _header.SubactionMainStart; i += 8)
                 _subactionflags.Add(new SubactionFlags(this, i));
-            var stringChunk = new UnknownElement(this, _subactionflags[0].AnimationStringOffset, "SubactionStrings", _header.SubactionMainStart - _subactionflags[0].AnimationStringOffset);
+            var stringChunk = new UnknownElement(this, _subactionflags[0].AnimationStringOffset, "SubactionStrings", _header.SubactionFlagsStart - _subactionflags[0].AnimationStringOffset);
             count = 0;
             for (int i = _header.SubactionMainStart; i < _header.SubactionGFXStart; i += 4)
                 _subactionmain.Add(new CommandList(this, i, "Subaction Main " + String.Format("0x{0:X}", count++), _subroutines));
@@ -147,11 +147,22 @@ namespace OpenSALib3.Moveset
 
             if (_header.Unknown26 > 0)
                 _articles.Add(new Article(this, _header.Unknown26));
-            for(int i = DataOffset+36*4; i < DataOffset+DataLength; i+=4)
-                _articles.Add(new Article(this, RootFile.ReadInt(i)));
+            for (int i = DataOffset + 36 * 4; i < DataOffset + DataLength; i += 4)
+            {
+                Article art = null;
+                try
+                {
+                    //art = new Article(this, RootFile.ReadInt(i));
+                    //_articles.Add(art);
+                }
+                catch (Exception err)
+                {
+                }
+
+            }
 
             //Setup Tree Structure
-            Children.Add(new UnknownElement(this, DataOffset, "Header", 36 * 4));
+            Children.Add(new UnknownElement(this, DataOffset, "Header", 32 * 4));
             Children.Add(new NamedList(Attributes, "Attributes"));
             Children.Add(new NamedList(SSEAttributes, "SSE Attributes"));
             Children.Add(new NamedList(_unknowna, "UnknownA(Global Action Flag?)"));
@@ -171,7 +182,7 @@ namespace OpenSALib3.Moveset
             Children.Add(new NamedList(_subactiongfx, "Subaction GFX"));
             Children.Add(new NamedList(_subactionsfx, "Subaction SFX"));
             Children.Add(new NamedList(_subactionother, "Subaction Other"));
-            Children.Add(new NamedList(_subroutines.Values, "Subroutines"));
+            Children.Add(new NamedList(_subroutines, "Subroutines"));
             Children.Add(new NamedList(_articles, "Articles"));
         }
 

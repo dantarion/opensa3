@@ -71,6 +71,7 @@ namespace OpenSALib3.Moveset
         private readonly GlideData _glidedata;
         private readonly CrawlData _crawldata;
         private readonly TetherData _tetherdata;
+        private readonly SoundData _sounddata;
         public unsafe MiscSection(DatElement parent, int fileOffset)
             : base(parent, fileOffset)
         {
@@ -96,6 +97,10 @@ namespace OpenSALib3.Moveset
                 _crawldata = new CrawlData(this, _header.CrawlOffset);
             if (_header.TetherOffset != 0)
                 _tetherdata = new TetherData(this, _header.TetherOffset);
+            if (_header.UnknownSection4Offset != 0)
+                _sounddata = new SoundData(this, _header.UnknownSection4Offset);
+
+            
             //Setup Tree Structure
             Children.Add(new NamedList(_section1, "Section1"));
             Children.Add(new NamedList(_hurtboxes, "Hurtboxes"));
@@ -106,6 +111,7 @@ namespace OpenSALib3.Moveset
             Children.Add(_glidedata);
             Children.Add(_crawldata);
             Children.Add(_tetherdata);
+            Children.Add(_sounddata);
             (Children as List<IEnumerable>).RemoveAll(x => x == null);
         }
     }
