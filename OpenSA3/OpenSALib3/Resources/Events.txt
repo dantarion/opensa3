@@ -1,0 +1,647 @@
+0001
+Synchronous Timer
+Pause the current flow of events until the set time is reached. Synchronous timers count down when they are reached in the code. 
+Frames
+
+0002
+Asynchronous Timer
+Pause the current flow of events until the set time is reached. Asynchronous Timers start counting from the beginning of the animation.
+Frames
+
+0004
+Set Loop
+Set a loop for X iterations. -1 (0xFFFF) sets an infinite loop.
+Iterations
+
+0005
+Execute Loop
+Execute the the previously set loop. 
+
+0007
+Subroutine
+Enter the event routine specified and return after ending. 
+Offset
+
+0008
+Return
+Return from a subroutine
+
+0009
+Goto
+Goto the event location specified and execute.
+Offset
+
+000A
+If
+Starts an If block
+Requirement
+
+000A04
+If
+Starts an If block
+Requirement
+Variable
+Comparison
+Variable
+
+000B
+And
+Adds another check to an If block
+Requirement
+Variable
+Comparison
+Variable
+
+000C
+Or
+Adds an alternate check to an If block
+Requirement
+Variable
+Comparison
+Variable
+
+000D
+Else If
+Starts an Else If block
+Requirement
+Variable
+Comparison
+Variable
+
+000E
+Else
+Starts an Else block. Used in a If/Else if block.
+
+000F
+End If
+Ends an If block.
+
+0010
+Switch
+Changes execution path based on a variable.
+
+0011
+Case
+Used inside a case block to mark a branch.
+
+0012
+Default Case
+Used inside a case block to mark a default branch.
+
+0013
+End Switch
+Used to end a Switch Block
+
+0101
+Loop Rest
+TODODescription
+
+0200
+Change Action(Status)
+TODODescription
+StatusID
+ID
+Requirement
+Variable
+Comparison
+Variable
+
+0201
+Change Action
+TODODescription
+ID
+Requirement
+Variable
+Comparison
+Variable
+
+0204
+Additional Requirement
+TODODescription
+Requirement
+Variable
+Comparison
+Variable
+
+0206
+Allow Change Action
+TODODescription
+StatusID
+
+0208
+Disable Change Action
+TODODescription
+StatusID
+
+020A
+Selective IASA
+TODODescription
+IASA
+
+020B
+End Selective IASA
+TODODescription
+IASA
+
+0400
+Change Subaction
+TODODescription
+ID
+Pass Frame?
+
+0407
+Frame Speed
+Changes how fast animations and events are processed.
+Multiplier
+
+0500
+Reverse Direction
+Reverses the direction this character is facing. This DOES reverse momentum as well.
+
+0600
+Offensive Collision
+TODODescription
+Bone/ID
+Damage
+Trajectory
+Base Knockback
+Knockback Growth
+Size
+Z Offset
+Y Offset
+X Offset
+Tripping Rate
+Hitlag Multiplier
+SDI Multiplier
+Hitbox Flags
+
+0601
+Change Hitbox Damage
+TODODescription
+Hitbox ID
+Damage
+
+0602
+Change Hitbox Size
+TODODescription
+Hitbox ID
+Damage
+
+0603
+Delete Hitbox
+TODODescription
+Hitbox ID
+Damage
+
+0604
+Terminate Collisions
+Removes all hitboxes that are currently active from the game world that were created by this character.
+
+0605
+Body Collision
+Changes the collision state of a charcters entire body. used to make a character invincible.
+Collision State
+
+0606
+Reset Bone Collisions
+TODODescription
+
+0608
+Modify Bone Collision
+Changes the collision state of individual bones. Used to make body parts invincible during certain moves.
+Bone
+Collision State
+
+060A
+Grab Collision
+TODODescription
+ID
+Bone
+Size
+Z Offset
+Y Offset
+X Offset
+Grabbed Action
+Air/Ground
+
+
+060D
+Terminate Grab Collisions
+TODODescription
+
+060E
+Throw Attack Collision
+TODODescription
+ID
+Bone
+Damage
+Trajectory
+Knockback Growth
+Weight Knockback
+Base Knockback
+Element
+
+060F
+Throw Collision
+TODODescription
+
+0610
+Uninteractive Collision
+TODODescription
+
+0615
+Special Offensive Collision
+TODODescription
+
+0617
+Defensive Collision
+TODODescription
+
+0618
+?Defensive?
+TODODescription
+
+061B
+Weapon Collision
+TODODescription
+
+062B
+Thrown Collision
+TODODescription
+
+0707
+Rumble
+TODODescription
+
+070B
+?Rumble Loop?
+TODODescription
+
+0800
+Edge Sticky
+TODODescription
+
+0A00
+Sound Effect
+TODODescription
+ID
+
+0A01
+Sound Effect(2)
+TODODescription
+ID
+
+0A02
+Sound Effect(3)
+TODODescription
+ID
+
+0A03
+Stop Sound Effect
+TODODescription
+
+0A05
+?Victory Sound?
+TODODescription
+
+0A09
+Other Sound Effect
+TODODescription
+ID
+
+0A0A
+Other Sound Effect(2)
+TODODescription
+ID
+
+0B00
+Model Changer
+TODODescription
+
+0B02
+Visibility
+TODODescription
+
+0C05
+Terminate Instance
+TODODescription
+
+0C06
+Final Smash State
+TODODescription
+
+0C08
+Terminate Self
+TODODescription
+
+0C09
+Enable/Disable Ledgegrab
+Changes whether or not the act of grabbing a ledge can intetrupt this action.
+
+0C0B
+Low Voice Clip
+TODODescription
+
+0C19
+Damage Voice Clip
+TODODescription
+
+0C1D
+Ottootto Voice Clip
+TODODescription
+
+0C23
+Time Manipulation
+TODODescription
+
+0C25
+Tag Display
+TODODescription
+
+0D00
+Concurrent Infinite Loop
+TODODescription
+
+0D01
+Terminate Concurrent Infinite Loop
+TODODescription
+
+0E00
+Set Air/Ground
+TODODescription
+
+0E01
+Add/Subtract Momentum
+TODODescription
+
+0E02
+Vertical Momentum
+TODODescription
+
+0E03
+Halt Vertical Momentum
+TODODescription
+VM State
+
+0E04
+Horizontal Momentum Mod
+TODODescription
+HM State
+
+0E05
+Stop Horizontal Momentum Mod
+TODODescription
+HM State
+
+0E06
+Disable Force
+TODODescription
+[Vertical/Horizontal]
+
+0E07
+Reennable Force
+TODODescription
+[Vertical/Horizontal]
+
+0E08
+Set Momentum
+TODODescription
+
+1000
+Generate Article/Prop
+TODODescription
+
+1003
+Remove Article
+TODODescription
+
+1004
+Change Article Subaction
+TODODescription
+Article ID
+ID
+Pass Frame?
+
+1005
+Article Visibility
+TODODescription
+Article ID
+
+1007
+?Article Visibility2?
+TODODescription
+Article ID
+
+100A
+Generate Article/Prop(2)
+TODODescription
+
+1100
+Graphic Effect
+TODODescription
+Bone
+Z Offset
+Y Offset
+X Offset
+Z Rotation
+Y Rotation
+X Rotation
+Size
+Random Z Trans
+Random Y Trans
+Random X Trans
+Random Z Rot
+Random Y Rot
+Random X Rot
+Terminate with Animation?
+
+1101
+External Graphic Effect
+TODODescription
+File#
+Bone
+Z Offset
+Y Offset
+X Offset
+Z Rotation
+Y Rotation
+X Rotation
+Size
+Anchored?
+
+1102
+External Graphic Effect(2)
+TODODescription
+
+1103
+Sword Glow
+TODODescription
+
+1105
+Terminate Sword Glow
+TODODescription
+Fade Time
+
+1115
+Terminate Graphic Effect
+TODODescription
+
+1117
+Screen Tint
+TODODescription
+
+111A
+Generic Graphic Effect
+TODODescription
+
+111B
+Generic Graphic Effect(2)
+TODODescription
+
+1200
+Basic Variable Set
+TODODescription
+
+1201
+Basic Variable Add
+TODODescription
+
+1202
+Basic Variable Subtract
+TODODescription
+
+1206
+Float Variable Set
+TODODescription
+
+1207
+Float Variable Add
+TODODescription
+
+1208
+Float Variable Subtract
+TODODescription
+
+120A
+Bit Variable Set
+TODODescription
+
+120B
+Bit Variable Clear
+TODODescription
+
+1300
+Start Combo
+1 - Jab Combo, 2 - FTilt Combo
+
+1404
+Stop Aesthetic Wind
+TODODescription
+
+1407
+Aesthetic Wind
+TODODescription
+
+1800
+Slope Model Movement
+TODODescription
+
+1A00
+Screenshake
+TODODescription
+
+1A03
+Set Camera Boundaries
+TODODescription
+
+1A04
+Camera Closeup
+TODODescription
+
+1A08
+Normal Camera
+TODODescription
+
+1E00
+Super/Heavy Armour
+TODODescription
+
+1E03
+Add/Subtract Damage
+TODODescription
+
+1F00
+Pickup Item
+TODODescription
+
+1F01
+Throw Item
+TODODescription
+
+1F02
+Drop Item
+TODODescription
+
+1F03
+Consume Item
+TODODescription
+
+1F04
+Item Property
+TODODescription
+
+1F05
+Fire Weapon
+TODODescription
+
+1F06
+Fire Weapon Projectile
+TODODescription
+
+1F07
+?Cracker Launcher?
+TODODescription
+
+1F08
+Generate Item(In Hand)
+TODODescription
+
+1F09
+Item Visibility
+TODODescription
+
+1F0A
+Destroy Held Item
+TODODescription
+
+1F0C
+Beam Sword Trail
+TODODescription
+
+1F0D
+Activate Held Item
+TODODescription
+
+1F0E
+Throw Item(2)
+TODODescription
+
+2100
+Terminate Flash Effect
+TODODescription
+
+2101
+Flash Overlay Effect
+TODODescription
+
+2102
+Change Flash Overlay Color
+TODODescription
+
+2105
+Flash Light Effect
+TODODescription
+
+6400
+Allow Interrupt
+TODODescription

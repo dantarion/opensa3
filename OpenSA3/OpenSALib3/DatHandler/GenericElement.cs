@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 
 namespace OpenSALib3.DatHandler
 {
@@ -8,7 +9,7 @@ namespace OpenSALib3.DatHandler
         {
             get { return typeof(T); }
         }
-        public unsafe GenericElement(DatElement parent, int fileOffset,String name)
+        public unsafe GenericElement(DatElement parent, int fileOffset, String name)
             : base(parent, fileOffset)
         {
             Length = 4;
@@ -33,6 +34,10 @@ namespace OpenSALib3.DatHandler
                 else
                     _intval = Convert.ToInt32(value);
             }
+        }
+        public IList Children
+        {
+            get { return base.Children; }
         }
     }
 }
