@@ -114,28 +114,14 @@ namespace OpenSALib3.PSA
             if (_data.OtherStart > 0)
                 for (int i = 0; i < subactions; i++)
                     ;//_subactionother.Add(new CommandList(this, _data.OtherStart + i * 4, "Subaction Other " + String.Format("0x{0:X}", count++), _subroutines));
-            /*
-            count = 0;
-            for (int i = _data.SubactionMainStart; i < _data.SubactionGFXStart; i += 4)
-                _subactionmain.Add(new CommandList(this, i, "Subaction Main " + String.Format("0x{0:X}", count++), _subroutines));
-            count = 0;
-            for (int i = _data.SubactionGFXStart; i < _data.SubactionSFXStart; i += 4)
-                _subactiongfx.Add(new CommandList(this, i, "Subaction GFX " + String.Format("0x{0:X}", count++), _subroutines));
-            count = 0;
-            for (int i = _data.SubactionSFXStart; i < _data.SubactionOtherStart; i += 4)
-                _subactionsfx.Add(new CommandList(this, i, "Subaction SFX " + String.Format("0x{0:X}", count++), _subroutines));
-            count = 0;
-            for (int i = _data.SubactionOtherStart; i < _data.SubactionOtherStart + _subactiongfx.Count * 4; i += 4)
-                _subactionother.Add(new CommandList(this, i, "Subaction Other " + String.Format("0x{0:X}", count++), _subroutines));
-            //Tree
-             * */
-            Children.Add(new NamedList(_actions, "Actions"));
-            Children.Add(new NamedList(_subactionflags, "Subaction Flags"));
-            Children.Add(new NamedList(_subactionmain, "Subaction Main"));
-            Children.Add(new NamedList(_subactiongfx, "Subaction GFX"));
-            Children.Add(new NamedList(_subactionsfx, "Subaction SFX"));
-            Children.Add(new NamedList(_subactionother, "Subaction Other"));
-            Children.Add(new NamedList(_subroutines, "Subroutines"));
+
+            this["Actions"] = _actions;
+            this["Subaction Flags"] = _subactionflags;
+            this["Subaction Main"] = _subactionmain;
+            this["Subaction GFX"] = _subactiongfx;
+            this["Subaction SFX"] = _subactionsfx;
+            this["Subaction Other"] = _subactionother;
+            this["Subroutines Flags"] = _subroutines;
         }
     }
 }

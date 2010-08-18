@@ -33,7 +33,7 @@ namespace OpenSALib3.PSA
                     int ParamOffset = c.data.ParameterOffset+ 4;
                     var ext = c.RootFile.isExternal(ParamOffset);
                     if (!ext)
-                        suboff = (c.Children[0] as Parameter).RawData;
+                        suboff = (c[0] as Parameter).RawData;
                     if (suboff > 0 && list[0].FileOffset != suboff && !subroutinelist.Exists(x => x[0].FileOffset == suboff))
                     {
                         subroutinelist.Add(ReadCommands(parent, suboff, subroutinelist));
@@ -42,7 +42,7 @@ namespace OpenSALib3.PSA
                 else
                     if (c.Module == 0x0D && c.ID == 0x00 && subroutinelist != null)
                     {
-                        suboff = (c.Children[1] as Parameter).RawData;
+                        suboff = (c[1] as Parameter).RawData;
                         if (suboff > 0 && !subroutinelist.Exists(x => x[0].FileOffset == suboff))
                             subroutinelist.Add(ReadCommands(parent, suboff, subroutinelist));
                     }
@@ -80,7 +80,7 @@ namespace OpenSALib3.PSA
             if (Module == 0xFF)
                 Debug.Fail("Command Module 0xFF");
             for (int i = 0; i < data.ParameterCount; i++)
-                Children.Add(new Parameter(this, (int)(data.ParameterOffset + i * 8)));
+                this[i] = new Parameter(this, (int)(data.ParameterOffset + i * 8));
         }
     }
 

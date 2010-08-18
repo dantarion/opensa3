@@ -2,7 +2,7 @@
     <Window.Resources>
         <utility:ItemToContextMenuConverter x:Key="ContextMenuConverter" />
         <HierarchicalDataTemplate x:Key="TreeTemp" ItemsSource="{Binding}">
-            <TextBlock Text="{Binding}" ContextMenu="{Binding Converter={StaticResource ContextMenuConverter}}" />
+            <TextBlock Text="{Binding StringFormat=S}" ContextMenu="{Binding Converter={StaticResource ContextMenuConverter}}" />
         </HierarchicalDataTemplate>
     </Window.Resources>
     <Grid>

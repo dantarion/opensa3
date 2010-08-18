@@ -14,7 +14,7 @@ namespace OpenSALib3.DatHandler
         }
         public override void Parse()
         {
-            Children.Add(new UnknownElement(this, DataOffset, "Data", DataLength));
+            this["Data"] = new UnknownElement(this, DataOffset, "Data", DataLength);
         }
     }
 }

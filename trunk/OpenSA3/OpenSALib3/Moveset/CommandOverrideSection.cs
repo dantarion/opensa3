@@ -19,11 +19,11 @@ namespace OpenSALib3.Moveset
             var ao = new ActionOverride(this, o);
             while (ao.ActionID > 0)
             {
-                Children.Add(ao);
+                this[null] = ao;
                 o += 8;
                 ao = new ActionOverride(this, o);
             }
-            Children.Add(ao); 
+            this[null] = ao; 
         }
     }
 }

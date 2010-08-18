@@ -36,8 +36,10 @@ namespace OpenSALib3.PSA
             data = *(Data*)Address;
             Name = "ActionOverride";
             Length = 8;
-            if(data.CommandListOffset > 0)
-            Children = Command.ReadCommands(this, (int)data.CommandListOffset,null);
+            if (data.CommandListOffset > 0)
+                foreach (Command cl in Command.ReadCommands(this, (int)data.CommandListOffset, null))
+                    this[null] = cl;
+
 
         }
     }

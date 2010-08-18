@@ -9,6 +9,7 @@ namespace OpenSALib3.Moveset
 
     public sealed class MiscSection : DatElement
     {
+        /* TODO: Cleanup */
         private struct Header
         {
             public bint Section1;
@@ -34,39 +35,11 @@ namespace OpenSALib3.Moveset
         }
 
         private readonly Header _header;
-        private readonly List<GenericElement<int>> _section1 = new List<GenericElement<int>>();
-
-        public List<GenericElement<int>> Section
-        {
-            get { return _section1; }
-        }
-
-        private readonly List<Hurtbox> _hurtboxes = new List<Hurtbox>();
-
-        public List<Hurtbox> Hurtboxes
-        {
-            get { return _hurtboxes; }
-        }
-
-        private readonly List<UnknownType1> _unknowntype1List = new List<UnknownType1>();
-
-        public List<UnknownType1> UnknownType1List
-        {
-            get { return _unknowntype1List; }
-        }
-
-        private readonly List<LedgegrabBox> _ledgegrabboxes = new List<LedgegrabBox>();
-
-        public List<LedgegrabBox> LedgegrabBoxes
-        {
-            get { return _ledgegrabboxes; }
-        }
-        private readonly List<BoneRef> _boneref2 = new List<BoneRef>();
-
-        public List<BoneRef> BoneRef2
-        {
-            get { return _boneref2; }
-        }
+        private readonly List<GenericElement<int>> _section1 = new NamedList<GenericElement<int>>("Section1");
+        private readonly List<Hurtbox> _hurtboxes = new NamedList<Hurtbox>("Hurtboxes");
+        private readonly List<UnknownType1> _unknowntype1List = new NamedList<UnknownType1>("UnknownT");
+        private readonly List<LedgegrabBox> _ledgegrabboxes = new NamedList<LedgegrabBox>("LedgegrabBoxes");
+        private readonly List<BoneRef> _boneref2 = new NamedList<BoneRef>("BoneRef");
         private readonly MultiJumpData _multijumpdata;
         private readonly GlideData _glidedata;
         private readonly CrawlData _crawldata;
@@ -88,7 +61,7 @@ namespace OpenSALib3.Moveset
                 _unknowntype1List.Add(new UnknownType1(this, _header.UnknownSectionOffset + i * 4 * 8));
             for (int i = 0; i < +_header.LedgegrabCount; i++)
                 _ledgegrabboxes.Add(new LedgegrabBox(this, _header.LedgegrabOffset + i * 4 * 4));
-            var _unknownx = new List<UnknownElement>();
+            var _unknownx = new NamedList<UnknownElement>("UnknownX");
             for (int i = 0; i < _header.UnknownSection2Count; i++)
                 _unknownx.Add(new UnknownElement(this, _header.UnknownSection2Offset + i * 32, "UnknownX", 32));
             for (int i = _header.BoneRef2Offset; i < _header.BoneRef2Offset + 4 * 14; i += 4)
@@ -109,8 +82,8 @@ namespace OpenSALib3.Moveset
             for (int i = 0; i < count; i++)
             {
                 var offele = new GenericElement<int>(_unknowny, _unknowny.ReadInt(0) + i * 4, "Entry");
-                offele.Children.Add(new UnknownElement(offele, (int)offele.Value, "Data", 24));
-                _unknowny.Children.Add(offele);
+                offele[null] =new UnknownElement(offele, (int)offele.Value, "Data", 24);
+                _unknowny[null] =offele;
             }
             //LastOne
             var _unknownz = new UnknownElement(this, _header.UnknownSection12Offset, "UnknownY2", 8);
@@ -118,28 +91,27 @@ namespace OpenSALib3.Moveset
             for (int i = 0; i < count; i++)
             {
                 var offele = new GenericElement<int>(_unknownz, _unknownz.ReadInt(0) + i * 4, "Entry");
-                offele.Children.Add(new UnknownElement(offele, (int)offele.Value, "Data", 24));
-                _unknownz.Children.Add(offele);
+                offele[null] =new UnknownElement(offele, (int)offele.Value, "Data", 24);
+                _unknownz[null] =offele;
             }
             var unknowno = new UnknownElement(this, _header.UnknownSection3Offset, "UnknownO", 24);
             for (int i = unknowno.ReadInt(16); i < unknowno.FileOffset; i += 4)
-                unknowno.Children.Add(new GenericElement<int>(unknowno, i, "Unknown"));
+                unknowno[null] =new GenericElement<int>(unknowno, i, "Unknown");
             //Setup Tree Structure
-            Children.Add(new NamedList(_section1, "Section1"));
-            Children.Add(new NamedList(_hurtboxes, "Hurtboxes"));
-            Children.Add(new NamedList(_unknowntype1List, "UnknownType1"));
-            Children.Add(new NamedList(_ledgegrabboxes, "LedgegrabBoxes"));
-            Children.Add(new NamedList(_unknownx, "UnkonwnX"));
-            Children.Add(new NamedList(_boneref2, "BoneRef"));
-            Children.Add(_unknowny);
-            Children.Add(_unknownz);
-            Children.Add(unknowno);
-            Children.Add(_multijumpdata);
-            Children.Add(_glidedata);
-            Children.Add(_crawldata);
-            Children.Add(_tetherdata);
-            Children.Add(_sounddata);
-            (Children as List<IEnumerable>).RemoveAll(x => x == null);
+            this["Section1"] = _section1;
+            this["Hurtboxes"] = _hurtboxes;
+            this["UnknownType1"] = _unknowntype1List;
+            this["LedgegrabBoxes"] = _ledgegrabboxes;
+            this["UnkonwnX"] = _unknownx;
+            this["BoneRef"] = _boneref2;
+            this["UnknownY"] = _unknowny;
+            this["UnknownZ"] = _unknownz;
+            this["UnknownO"] = unknowno;
+            this["JumpData"] = _multijumpdata;
+            this["GlideData"] = _glidedata;
+            this["CrawlData"] = _crawldata;
+            this["TetherData"] = _tetherdata;
+            this["SoundData"] = _sounddata;
         }
     }
 }
