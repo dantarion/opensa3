@@ -120,7 +120,74 @@ namespace OpenSALib3.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to 00
+        ///Animation End
+        ///02
+        ///On Ground
+        ///In Air
+        ///05
+        ///06
+        ///Compare
+        ///Bit is Set
+        ///Facing Right
+        ///Facing Left
+        ///Hitbox Connects
+        ///Touch Stage
+        ///0D
+        ///0E
+        ///Item Death?
+        ///00
+        ///11
+        ///12
+        ///13
+        ///14
+        ///Article Exists
+        ///16
+        ///17
+        ///Article?(ID,?)
+        ///19
+        ///1A
+        ///1B
+        ///Article Limit
+        ///1D
+        ///1E
+        ///Holding Item
+        ///20
+        ///21
+        ///22
+        ///23
+        ///24
+        ///25
+        ///26
+        ///27
+        ///28
+        ///29
+        ///2A
+        ///Random
+        ///2C
+        ///2D
+        ///2E
+        ///2F
+        ///Button Press
+        ///Button Released
+        ///Button Held
+        ///Button Not Held
+        ///34
+        ///35
+        ///36
+        ///37
+        ///38
+        ///Hasn&apos;t Tethered 3 times
+        ///Passed over ledge
+        ///Passed over ledge(facing away)
+        ///3C
+        ///3D
+        ///3E
+        ///3F
+        ///40
+        ///41
+        ///42
+        ///4 [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string Requirements {
             get {
