@@ -198,7 +198,7 @@ namespace OpenSALib3.DatHandler
             sb.AppendFormat("{0}\n", this.Name);
             sb.AppendFormat("Total Size:{0}\n", Length);
             sb.AppendFormat("Bytes Parsed:{0}\n", usage);
-            sb.AppendFormat("% Complete:{0}\n", (float)usage / Length);
+            sb.AppendFormat("% Complete:{0}\n", (float)usage / (Length+0x20));
 
             int lastdata = 0;
             foreach (UsageData ug in usagedata)

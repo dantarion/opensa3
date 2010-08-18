@@ -89,5 +89,43 @@ namespace OpenSALib3.Properties {
                 return ResourceManager.GetString("Attributes", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 0001
+        ///Synchronous Timer
+        ///Pause the current flow of events until the set time is reached. Synchronous timers count down when they are reached in the code. 
+        ///Frames
+        ///
+        ///0002
+        ///Asynchronous Timer
+        ///Pause the current flow of events until the set time is reached. Asynchronous Timers start counting from the beginning of the animation.
+        ///Frames
+        ///
+        ///0004
+        ///Set Loop
+        ///Set a loop for X iterations. -1 (0xFFFF) sets an infinite loop.
+        ///Iterations
+        ///
+        ///0005
+        ///Execute Loop
+        ///Execute the the previously set loop. 
+        ///
+        ///0007
+        ///Subroutine        /// [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string Events {
+            get {
+                return ResourceManager.GetString("Events", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string Requirements {
+            get {
+                return ResourceManager.GetString("Requirements", resourceCulture);
+            }
+        }
     }
 }

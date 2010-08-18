@@ -116,12 +116,14 @@ namespace OpenSALib3.Moveset
                 _unknowna.Add(new UnknownElement(this, i, "UnknownA", 16));
             for (int i = _header.Unknown6Start; i < _header.ActionsStart; i += 16)
                 _unknownc.Add(new UnknownElement(this, i, "UnknownC", 16));
-            for (int i = _header.Unknown7; i < _header.Unknown7 + 8 * (_unknowna.Count+_unknownc.Count); i += 8)
+            for (int i = _header.Unknown7; i < _header.Unknown7 + 8 * (_unknowna.Count + _unknownc.Count); i += 8)
                 _unknowne.Add(new UnknownElement(this, i, "UnknownE", 8));
             for (int i = _header.Unknown1; i < _header.Unknown19; i += 8)
                 _unknownb.Add(new UnknownElement(this, i, "UnknownB", 8));
 
             var unknownd = new UnknownElement(this, _header.Unknown8, "UnknownD", 8);
+            for (int i = RootFile.ReadInt(unknownd.FileOffset); i < RootFile.ReadInt(unknownd.FileOffset) + RootFile.ReadInt(unknownd.FileOffset + 4) * 4; i += 4)
+                unknownd.Children.Add(new GenericElement<int>(unknownd, i, "UnknownDEntry"));
             int count = 0x112;
             for (int i = _header.ActionsStart; i < _header.Actions2Start; i += 4)
                 _actions.Add(new CommandList(this, i, "Action " + String.Format("0x{0:X}", count++), _subroutines));
@@ -131,7 +133,7 @@ namespace OpenSALib3.Moveset
             count = 0;
             for (int i = _header.SubactionFlagsStart; i < _header.SubactionMainStart; i += 8)
                 _subactionflags.Add(new SubactionFlags(this, i));
-            var stringChunk = new UnknownElement(this, _subactionflags[0].AnimationStringOffset, "SubactionStrings", _header.SubactionFlagsStart - _subactionflags[0].AnimationStringOffset);
+            var stringChunk = new UnknownElement(this, _subactionflags[0].AnimationStringOffset, "SubactionStrings", _subactionflags[_subactionflags.Count - 1].AnimationStringOffset + _subactionflags[_subactionflags.Count - 1].Name.Length+1 - _subactionflags[0].AnimationStringOffset);
             count = 0;
             for (int i = _header.SubactionMainStart; i < _header.SubactionGFXStart; i += 4)
                 _subactionmain.Add(new CommandList(this, i, "Subaction Main " + String.Format("0x{0:X}", count++), _subroutines));
@@ -144,7 +146,46 @@ namespace OpenSALib3.Moveset
             count = 0;
             for (int i = _header.SubactionOtherStart; i < _header.SubactionOtherStart + _subactiongfx.Count * 4; i += 4)
                 _subactionother.Add(new CommandList(this, i, "Subaction Other " + String.Format("0x{0:X}", count++), _subroutines));
-
+            //LastOne
+            var _unknownk = new UnknownElement(this, _header.Unknown1, "UnknownKTree", 16);
+            for (int i = 0; i < _unknownk.ReadInt(12); i++)
+                _unknownk.Children.Add(new UnknownElement(_unknownk, _unknownk.ReadInt(8) + i * 8, "Stats", 8));
+            count = _unknownk.ReadInt(4);
+            for (int i = 0; i < 2; i++)
+            {
+                //For each offset...
+                var offele = new GenericElement<int>(_unknownk, _unknownk.ReadInt(0) + i * 4, "Offset");
+                if ((int)offele.Value == 0)
+                {
+                    _unknownk.Children.Add(offele);
+                    continue;
+                }
+                for (int c = 0; c < count; c++)
+                {
+                    //Each element needs is children too
+                    var inele = new UnknownElement(offele, (int)offele.Value+c*8, "Entry", 8);
+                    var incount = inele.ReadInt(4);
+                    for (int j = 0; j < incount; j++)
+                    {
+                        var ininele = new UnknownElement(inele, inele.ReadInt(0) + j * 8, "Entry", 8);
+                        var inincount = ininele.ReadInt(4);
+                        for (int m = 0; m < inincount; m++)
+                        {
+                            var inininele = new GenericElement<int>(ininele, ininele.ReadInt(0) + m * 4, "Value");
+                            ininele.Children.Add(inininele);
+                        }
+                        inele.Children.Add(ininele);
+                    }
+                    offele.Children.Add(inele);
+                }
+                _unknownk.Children.Add(offele);
+            }
+            var unknowno = new UnknownElement(this, _header.Unknown19, "UnknownO", 24);
+            for (int i = unknowno.ReadInt(20); i < unknowno.FileOffset; i += 4)
+                unknowno.Children.Add(new GenericElement<int>(unknowno, i, "Unknown"));
+            var bonerefs = new List<BoneRef>();
+            for (int i = _header.Unknown18; i < MiscSection.ReadInt(4 * 9); i += 4)
+                bonerefs.Add(new BoneRef(this, i, "Unknown"));
             if (_header.Unknown26 > 0)
                 _articles.Add(new Article(this, _header.Unknown26));
             for (int i = DataOffset + 36 * 4; i < DataOffset + DataLength; i += 4)
@@ -160,14 +201,16 @@ namespace OpenSALib3.Moveset
                 }
 
             }
+            UnknownElement headerExtension = new UnknownElement(this, DataOffset + 31 * 4, "HeaderEXT", DataLength - 31 * 4);
             List<UnknownElement> unknownV = new List<UnknownElement>();
-            for(int i = _header.Unknown16; i < _header.Unknown18; i +=0x1c)
-                unknownV.Add(new UnknownElement(this,i,"UnknownV",0x1c));
+            for (int i = _header.Unknown16; i < _header.Unknown18; i += 0x1c)
+                unknownV.Add(new UnknownElement(this, i, "UnknownV", 0x1c));
             List<GenericElement<int>> unknownAO = new List<GenericElement<int>>();
-            for (int i = _header.Unknown11; i < _header.Unknown11+4*0x116; i += 0x4)
-                unknownAO.Add(new GenericElement<int>(this, i, "UnknownV"));
+            for (int i = _header.Unknown11; i < _header.Unknown11 + 4 * _unknowne.Count; i += 0x4)
+                unknownAO.Add(new GenericElement<int>(this, i, "UnknownAO"));
             //Setup Tree Structure
-            Children.Add(new UnknownElement(this, DataOffset, "Header", 32 * 4));
+            Children.Add(new UnknownElement(this, DataOffset, "Header", 31 * 4));
+            Children.Add(headerExtension);
             Children.Add(new NamedList(Attributes, "Attributes"));
             Children.Add(new NamedList(SSEAttributes, "SSE Attributes"));
             Children.Add(new NamedList(_unknowna, "UnknownA(Global Action Flag?)"));
@@ -175,11 +218,14 @@ namespace OpenSALib3.Moveset
             Children.Add(new NamedList(_unknowne, "UnknownE(Action Flag2?)"));
             Children.Add(new NamedList(unknownV, "UnknownV"));
             Children.Add(new NamedList(unknownAO, "UnknownAO"));
+            Children.Add(_unknownk);
+            Children.Add(unknowno);
             //Children.Add(new NamedList(_unknownb, "UnknownB(Local Action Flag?)"));
 
 
             Children.Add(unknownd);
             Children.Add(MiscSection);
+            Children.Add(new NamedList(bonerefs, "Bonerefs?"));
             Children.Add(new NamedList(_actions, "Actions"));
             Children.Add(new NamedList(_actions2, "Actions2?"));
             Children.Add(new NamedList(_subactionflags, "Subaction Flags"));
