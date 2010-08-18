@@ -95,7 +95,7 @@
     <Compile Include="Moveset\SoundData.cs" />
     <Compile Include="Moveset\TetherData.cs" />
     <Compile Include="Moveset\UnknownType1.cs" />
-    <Compile Include="Moveset\UnknownType2.cs" />
+    <Compile Include="DatHandler\UnknownElement.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -127,6 +127,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Events.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Requirements.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

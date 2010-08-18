@@ -90,10 +90,12 @@ namespace OpenSALib3.DatHandler
         public ResourceNode Node;
 
         [Browsable(false)]
-        public List<DatSection> Sections { get; private set; }
+        private NamedList<DatSection> _sections = new NamedList<DatSection>("Sections");
+        public List<DatSection> Sections { get { return _sections; } }
 
+        private NamedList<DatSection> _references = new NamedList<DatSection>("References");
         [Browsable(false)]
-        public List<DatSection> References { get; private set; }
+        public List<DatSection> References { get { return _references; } }
 
         [Category("File")]
         [ReadOnly(true)]
@@ -129,8 +131,6 @@ namespace OpenSALib3.DatHandler
             _header = *(DatFileHeader*)node.WorkingUncompressed.Address;
             if (_header.FileSize != node.WorkingUncompressed.Length)
                 throw new Exception("This is not a valid moveset file");
-            Sections = new List<DatSection>();
-            References = new List<DatSection>();
             Name = node.TreePathAbsolute;
             Length = (int)(_header.FileSize - Marshal.SizeOf(_header));
             Changed = false;
@@ -168,10 +168,10 @@ namespace OpenSALib3.DatHandler
             var stringChunk = new UnknownElement(this, stringBase, "StringChunk", _header.FileSize - stringBase);
 
             //Setup Tree Structure
-            Children.Add(new NamedList(Sections, "Sections"));
-            Children.Add(new NamedList(References, "References"));
-            Children.Add(offsetchunk);
-            Children.Add(stringChunk);
+            this["Sections"] = Sections;
+            this["References"] = References;
+            this["OffsetChunk"] = offsetchunk;
+            this["StringChunk"] = stringChunk;
 
         }
 
@@ -186,7 +186,7 @@ namespace OpenSALib3.DatHandler
         public string Report(bool onlyholes)
         {
             var usagedata = new List<UsageData>();
-            foreach (IEnumerable child in Children)
+            foreach (IEnumerable child in _dictionary.Values)
                 collectUsage(child, ref usagedata);
             foreach (UsageData ug in susagedata)
                 usagedata.Add(ug);

@@ -20,7 +20,7 @@ namespace OpenSALib3.Moveset
             Length = 8;
             for (int i = 0; i < _data.ListCount; i++)
             {
-                Children.Add(new SoundDataList(parent, _data.StartOffset + i * 8));
+                this[i] = new SoundDataList(parent, _data.StartOffset + i * 8);
             }
         }
     }
@@ -41,7 +41,7 @@ namespace OpenSALib3.Moveset
             Length = 8;
             for (int i = 0; i < _data.ListCount; i++)
             {
-                Children.Add(new GenericElement<int>(this, _data.StartOffset + i * 4, "SFX?"));
+                this[i] = new GenericElement<int>(this, _data.StartOffset + i * 4, "SFX?");
             }
         }
     }

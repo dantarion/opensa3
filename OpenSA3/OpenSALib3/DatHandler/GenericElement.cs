@@ -35,9 +35,5 @@ namespace OpenSALib3.DatHandler
                     _intval = Convert.ToInt32(value);
             }
         }
-        public IList Children
-        {
-            get { return base.Children; }
-        }
     }
 }

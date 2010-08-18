@@ -14,7 +14,8 @@ namespace OpenSALib3.PSA
             Name = name;
             _offset = *(bint*)(Address);
             if(_offset > 0)
-                Children = Command.ReadCommands(this, _offset, subroutines);
+                foreach (Command cl in Command.ReadCommands(this, _offset, subroutines))
+                    this[null] = cl;
             Color = System.Drawing.Color.CadetBlue;
         }
     }

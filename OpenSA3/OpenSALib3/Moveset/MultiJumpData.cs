@@ -33,11 +33,11 @@ namespace OpenSALib3.Moveset
             Name = "MultiJumpData";
             Length = 7*4;
             for (int i = _data.HopListOffset; i < FileOffset; i += 4)
-                _hoplist.Add(new GenericElement<float>(this, (int)i, "Unknown"));
-            Children.Add(new NamedList(_hoplist, "HopList"));
+                _hoplist.Add(new GenericElement<float>(this, i, "Unknown"));
+            this["HopList"] = _hoplist;
             for (int i = _data.UnknownListOffset; i < _data.HopListOffset; i += 4)
-                _unknownlist.Add(new GenericElement<float>(this, (int)i, "Unknown"));
-            Children.Add(new NamedList(_unknownlist,"UnknownList"));
+                _unknownlist.Add(new GenericElement<float>(this, i, "Unknown"));
+            this["UnknownList"] = _unknownlist;
 
 
         }
