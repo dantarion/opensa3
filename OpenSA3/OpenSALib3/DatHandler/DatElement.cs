@@ -8,7 +8,7 @@ using OpenSALib3.Utility;
 
 namespace OpenSALib3.DatHandler
 {
-    public abstract class DatElement : IEnumerable
+    public abstract class DatElement : IEnumerable, INotifyPropertyChanged
     {
         #region Node Structure
         /* Every Node has a parent */
@@ -107,8 +107,17 @@ namespace OpenSALib3.DatHandler
             if (parent != null)/*This is so DatFiles can be instantiated */
                 _address = RootFile.Address + FileOffset;
             Color = Color.FromArgb(255 / 2, Random.Next(255), Random.Next(255), Random.Next(255));
+            PropertyChanged += new PropertyChangedEventHandler(MarkDirty);
         }
-
+        public bool isChanged
+        {
+            get;
+            set;
+        }
+        public void MarkDirty(object sender, PropertyChangedEventArgs e)
+        {
+            isChanged = true;
+        }
         public override string ToString()
         {
             return Name ?? "NullName";
@@ -136,5 +145,7 @@ namespace OpenSALib3.DatHandler
             return *(bfloat*)(RootFile.Address + FileOffset + offset);
         }
         #endregion
+
+        public event PropertyChangedEventHandler PropertyChanged;
     }
 }

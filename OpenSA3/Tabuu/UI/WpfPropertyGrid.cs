@@ -77,11 +77,10 @@ namespace Tabuu.UI
 
             if (objects is INotifyCollectionChanged)
                 ((INotifyCollectionChanged)objects).CollectionChanged += pg.PropertyGridCollectionChanged;
-
             if (e.OldValue is IEnumerable)
                 foreach (var old in ((IEnumerable)e.OldValue).OfType<INotifyPropertyChanged>())
                     (old).PropertyChanged -= pg.PropertyGridPropertyChanged;
-
+                ;
             var mis = new List<ModelItem>();
             foreach (var obj in objects)
             {

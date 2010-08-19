@@ -578,7 +578,11 @@ namespace Be.Windows.Forms {
                 var sCb = currentByte.ToString("X", Thread.CurrentThread.CurrentCulture);
                 if (sCb.Length == 1) sCb = "0" + sCb;
                 var sNewCb = c.ToString();
-                sNewCb += sCb.Substring(cp == 0 ? 1 : 0, 1);
+                if(cp == 0)
+                    sNewCb += sCb.Substring(1, 1);
+                else
+                    sNewCb = sCb.Substring(0, 1)+sNewCb;
+
                 var newcb = byte.Parse(sNewCb, NumberStyles.AllowHexSpecifier,
                                        Thread.CurrentThread.CurrentCulture);
                 if (isInsertMode)
