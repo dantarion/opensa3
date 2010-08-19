@@ -69,15 +69,16 @@ namespace OpenSALib3.Moveset
 
         [Browsable(false)]
         public MiscSection MiscSection { get; private set; }
-        private NamedList<ActionFlags> _commonactionflags = new NamedList<ActionFlags>("Common Action Flags");
-        private NamedList<ActionFlags> _actionflags = new NamedList<ActionFlags>("Action Flags");
-        private NamedList<CommandList> _actions = new NamedList<CommandList>("Actions");
-        private NamedList<CommandList> _actions2 = new NamedList<CommandList>("Actions2");
-        private NamedList<UnknownElement> _subactions = new NamedList<UnknownElement>("Subactions");
-        private NamedList<UnknownElement> _unknownb = new NamedList<UnknownElement>("UnknownB");     
-        private NamedList<UnknownElement> _unknowne = new NamedList<UnknownElement>("UnknownE");
-        private NamedList<Article> _articles = new NamedList<Article>("Article");
-        private NamedList<List<Command>> _subroutines = new NamedList<List<Command>>("Subroutines");
+
+        private readonly NamedList<ActionFlags> _unknowna = new NamedList<ActionFlags>("Action Flags");
+        private readonly NamedList<CommandList> _actions = new NamedList<CommandList>("Actions");
+        private readonly NamedList<CommandList> _actions2 = new NamedList<CommandList>("Actions2");
+        private readonly NamedList<UnknownElement> _subactions = new NamedList<UnknownElement>("Subactions");
+        private readonly NamedList<UnknownElement> _unknownb = new NamedList<UnknownElement>("UnknownB");
+        private readonly NamedList<UnknownElement> _unknownc = new NamedList<UnknownElement>("UnknownC");
+        private readonly NamedList<UnknownElement> _unknowne = new NamedList<UnknownElement>("UnknownE");
+        private readonly NamedList<Article> _articles = new NamedList<Article>("Article");
+        private readonly NamedList<List<Command>> _subroutines = new NamedList<List<Command>>("Subroutines");
 
         public unsafe MovesetSection(DatElement parent, int offset, VoidPtr stringPtr)
             : base(parent, offset, stringPtr)
@@ -95,10 +96,10 @@ namespace OpenSALib3.Moveset
 
             var count = 0;
             for (int i = _header.Unknown5Start; i < _header.Unknown7; i += 16)
-                _commonactionflags.Add(new ActionFlags(this,i,count++));
+                _unknowna.Add(new ActionFlags(this,i,count++));
             for (int i = _header.Unknown6Start; i < _header.ActionsStart; i += 16)
-                _actionflags.Add(new ActionFlags(this, i, count++));
-            for (int i = _header.Unknown7; i < _header.Unknown7 + 8 * (_commonactionflags.Count + _actionflags.Count); i += 8)
+                _unknownc.Add(new UnknownElement(this, i, "UnknownC", 16));
+            for (int i = _header.Unknown7; i < _header.Unknown7 + 8 * (_unknowna.Count + _unknownc.Count); i += 8)
                 _unknowne.Add(new UnknownElement(this, i, "UnknownE", 8));
             for (int i = _header.Unknown1; i < _header.Unknown19; i += 8)
                 _unknownb.Add(new UnknownElement(this, i, "UnknownB", 8));
@@ -122,7 +123,7 @@ namespace OpenSALib3.Moveset
                 _subactions.Add(subactiongroup);
                  var flags = new SubactionFlags(subactiongroup, i);
                  if(flags.AnimationStringOffset != 0)
-                    first = Math.Min(first, flags.AnimationStringOffset);
+                 first = Math.Min(first, flags.AnimationStringOffset);
                  last = Math.Max(last, flags.AnimationStringOffset + flags.AnimationName.Length);
                  subactiongroup["Flags"] = flags;
                  subactiongroup.Name += " - " + flags.AnimationName;
@@ -212,7 +213,7 @@ namespace OpenSALib3.Moveset
             AddNamedList(_attributes);
             AddNamedList(_sseattributes);
             
-            
+            AddNamedList(_unknownc);
             AddNamedList( _unknowne);
             AddNamedList( unknownV);
             AddNamedList(unknownAO);
@@ -221,13 +222,11 @@ namespace OpenSALib3.Moveset
 
             this["UnknownD"] = unknownd;
             this["MiscSection"] = MiscSection;
-            this.AddNamedList(bonerefs);
-
-            this.AddNamedList(_commonactionflags);
-            this.AddNamedList(_actionflags);
-            this.AddNamedList(_actions);
-            this.AddNamedList( _actions2);    
-            this.AddNamedList( _subactions);
+            this["BoneRefs"] = bonerefs;
+            AddNamedList(_unknowna);
+            AddNamedList(_actions);
+            AddNamedList( _actions2);    
+            AddNamedList( _subactions);
             this["String Chunk"] = stringChunk;
             AddNamedList(_subroutines);
             AddNamedList( _articles);
