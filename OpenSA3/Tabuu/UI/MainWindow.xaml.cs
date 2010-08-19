@@ -114,7 +114,7 @@ namespace Tabuu.UI {
                 return;
             var d = (DatFile)e.Parameter;
             d.LoadModel(dialog.FileName);
-            
+            (sender as MainWindow).TreeView.Items.Refresh();
         }
 
         private static void HexOpenCommandExecuted(object sender, ExecutedRoutedEventArgs e) {
@@ -140,7 +140,7 @@ namespace Tabuu.UI {
         private void CloseFileCommandExecuted(object sender, ExecutedRoutedEventArgs e) {
             e.Parameter.ToString();
             var d = (DatFile)e.Parameter;
-            if (d.Changed) {
+            if (d.isChanged) {
                 var result = MessageBox.Show("Unsaved changes detected! Are you sure you want to close this file?",
                                              "Close file?", MessageBoxButton.OKCancel);
                 if (result != MessageBoxResult.OK)
@@ -154,7 +154,7 @@ namespace Tabuu.UI {
         private static void SaveFileCommandExecuted(object sender, ExecutedRoutedEventArgs e) {
             e.Parameter.ToString();
             var d = (DatFile)e.Parameter;
-            if (d.Changed) {
+            if (d.isChanged) {
                 var result = MessageBox.Show("This will overrite the file! Are you sure you want to save this file?",
                                              "Save file?", MessageBoxButton.OKCancel);
                 if (result != MessageBoxResult.OK)

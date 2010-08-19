@@ -89,12 +89,6 @@ namespace OpenSALib3.DatHandler
         private readonly UnknownElement _references;
         [Browsable(false)]
         public UnknownElement References { get { return _references; } }
-
-        [Category("File")]
-        [ReadOnly(true)]
-        [Browsable(true)]
-        public bool Changed { get; set; }
-
         [Category("File")]
         [ReadOnly(true)]
         [Browsable(true)]
@@ -121,7 +115,6 @@ namespace OpenSALib3.DatHandler
                 throw new Exception("This is not a valid moveset file");
             Name = node.TreePathAbsolute;
             Length = (_header.FileSize - Marshal.SizeOf(_header));
-            Changed = false;
             Color = Color.Transparent;
             //Start Parse
             var section = _header.DataChunkSize + _header.OffsetCount * 4;
@@ -131,7 +124,7 @@ namespace OpenSALib3.DatHandler
             _references = new UnknownElement(this, -1, "References", 0);
             for (var i = 0; i < _header.ReferenceCount; i++)
             {
-                var s = DatSection.Factory(this, section2, stringBase);
+                var s = DatSection.Factory(References, section2, stringBase);
                 References[s.Name] = s;
                 var tmp = s.DataOffset;
                 do
@@ -146,7 +139,7 @@ namespace OpenSALib3.DatHandler
             _sections = new UnknownElement(this, -1, "Sections", 0);
             for (var i = 0; i < _header.SectionCount; i++)
             {
-                var s = DatSection.Factory(this, section, stringBase);
+                var s = DatSection.Factory(Sections, section, stringBase);
                 Sections[s.Name] = s;
                 section += 8;
             }

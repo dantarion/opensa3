@@ -13,7 +13,6 @@ namespace OpenSALib3.DatHandler
         #region Node Structure
         /* Every Node has a parent */
         [Browsable(false)]
-
         public DatElement Parent { get; private set; }
         [Browsable(false)]
         /* And a way to access the root file*/
@@ -21,7 +20,6 @@ namespace OpenSALib3.DatHandler
         {
             get {
                 if (this is DatFile) return (DatFile) this;
-                if (Parent is DatFile) return (DatFile) Parent;
                 return Parent.RootFile;
             }
         }
@@ -109,13 +107,16 @@ namespace OpenSALib3.DatHandler
             Color = Color.FromArgb(255 / 2, Random.Next(255), Random.Next(255), Random.Next(255));
             PropertyChanged += new PropertyChangedEventHandler(MarkDirty);
         }
+        [ReadOnly(true),Browsable(true)]
         public bool isChanged
         {
             get;
-            set;
+            private set;
         }
         public void MarkDirty(object sender, PropertyChangedEventArgs e)
         {
+            if(Parent != null)
+                Parent.MarkDirty(sender,e);
             isChanged = true;
         }
         public override string ToString()
