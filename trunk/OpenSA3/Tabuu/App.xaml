@@ -5,6 +5,7 @@
 				<MenuItem Header="Open Hex View..." Command="{x:Static local:MainWindow.HexOpenCommand}" CommandParameter="{Binding}" />
                 <MenuItem Header="Open Model View..." Command="{x:Static local:MainWindow.ModelOpenCommand}" CommandParameter="{Binding}" />
                 <MenuItem Header="Load Model..." Command="{x:Static local:MainWindow.LoadModelCommand}" CommandParameter="{Binding}" />
+                <MenuItem Header="Load Animations..." Command="{x:Static local:MainWindow.LoadAnimationCommand}" CommandParameter="{Binding}" />
 				<MenuItem Header="Save File" Command="{x:Static local:MainWindow.SaveFileCommand}" CommandParameter="{Binding}" />
 				<MenuItem Header="Save File As..." Command="{x:Static local:MainWindow.SaveFileAsCommand}" CommandParameter="{Binding}" />
 				<MenuItem Header="Close File" Command="{x:Static local:MainWindow.CloseFileCommand}" CommandParameter="{Binding}" />

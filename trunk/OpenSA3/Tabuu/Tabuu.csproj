@@ -41,7 +41,7 @@
   <ItemGroup>
     <Reference Include="BrawlLib, Version=0.10.3691.33773, Culture=neutral, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>W:\brawl_hax\BBox\BrawlLib.dll</HintPath>
+      <HintPath>..\OpenSALib3\res\BrawlLib.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Activities" />
@@ -71,13 +71,13 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="ModelViewerWindow.xaml.cs">
+    <Compile Include="UI\ModelViewerWindow.xaml.cs">
       <DependentUpon>ModelViewerWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\ScriptWindow.xaml.cs">
       <DependentUpon>ScriptWindow.xaml</DependentUpon>
     </Compile>
-    <Page Include="ModelViewerWindow.xaml">
+    <Page Include="UI\ModelViewerWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

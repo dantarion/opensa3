@@ -16,9 +16,11 @@ namespace Tabuu.UI {
         public static RoutedCommand ModelOpenCommand = new RoutedCommand();
         public static RoutedCommand ExamineCommand = new RoutedCommand();
         public static RoutedCommand LoadModelCommand = new RoutedCommand();
+        public static RoutedCommand LoadAnimationCommand = new RoutedCommand();
         public static RoutedCommand SaveFileCommand = new RoutedCommand();
         public static RoutedCommand SaveFileAsCommand = new RoutedCommand();
         public static RoutedCommand CloseFileCommand = new RoutedCommand();
+        public static ModelViewerWindow ModelViewer;
 
         public MainWindow() {
             InitializeComponent();
@@ -28,6 +30,7 @@ namespace Tabuu.UI {
             CommandBindings.Add(new CommandBinding(CloseFileCommand, CloseFileCommandExecuted, AlwaysExecute));
             CommandBindings.Add(new CommandBinding(SaveFileCommand, SaveFileCommandExecuted, AlwaysExecute));
             CommandBindings.Add(new CommandBinding(LoadModelCommand, LoadModelCommandExecuted, AlwaysExecute));
+            CommandBindings.Add(new CommandBinding(LoadAnimationCommand, LoadAnimationCommandExecuted, AlwaysExecute));
             RunScript.LoadAssembly(typeof(DatElementWrapper).Assembly);
             Focus();
         }
@@ -116,6 +119,15 @@ namespace Tabuu.UI {
             d.LoadModel(dialog.FileName);
             (sender as MainWindow).TreeView.Items.Refresh();
         }
+        private static void LoadAnimationCommandExecuted(object sender, ExecutedRoutedEventArgs e)
+        {
+            var dialog = new Microsoft.Win32.OpenFileDialog();
+            if (!dialog.ShowDialog().Value)
+                return;
+            var d = (DatFile)e.Parameter;
+            d.LoadAnimations(dialog.FileName);
+            (sender as MainWindow).TreeView.Items.Refresh();
+        }
 
         private static void HexOpenCommandExecuted(object sender, ExecutedRoutedEventArgs e) {
             e.Parameter.ToString();
@@ -130,11 +142,15 @@ namespace Tabuu.UI {
         }
         private static void ModelOpenCommandExecuted(object sender, ExecutedRoutedEventArgs e)
         {
-
+            if (ModelViewer != null)
+                ModelViewer.Close();
             e.Parameter.ToString();
             var d = (DatFile)e.Parameter;
-            if(d.Model != null)
-            new ModelViewerWindow(d).Show();
+            if (d.Model != null)
+            {
+                ModelViewer = new ModelViewerWindow(d);
+                ModelViewer.Show();
+            }
         }
 
         private void CloseFileCommandExecuted(object sender, ExecutedRoutedEventArgs e) {
@@ -175,6 +191,17 @@ namespace Tabuu.UI {
             new ScriptWindow().Show();
         }
 
-        private void TreeViewSelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e) { }
+        private void TreeViewSelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e) 
+        {
+            sender.ToString();
+            if (ModelViewer != null && e.NewValue is OpenSALib3.PSA.SubactionFlags)
+            {
+                OpenSALib3.PSA.SubactionFlags flags = (OpenSALib3.PSA.SubactionFlags)e.NewValue;
+                if(flags.RootFile.Animations.ContainsKey(flags.AnimationName))
+                {
+                    ModelViewer.ChangeAnimation(flags.RootFile.Animations[flags.AnimationName]);
+                }
+            }
+        }
     }
 }

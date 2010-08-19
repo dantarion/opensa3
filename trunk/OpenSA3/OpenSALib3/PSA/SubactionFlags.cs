@@ -15,7 +15,7 @@ namespace OpenSALib3.PSA
         TransitionOutFromStart = 64,
         Unknown4 = 128
     }
-    class SubactionFlags : DatElement {
+    public class SubactionFlags : DatElement {
 
 #pragma warning disable 169 //'Field ____ is never used'
 #pragma warning disable 649 //'Field ____ is never assigned';
