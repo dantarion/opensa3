@@ -6,7 +6,6 @@ using System.Collections.Generic;
 namespace Tabuu.Utility {
     public class DatElementWrapper : Be.Windows.Forms.IByteProvider {
         private readonly DatElement _datelement;
-        private bool _changed;
         readonly bool _contentmode;
         public DatElementWrapper(DatElement datElement, bool contentmode = false) {
             _datelement = datElement;
@@ -21,7 +20,7 @@ namespace Tabuu.Utility {
         }
 
         public bool HasChanges() {
-            return _changed;
+            return _datelement.isChanged;
         }
 
         public void InsertBytes(long index, byte[] bs) {
@@ -90,7 +89,7 @@ namespace Tabuu.Utility {
         public unsafe void WriteByte(long index, byte value) {
             var src = (byte*)(_datelement.RootFile.Address + _datelement.FileOffset + (uint)index);
             *src = value;
-            _changed = true;
+            _datelement.isChanged = true;
             _datelement.RootFile.Changed = true;
         }
         #endregion
