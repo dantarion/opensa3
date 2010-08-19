@@ -89,8 +89,7 @@ namespace Tabuu.Utility {
         public unsafe void WriteByte(long index, byte value) {
             var src = (byte*)(_datelement.RootFile.Address + _datelement.FileOffset + (uint)index);
             *src = value;
-            _datelement.isChanged = true;
-            _datelement.RootFile.Changed = true;
+            _datelement.MarkDirty(this, null);
         }
         #endregion
 

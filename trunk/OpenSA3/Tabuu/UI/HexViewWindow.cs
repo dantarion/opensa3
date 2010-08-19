@@ -37,5 +37,32 @@ namespace Tabuu.UI {
             hexBox1.ScrollByteIntoView(jumpto);
             hexBox1.Select(jumpto, 4);
         }
+
+        private void textBox2_TextChanged(object sender, EventArgs e)
+        {
+            var offset = hexBox1.SelectionStart - hexBox1.SelectionStart % 4;
+            float value;
+            if (!float.TryParse(textBox2.Text, out value))
+                return;
+            var bytes = BitConverter.GetBytes(value);
+            Array.Reverse(bytes);
+            for(int i = 0; i < 4; i++)
+                hexBox1.ByteProvider.WriteByte(offset + i,bytes[i]);
+            hexBox1.Refresh();
+                
+        }
+
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+            var offset = hexBox1.SelectionStart - hexBox1.SelectionStart % 4;
+            int value;
+            if (!int.TryParse(textBox1.Text, out value))
+                return;
+            var bytes = BitConverter.GetBytes(value);
+            Array.Reverse(bytes);
+            for (int i = 0; i < 4; i++)
+                hexBox1.ByteProvider.WriteByte(offset + i, bytes[i]);
+            hexBox1.Refresh();
+        }
     }
 }
