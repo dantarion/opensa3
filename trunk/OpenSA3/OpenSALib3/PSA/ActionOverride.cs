@@ -1,17 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using OpenSALib3.DatHandler;
-using System.ComponentModel;
-using OpenSALib3.Utility;
 using System.Activities.Presentation.PropertyEditing;
+using System.ComponentModel;
+using OpenSALib3.DatHandler;
+using OpenSALib3.Utility;
+
 namespace OpenSALib3.PSA
 {
     public class ActionOverride : DatElement
     {
-        private Data data;
-        unsafe struct Data
+        private Data _data;
+
+         struct Data
         {
             public bint ActionID;
             public bint CommandListOffset;
@@ -20,24 +19,24 @@ namespace OpenSALib3.PSA
         [Editor(typeof(HexPropertyEditor), typeof(PropertyValueEditor))]
         public int ActionID
         {
-            get { return data.ActionID; }
-            set { data.ActionID = value; }
+            get { return _data.ActionID; }
+            set { _data.ActionID = value; }
         }
         [Category("Override")]
         [Editor(typeof(HexPropertyEditor), typeof(PropertyValueEditor))]
         public int CommandListOffset
         {
-            get { return data.CommandListOffset; }
-            set { data.CommandListOffset = value; }
+            get { return _data.CommandListOffset; }
+            set { _data.CommandListOffset = value; }
         }
         public unsafe ActionOverride(DatElement parent, int offset)
             : base(parent, offset)
         {
-            data = *(Data*)Address;
+            _data = *(Data*)base.Address;
             Name = "ActionOverride";
             Length = 8;
-            if (data.CommandListOffset > 0)
-                foreach (Command cl in Command.ReadCommands(this, (int)data.CommandListOffset, null))
+            if (_data.CommandListOffset > 0)
+                foreach (var cl in Command.ReadCommands(this, _data.CommandListOffset, null))
                     this[null] = cl;
 
 

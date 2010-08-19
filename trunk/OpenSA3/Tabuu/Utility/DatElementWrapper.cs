@@ -12,7 +12,7 @@ namespace Tabuu.Utility {
             _datelement = datElement;
             _contentmode = contentmode;
         }
-        private Dictionary<long, System.Drawing.Color> _colorCache = new Dictionary<long, System.Drawing.Color>();
+        private readonly Dictionary<long, System.Drawing.Color> _colorCache = new Dictionary<long, System.Drawing.Color>();
         #region IByteProvider
         public void ApplyChanges() { }
 
@@ -32,17 +32,19 @@ namespace Tabuu.Utility {
             get { return _contentmode ? ((DatSection) _datelement).DataLength: _datelement.Length; }
         }
 
+#pragma warning disable 067 //The event '____' is never used
         public event EventHandler Changed;
         public event EventHandler LengthChanged;
+#pragma warning restore 067
 
         public unsafe byte ReadByte(long index) {
-            int offset = _contentmode ? (_datelement as DatSection).DataOffset : _datelement.FileOffset;
+            var offset = _contentmode ? ((DatSection) _datelement).DataOffset : _datelement.FileOffset;
             return *(byte*)(_datelement.RootFile.Address + offset + (uint)index);
         }
 
         public System.Drawing.Color GetByteColor(long index) {
 
-            long offset = _contentmode ? (_datelement as DatSection).DataOffset : _datelement.FileOffset;
+            long offset = _contentmode ? ((DatSection) _datelement).DataOffset : _datelement.FileOffset;
             offset += index;
             offset -= offset % 4;
             if (!_colorCache.ContainsKey(offset))
@@ -54,11 +56,9 @@ namespace Tabuu.Utility {
         }
 
         private static DatElement SearchForDatElement(IEnumerable node, long index) {
-            DatElement found = null;
-            foreach (var searchableChild in node.OfType<IEnumerable>()) {
-                found = SearchForDatElement(searchableChild, index); //Search child nodes
-                if (found != null)
-                    return found; //If we find it, stop searching>	Tabuu.exe!Tabuu.Utility.DatElementWrapper.SearchForDatElement(System.Collections.IEnumerable node, long index) Line 59 + 0x70 bytes	C#
+            foreach (var found in
+                node.OfType<IEnumerable>().Select(searchableChild => SearchForDatElement(searchableChild, index)).Where(found => found != null)) {
+                return found; //If we find it, stop searching>	Tabuu.exe!Tabuu.Utility.DatElementWrapper.SearchForDatElement(System.Collections.IEnumerable node, long index) Line 59 + 0x70 bytes	C#
             }
             //If its not in any of the children, maybe this is it!
             var asDatElement = node as DatElement;

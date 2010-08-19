@@ -1,7 +1,7 @@
-﻿using System;
+﻿#pragma warning disable 649 //'Field ____ is never assigned'
+using System;
 using System.Collections.Generic;
 using OpenSALib3.DatHandler;
-using OpenSALib3.Utility;
 
 namespace OpenSALib3.Moveset
 {

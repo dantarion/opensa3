@@ -134,12 +134,13 @@ namespace Be.Windows.Forms {
             _writes.Clear();
         }
 
+#pragma warning disable 067 //The event '____' is never used
         #region IByteProvider Members
         /// <summary>
         ///   Never used.
         /// </summary>
         public event EventHandler LengthChanged;
-
+#pragma warning restore 067
         /// <summary>
         ///   Reads a byte from the file.
         /// </summary>

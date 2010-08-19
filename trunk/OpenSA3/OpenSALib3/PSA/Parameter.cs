@@ -1,48 +1,46 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using OpenSALib3.DatHandler;
 using System.ComponentModel;
-using System.Diagnostics;
+#pragma warning disable 649 //'Field ____ is never assigned'
+using System.Drawing;
+using OpenSALib3.DatHandler;
+
 namespace OpenSALib3.PSA
 {
-    public enum ParameterType : int
-    {
-        VALUE = 0,
-        SCALAR = 1,
-        OFFSET = 2,
-        BOOLEAN = 3,
-        VARIABLE = 5,
-        REQUIREMENT = 6,
+    public enum ParameterType {
+        Value = 0,
+        Scalar = 1,
+        Offset = 2,
+        Boolean = 3,
+        Variable = 5,
+        Requirement = 6,
     }
     public class Parameter : DatElement
     {
-        struct Data
+      private struct Data
         {
-            public bint type;
-            public bint rawData;
+            public bint Type;
+            public bint RawData;
         }
-        private Data data;
+        private Data _data;
         [Category("Parameter")]
         public ParameterType Type
         {
-            get { return (ParameterType)(int)data.type; }
+            get { return (ParameterType)(int)_data.Type; }
         }
         [Category("Parameter")]
         public int RawData
         {
-            get { return data.rawData; }
+            get { return _data.RawData; }
         }
         public unsafe Parameter(DatElement parent, int offset)
             : base(parent, offset)
         {
-            data = *(Data*)Address;
+            _data = *(Data*)base.Address;
             Length = 8;
-            if ((int)(this.Type) > 6)
+            if ((int)(Type) > 6)
                 throw new Exception("Improper Parameter");
             Name = Type + " Parameter";
-            Color = System.Drawing.Color.BlueViolet;
+            Color = Color.BlueViolet;
         }
     }
 }

@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using OpenSALib3.Moveset;
+
 namespace OpenSALib3.DatHandler
 {
     public class GenericSection : DatSection

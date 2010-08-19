@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using OpenSALib3.DatHandler;
 using System.Diagnostics;
+using System.Drawing;
+using OpenSALib3.DatHandler;
+
 namespace OpenSALib3.PSA
 {
 
@@ -15,7 +15,7 @@ namespace OpenSALib3.PSA
             var list = new List<Command>();
             if (offset == -1)
                 return list;
-            Command command = new Command(parent, offset);
+            var command = new Command(parent, offset);
             while (command.Module != 0 || command.ID != 0)
             {
                 offset += 8;
@@ -25,15 +25,15 @@ namespace OpenSALib3.PSA
             list.Add(command);
 
             //Search for subroutines
-            foreach (Command c in list)
+            foreach (var c in list)
             {
-                int suboff = -1;
+                var suboff = -1;
                 if (c.Module == 0x00 && (c.ID == 0x07||c.ID ==0x09) && subroutinelist != null)
                 {
-                    int ParamOffset = c.data.ParameterOffset+ 4;
-                    var ext = c.RootFile.isExternal(ParamOffset);
+                    var paramOffset = c._data.ParameterOffset+ 4;
+                    var ext = c.RootFile.IsExternal(paramOffset);
                     if (!ext)
-                        suboff = (c[0] as Parameter).RawData;
+                        suboff = ((Parameter) c[0]).RawData;
                     if (suboff > 0 && list[0].FileOffset != suboff && !subroutinelist.Exists(x => x[0].FileOffset == suboff))
                     {
                         subroutinelist.Add(ReadCommands(parent, suboff, subroutinelist));
@@ -42,14 +42,15 @@ namespace OpenSALib3.PSA
                 else
                     if (c.Module == 0x0D && c.ID == 0x00 && subroutinelist != null)
                     {
-                        suboff = (c[1] as Parameter).RawData;
+                        suboff = ((Parameter) c[1]).RawData;
                         if (suboff > 0 && !subroutinelist.Exists(x => x[0].FileOffset == suboff))
                             subroutinelist.Add(ReadCommands(parent, suboff, subroutinelist));
                     }
             }
             return list;
         }
-
+#pragma warning disable 169 //'Field ____ is never used'
+#pragma warning disable 649 //'Field ____ is never assigned';
         struct Data
         {
             public byte Module;
@@ -58,29 +59,31 @@ namespace OpenSALib3.PSA
             public byte Unknown;
             public bint ParameterOffset;
         }
+#pragma warning restore 169 //'Field ____ is never used'
+#pragma warning restore 649 //'Field ____ is never assigned';
         public byte Module
         {
-            get { return data.Module; }
-            set { data.Module = value; }
+            get { return _data.Module; }
+            set { _data.Module = value; }
         }
         public byte ID
         {
-            get { return data.ID; }
-            set { data.ID = value; }
+            get { return _data.ID; }
+            set { _data.ID = value; }
         }
 
-        private Data data;
+        private Data _data;
         public unsafe Command(DatElement parent, int offset)
             : base(parent, offset)
         {
-            data = *(Data*)(Address);
+            _data = *(Data*)(base.Address);
             Length = 8;
-            Color = System.Drawing.Color.Blue;
-            Name = String.Format("{0:X02}{1:X02}{2:X02}{3:X02}", Module, ID, data.ParameterCount, data.Unknown);
+            Color = Color.Blue;
+            Name = String.Format("{0:X02}{1:X02}{2:X02}{3:X02}", Module, ID, _data.ParameterCount, _data.Unknown);
             if (Module == 0xFF)
                 Debug.Fail("Command Module 0xFF");
-            for (int i = 0; i < data.ParameterCount; i++)
-                this[i] = new Parameter(this, (int)(data.ParameterOffset + i * 8));
+            for (var i = 0; i < _data.ParameterCount; i++)
+                this[i] = new Parameter(this, (_data.ParameterOffset + i * 8));
         }
     }
 
