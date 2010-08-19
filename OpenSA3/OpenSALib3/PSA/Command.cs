@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using OpenSALib3.DatHandler;
+using System.ComponentModel;
 
 namespace OpenSALib3.PSA
 {
@@ -61,11 +62,13 @@ namespace OpenSALib3.PSA
         }
 #pragma warning restore 169 //'Field ____ is never used'
 #pragma warning restore 649 //'Field ____ is never assigned';
+        [Category("Command")]
         public byte Module
         {
             get { return _data.Module; }
             set { _data.Module = value; }
         }
+        [Category("Command")]
         public byte ID
         {
             get { return _data.ID; }

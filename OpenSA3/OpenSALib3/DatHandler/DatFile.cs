@@ -58,13 +58,13 @@ namespace OpenSALib3.DatHandler
             {
                 _boneNames = new Dictionary<int, string>();
                 var node = NodeFactory.FromFile(null, filename);
-                Model = node.Children[0].Children[0].Children[0] as MDL0Node;
+                Model = (MDL0Node) node.FindChildrenByType("", ResourceType.MDL0).First();
                 Debug.Assert(Model != null);
                 foreach (MDL0BoneNode innernode in Model.FindChildrenByType("", ResourceType.MDL0Bone))
                 {
                     _boneNames[innernode.BoneIndex] = innernode.Name;
                 }
-                Model.Merge();
+                
             }
             catch (Exception)
             {

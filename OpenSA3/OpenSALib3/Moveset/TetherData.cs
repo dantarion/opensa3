@@ -1,5 +1,6 @@
 ﻿using System;
 using OpenSALib3.DatHandler;
+using System.ComponentModel;
 
 namespace OpenSALib3.Moveset
 {  
@@ -12,11 +13,13 @@ namespace OpenSALib3.Moveset
             public bint HangFrameCount;
             public bfloat Unknown;
         }
+        [Browsable(true), Category("TetherData")]
         public int HangFrameCount
         {
             get { return _data.HangFrameCount; }
             set { _data.HangFrameCount = value; }
         }
+        [Browsable(true), Category("TetherData")]
         public float Unknown
         {
             get { return _data.Unknown; }

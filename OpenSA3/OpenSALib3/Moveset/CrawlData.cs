@@ -1,5 +1,6 @@
 ﻿using System;
 using OpenSALib3.DatHandler;
+using System.ComponentModel;
 
 namespace OpenSALib3.Moveset
 {
@@ -12,11 +13,13 @@ namespace OpenSALib3.Moveset
             public bfloat ForwardAccel;
             public bfloat BackwardAccel;
         }
+        [Browsable(true), Category("CrawlData")]
         public float ForwardAcceleration
         {
             get { return _data.ForwardAccel; }
             set { _data.ForwardAccel = value; }
         }
+        [Browsable(true), Category("CrawlData")]
         public float BackwardAcceleration
         {
             get { return _data.BackwardAccel; }
