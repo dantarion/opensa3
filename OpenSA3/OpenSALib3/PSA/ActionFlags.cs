@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using OpenSALib3.DatHandler;
-using System.ComponentModel;
-using OpenSALib3.Utility;
 using System.Activities.Presentation.PropertyEditing;
+using System.ComponentModel;
+using OpenSALib3.DatHandler;
+using OpenSALib3.Utility;
+
 namespace OpenSALib3.PSA
 {
     public static class Extensions
@@ -19,7 +17,7 @@ namespace OpenSALib3.PSA
         {
             return (value >> count) | (value << (32 - count));
         }
-        public static buint rlwinm(this buint value, int rot, uint maskleft, uint maskright)
+        public static buint Rlwinm(this buint value, int rot, uint maskleft, uint maskright)
         {
             buint mask = 1;
             for (buint i = maskleft; i < maskright; i++)
@@ -75,7 +73,7 @@ namespace OpenSALib3.PSA
         {
             get
             {
-                return _data.Flags.rlwinm(8, 28, 31);
+                return _data.Flags.Rlwinm(8, 28, 31);
             }
         }
         [Browsable(true)]
@@ -83,7 +81,7 @@ namespace OpenSALib3.PSA
         {
             get
             {
-                return _data.Flags.rlwinm(11, 29, 31);
+                return _data.Flags.Rlwinm(11, 29, 31);
             }
         }
         [Browsable(true)]
@@ -91,7 +89,7 @@ namespace OpenSALib3.PSA
         {
             get
             {
-                return _data.Flags.rlwinm(11, 0, 8).RotateLeft(24);
+                return _data.Flags.Rlwinm(11, 0, 8).RotateLeft(24);
             }
         }
         [Browsable(true)]
@@ -99,13 +97,13 @@ namespace OpenSALib3.PSA
         {
             get
             {
-                return _data.Flags.rlwinm(20, 31, 31);
+                return _data.Flags.Rlwinm(20, 31, 31);
             }
         }
         public unsafe ActionFlags(DatElement parent, int offset, int index)
             : base(parent, offset)
         {
-            _data = *(Data*)Address;
+            _data = *(Data*)base.Address;
             Name = String.Format("{0:X03}",index);
             Length = 16;
         }

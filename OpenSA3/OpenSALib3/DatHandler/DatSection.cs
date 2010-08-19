@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Activities.Presentation.PropertyEditing;
 using System.ComponentModel;
 using OpenSALib3.Moveset;
+using OpenSALib3.Utility;
 
 namespace OpenSALib3.DatHandler {
 
@@ -29,7 +31,7 @@ namespace OpenSALib3.DatHandler {
             get { return _header.StringOffset; }
             set { _header.StringOffset = value; }
         }
-        [Editor(typeof(OpenSALib3.Utility.HexPropertyEditor), typeof(System.Activities.Presentation.PropertyEditing.PropertyValueEditor))]
+        [Editor(typeof(HexPropertyEditor), typeof(PropertyValueEditor))]
         [Category("Section")]
         public int DataOffset
         {
@@ -45,7 +47,7 @@ namespace OpenSALib3.DatHandler {
         protected DatSection(DatElement parent, int offset, int stringbase)
             : base(parent, offset)
         {
-            _header = *(DatSectionHeader*)Address;
+            _header = *(DatSectionHeader*)base.Address;
             Length = 8;
             Name = RootFile.ReadString(stringbase + StringOffset);
         }

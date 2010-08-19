@@ -1,8 +1,8 @@
-﻿using System;
-using OpenSALib3.DatHandler;
-using OpenSALib3.Utility;
+﻿#pragma warning disable 649 //'Field ____ is never assigned'
+using System;
 using System.Collections.Generic;
-using OpenSALib3.Moveset;
+using OpenSALib3.DatHandler;
+
 namespace OpenSALib3.PSA
 {
     public class Article : DatElement
@@ -61,17 +61,17 @@ namespace OpenSALib3.PSA
             get { return _data.UnknownD4; }
             set { _data.UnknownD4 = value; }
         }
-        private List<CommandList> _actions = new List<CommandList>();
-        private List<SubactionFlags> _subactionflags = new List<SubactionFlags>();
-        private List<CommandList> _subactionmain = new List<CommandList>();
-        private List<CommandList> _subactiongfx = new List<CommandList>();
-        private List<CommandList> _subactionsfx = new List<CommandList>();
-        private List<CommandList> _subactionother = new List<CommandList>();
-        private List<List<Command>> _subroutines = new List<List<Command>>();
-        public unsafe Article(MovesetSection parent, int offset)
+        private readonly List<CommandList> _actions = new List<CommandList>();
+        private readonly List<SubactionFlags> _subactionflags = new List<SubactionFlags>();
+        private readonly List<CommandList> _subactionmain = new List<CommandList>();
+        private readonly List<CommandList> _subactiongfx = new List<CommandList>();
+        private readonly List<CommandList> _subactionsfx = new List<CommandList>();
+        private readonly List<CommandList> _subactionother = new List<CommandList>();
+        private readonly List<List<Command>> _subroutines = new List<List<Command>>();
+        public unsafe Article(DatElement parent, int offset)
             : base(parent, offset)
         {
-            _data = *(Data*)Address;
+            _data = *(Data*)base.Address;
             Name = "Article";
             Length = 4 * 10;
             if (
@@ -81,9 +81,9 @@ namespace OpenSALib3.PSA
                 _data.SubactionSFXStart > RootFile.Length || _data.SubactionSFXStart % 4 != 0 ||
                 _data.OtherStart > RootFile.Length || _data.OtherStart % 4 != 0
                 )
-                throw new Exception("Not actually a Article, lol");
-            int actions = 0;
-            int subactions = (FileOffset-_data.SubactionFlagsStart)/8;
+                throw new Exception("Not actually an Article, lol");
+            var actions = 0;
+            var subactions = (FileOffset-_data.SubactionFlagsStart)/8;
             if (_data.ActionFlagsStart > 0)
                 actions = (_data.ActionsStart - _data.ActionFlagsStart) / 0x10;
             if (_data.SubactionFlagsStart > 0 && _data.SubactionMainStart > 0)
@@ -95,25 +95,24 @@ namespace OpenSALib3.PSA
 
             
             //Parse
-            int count = 0;
-            for (int i = 0; i < actions; i++)
+            var count = 0;
+            for (var i = 0; i < actions; i++)
                 _actions.Add(new CommandList(this,_data.ActionsStart+ i*4, "Action " + String.Format("0x{0:X}", count++), _subroutines));
-            count = 0;
-            for (int i = 0; i < subactions; i++)
+            for (var i = 0; i < subactions; i++)
                 _subactionflags.Add(new SubactionFlags(this, _data.SubactionFlagsStart+i*8));
             count = 0;
             if(_data.SubactionMainStart > 0)
-            for (int i = 0; i < subactions; i++)
+            for (var i = 0; i < subactions; i++)
                 _subactionmain.Add(new CommandList(this, _data.SubactionMainStart + i * 4, "Subaction Main " + String.Format("0x{0:X}", count++), _subroutines));
             if (_data.SubactionGFXStart > 0)
-                for (int i = 0; i < subactions; i++)
+                for (var i = 0; i < subactions; i++)
                     _subactiongfx.Add(new CommandList(this, _data.SubactionGFXStart + i * 4, "Subaction GFX " + String.Format("0x{0:X}", count++), _subroutines));
             if (_data.SubactionSFXStart > 0)
-                for (int i = 0; i < subactions; i++)
+                for (var i = 0; i < subactions; i++)
                    _subactionsfx.Add(new CommandList(this, _data.SubactionSFXStart + i * 4, "Subaction SFX " + String.Format("0x{0:X}", count++), _subroutines));
-            if (_data.OtherStart > 0)
-                for (int i = 0; i < subactions; i++)
-                    ;//_subactionother.Add(new CommandList(this, _data.OtherStart + i * 4, "Subaction Other " + String.Format("0x{0:X}", count++), _subroutines));
+            //if (_data.OtherStart > 0)
+            //    for (var i = 0; i < subactions; i++)
+            //        _subactionother.Add(new CommandList(this, _data.OtherStart + i * 4, "Subaction Other " + String.Format("0x{0:X}", count++), _subroutines));
 
             this["Actions"] = _actions;
             this["Subaction Flags"] = _subactionflags;

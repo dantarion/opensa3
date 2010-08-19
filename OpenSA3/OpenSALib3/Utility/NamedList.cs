@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections;
-using System.ComponentModel;
 using System.Collections.Generic;
+using System.ComponentModel;
+
 namespace OpenSALib3.Utility {
     public class NamedList<T> : List<T>,INamed {
         [Browsable(true)]

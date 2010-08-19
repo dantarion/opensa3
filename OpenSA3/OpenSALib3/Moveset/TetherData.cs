@@ -25,7 +25,7 @@ namespace OpenSALib3.Moveset
         public unsafe TetherData(DatElement parent, int offset)
             : base(parent, offset)
         {
-            _data = *(Data*)Address;
+            _data = *(Data*)base.Address;
             Name = "TetherData";
             Length = 8;
         }

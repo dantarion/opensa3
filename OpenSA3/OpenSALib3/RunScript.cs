@@ -38,9 +38,9 @@ namespace OpenSALib3
         {
             if (_scope != null) return;
             _runtime = Engine.Runtime;
-            var EntryAssembly = Assembly.GetEntryAssembly();
-            foreach (AssemblyName Name in EntryAssembly.GetReferencedAssemblies())
-                _runtime.LoadAssembly(Assembly.LoadWithPartialName(Name.FullName));
+            var entryAssembly = Assembly.GetEntryAssembly();
+            foreach (var name in entryAssembly.GetReferencedAssemblies())
+                _runtime.LoadAssembly(Assembly.Load(name.FullName));
             _runtime.LoadAssembly(typeof(DatFile).Assembly);
             _runtime.LoadAssembly(typeof(ResourceNode).Assembly);
             _scope = Engine.CreateScope();

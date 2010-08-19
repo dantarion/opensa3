@@ -1,14 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using OpenSALib3.DatHandler;
 using OpenSALib3.PSA;
+
 namespace OpenSALib3.Moveset
 {
     class CommandOverrideSection : DatSection
     {
-        public unsafe CommandOverrideSection(DatElement parent, int offset, VoidPtr stringPtr)
+        public CommandOverrideSection(DatElement parent, int offset, VoidPtr stringPtr)
             : base(parent, offset, stringPtr)
         {
         

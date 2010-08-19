@@ -1,14 +1,13 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using OpenSALib3.DatHandler;
 using OpenSALib3.Utility;
 
 namespace OpenSALib3.Moveset
 {
 
-    public sealed class MiscSection : DatElement
-    {
+    public sealed class MiscSection : DatElement {
+#pragma warning disable 169 //'Field ____ is never used'
+#pragma warning disable 649 //'Field ____ is never assigned';
         /* TODO: Cleanup */
         private struct Header
         {
@@ -33,6 +32,8 @@ namespace OpenSALib3.Moveset
             public bint UnknownSection12Offset;
             public bint UnknownSection13Offset;
         }
+#pragma warning restore 169 //'Field ____ is never used'
+#pragma warning restore 649 //'Field ____ is never assigned';
 
         private readonly Header _header;
         private readonly NamedList<GenericElement<int>> _section1 = new NamedList<GenericElement<int>>("Section1");
@@ -53,17 +54,17 @@ namespace OpenSALib3.Moveset
             Length = 4 * 19;
             _header = *(Header*)(Address);
             /* TODO: Figure out proper length of section */
-            for (int i = 0; i < 14; i++)
+            for (var i = 0; i < 14; i++)
                 _section1.Add(new GenericElement<int>(this, _header.Section1 + i * 4, "Unknown"));
-            for (int i = 0; i < +_header.HurtBoxCount; i++)
+            for (var i = 0; i < +_header.HurtBoxCount; i++)
                 _hurtboxes.Add(new Hurtbox(this, _header.HurtBoxOffset + i * 4 * 5));
-            for (int i = 0; i < +_header.UnknownSectionCount; i++)
+            for (var i = 0; i < +_header.UnknownSectionCount; i++)
                 _unknowntype1List.Add(new UnknownType1(this, _header.UnknownSectionOffset + i * 4 * 8));
-            for (int i = 0; i < +_header.LedgegrabCount; i++)
+            for (var i = 0; i < +_header.LedgegrabCount; i++)
                 _ledgegrabboxes.Add(new LedgegrabBox(this, _header.LedgegrabOffset + i * 4 * 4));
-            var _unknownx = new NamedList<UnknownElement>("UnknownX");
-            for (int i = 0; i < _header.UnknownSection2Count; i++)
-                _unknownx.Add(new UnknownElement(this, _header.UnknownSection2Offset + i * 32, "UnknownX", 32));
+            var unknownX = new NamedList<UnknownElement>("UnknownX");
+            for (var i = 0; i < _header.UnknownSection2Count; i++)
+                unknownX.Add(new UnknownElement(this, _header.UnknownSection2Offset + i * 32, "UnknownX", 32));
             for (int i = _header.BoneRef2Offset; i < _header.BoneRef2Offset + 4 * 14; i += 4)
                 _boneref2.Add(new BoneRef(this, i, "BoneRef2"));
             if (_header.MultiJumpOffset != 0)
@@ -77,35 +78,35 @@ namespace OpenSALib3.Moveset
             if (_header.UnknownSection4Offset != 0)
                 _sounddata = new SoundData(this, _header.UnknownSection4Offset);
             //LastOne
-            var _unknowny = new UnknownElement(this, _header.UnknownSection9Offset, "UnknownY", 8);
-            int count = _unknowny.ReadInt(4);
-            for (int i = 0; i < count; i++)
+            var unknownY = new UnknownElement(this, _header.UnknownSection9Offset, "UnknownY", 8);
+            var count = unknownY.ReadInt(4);
+            for (var i = 0; i < count; i++)
             {
-                var offele = new GenericElement<int>(_unknowny, _unknowny.ReadInt(0) + i * 4, "Entry");
+                var offele = new GenericElement<int>(unknownY, unknownY.ReadInt(0) + i * 4, "Entry");
                 offele[null] = new UnknownElement(offele, (int)offele.Value, "Data", 24);
-                _unknowny[null] = offele;
+                unknownY[null] = offele;
             }
             //LastOne
-            var _unknownz = new UnknownElement(this, _header.UnknownSection12Offset, "UnknownY2", 8);
-            count = _unknownz.ReadInt(4) + 1;
-            for (int i = 0; i < count; i++)
+            var unknownZ = new UnknownElement(this, _header.UnknownSection12Offset, "UnknownY2", 8);
+            count = unknownZ.ReadInt(4) + 1;
+            for (var i = 0; i < count; i++)
             {
-                var offele = new GenericElement<int>(_unknownz, _unknownz.ReadInt(0) + i * 4, "Entry");
+                var offele = new GenericElement<int>(unknownZ, unknownZ.ReadInt(0) + i * 4, "Entry");
                 offele[null] = new UnknownElement(offele, (int)offele.Value, "Data", 24);
-                _unknownz[null] = offele;
+                unknownZ[null] = offele;
             }
             var unknowno = new UnknownElement(this, _header.UnknownSection3Offset, "UnknownO", 24);
-            for (int i = unknowno.ReadInt(16); i < unknowno.FileOffset; i += 4)
+            for (var i = unknowno.ReadInt(16); i < unknowno.FileOffset; i += 4)
                 unknowno[null] = new GenericElement<int>(unknowno, i, "Unknown");
             //Setup Tree Structure
-            this.AddNamedList(_section1);
-            this.AddNamedList(_hurtboxes);
-            this.AddNamedList(_unknowntype1List);
-            this.AddNamedList(_ledgegrabboxes);
-            this.AddNamedList(_unknownx);
-            this.AddNamedList(_boneref2);
-            this["UnknownY"] = _unknowny;
-            this["UnknownZ"] = _unknownz;
+            AddNamedList(_section1);
+            AddNamedList(_hurtboxes);
+            AddNamedList(_unknowntype1List);
+            AddNamedList(_ledgegrabboxes);
+            AddNamedList(unknownX);
+            AddNamedList(_boneref2);
+            this["UnknownY"] = unknownY;
+            this["UnknownZ"] = unknownZ;
             this["UnknownO"] = unknowno;
             if (_multijumpdata != null)
                 this["JumpData"] = _multijumpdata;

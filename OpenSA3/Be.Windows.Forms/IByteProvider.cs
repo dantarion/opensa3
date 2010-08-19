@@ -13,6 +13,11 @@ namespace Be.Windows.Forms {
         /// <returns>the byte to read</returns>
         byte ReadByte(long index);
 
+        /// <summary>
+        ///   Gets the color of a byte from the provider
+        /// </summary>
+        /// <param name = "index">the index of the byte to get the color of</param>
+        /// <returns>the byte to get the color of</returns>
         Color GetByteColor(long index);
 
         /// <summary>

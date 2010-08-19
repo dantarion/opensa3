@@ -1,11 +1,11 @@
 ﻿using System;
+using System.Activities.Presentation.PropertyEditing;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-
 using OpenSALib3.Utility;
-using System.Activities.Presentation.PropertyEditing;
+
 namespace OpenSALib3.DatHandler
 {
     public abstract class DatElement : IEnumerable
@@ -17,43 +17,45 @@ namespace OpenSALib3.DatHandler
         public DatElement Parent { get; private set; }
         [Browsable(false)]
         /* And a way to access the root file*/
-        public virtual DatFile RootFile
+        public DatFile RootFile
         {
-            get { return Parent is DatFile ? (DatFile)Parent : Parent.RootFile; }
+            get {
+                if (this is DatFile) return null;
+                if (Parent is DatFile) return (DatFile) Parent;
+                return Parent.RootFile;
+            }
         }
+        private int _autoIndex;
         public IEnumerable this[string name]
         {
             get
             {
                 if (name != null)
-                if (_dictionary.ContainsKey(name))
-                    return _dictionary[name];
+                if (Dictionary.ContainsKey(name))
+                    return Dictionary[name];
                 return null;
             }
             set
             {
                 if (name != null)
-                    _dictionary[name] = value;
+                    Dictionary[name] = value;
                 else
-                    _dictionary["_auto" + (i++)] = value;
+                    Dictionary["_auto" + (_autoIndex++)] = value;
             }
         }
         public IEnumerable this[int index]
         {
-            get { string key = "_indexed" + index; 
-                if(_dictionary.ContainsKey(key))
-                    return _dictionary[key];
-                return null;
+            get { var key = "_indexed" + index; 
+                return Dictionary.ContainsKey(key) ? Dictionary[key] : null;
             }
-            set { _dictionary["_indexed" + index] = value; }
+            set { Dictionary["_indexed" + index] = value; }
         }
         public void AddNamedList(INamed list)
         {
             this[list.Name] = list;
         }
-        private int i = 0;
         /* Hidden list of children */
-        protected Dictionary<string, IEnumerable> _dictionary = new Dictionary<string, IEnumerable>();
+        protected Dictionary<string, IEnumerable> Dictionary = new Dictionary<string, IEnumerable>();
         #endregion
         /* Printable Path 
          TODO: Make it so that identical paths don't exist..i.e Hurtbox#0,Hurtbox# etc
@@ -114,7 +116,7 @@ namespace OpenSALib3.DatHandler
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return _dictionary.Values.GetEnumerator();
+            return Dictionary.Values.GetEnumerator();
         }
         #region ScriptingFunctions
         public unsafe byte ReadByte(int offset)

@@ -101,10 +101,8 @@ namespace Tabuu.UI {
             var ds = new BrawlLib.SSBB.ResourceNodes.DataSource(fp);
             var rs = BrawlLib.SSBB.ResourceNodes.NodeFactory.FromSource(null, ds);
             var list = rs.FindChildrenByType(".", BrawlLib.SSBB.ResourceNodes.ResourceType.ARCEntry).Where(x => x.Name.Contains("MiscData"));
-            foreach(BrawlLib.SSBB.ResourceNodes.ResourceNode node in list)
-            {
-                if(DatFile.isDatFile(node))
-                    TreeView.Items.Add(DatFile.FromNode(node));
+            foreach (var node in list.Where(DatFile.IsDatFile)) {
+                TreeView.Items.Add(DatFile.FromNode(node));
             }
         }
 
