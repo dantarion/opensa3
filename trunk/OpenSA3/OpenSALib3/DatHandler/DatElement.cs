@@ -105,19 +105,34 @@ namespace OpenSALib3.DatHandler
             if (parent != null)/*This is so DatFiles can be instantiated */
                 _address = RootFile.Address + FileOffset;
             Color = Color.FromArgb(255 / 2, Random.Next(255), Random.Next(255), Random.Next(255));
-            PropertyChanged += new PropertyChangedEventHandler(MarkDirty);
+            //PropertyChanged += new PropertyChangedEventHandler(MarkDirty);
         }
-        [ReadOnly(true),Browsable(true)]
-        public bool isChanged
+        [ReadOnly(true), Browsable(true)]
+        private bool _ischanged;
+        public bool IsChanged
         {
-            get;
-            private set;
+            get { return _ischanged; }
+            private set {
+                _ischanged = value;
+                PropertyChanged(this, new PropertyChangedEventArgs("IsChanged"));
+            }
+        }
+        public void MarkClean()
+        {
+            _ischanged = false;
+            foreach (IEnumerable el in this)
+            {
+                if (el is DatElement)
+                    ((DatElement)el).MarkClean();
+                el._ischanged = false;
+            }
+
         }
         public void MarkDirty(object sender, PropertyChangedEventArgs e)
         {
             if(Parent != null)
                 Parent.MarkDirty(sender,e);
-            isChanged = true;
+            IsChanged = true;
         }
         public override string ToString()
         {

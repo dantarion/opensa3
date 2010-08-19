@@ -43,7 +43,7 @@ namespace OpenSALib3.DatHandler
             var file =
                 new DatFile(node)
                 {
-                    Filename = node.RootNode.OriginalSource.Map.FilePath
+                    Filename = node.RootNode.FilePath
                 };
             return file;
         }
@@ -64,6 +64,7 @@ namespace OpenSALib3.DatHandler
                 {
                     _boneNames[innernode.BoneIndex] = innernode.Name;
                 }
+                Model.Merge();
             }
             catch (Exception)
             {
