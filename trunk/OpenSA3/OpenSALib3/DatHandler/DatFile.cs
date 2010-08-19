@@ -30,7 +30,7 @@ namespace OpenSALib3.DatHandler
         public static bool IsDatFile(ResourceNode node)
         {
             return node.WorkingUncompressed.Length == *(bint*)node.WorkingUncompressed.Address;
-                
+
         }
         public static DatFile FromFile(string filename)
         {
@@ -50,7 +50,7 @@ namespace OpenSALib3.DatHandler
         #endregion
 
         public MDL0Node Model { get; private set; }
-        public Dictionary<string,CHR0Node> Animations { get; private set; }
+        public Dictionary<string, CHR0Node> Animations { get; private set; }
         private Dictionary<int, string> _boneNames;
         public void LoadModel(string filename)
         {
@@ -177,12 +177,15 @@ namespace OpenSALib3.DatHandler
 
         private void ComputeDataLengths(IEnumerable sections)
         {
-            
+
             var sorted = sections.OfType<DatSection>().OrderBy(x => (x).DataOffset).ToList();
             for (var i = 0; i < sorted.Count; i++)
+            {
                 if (i < sorted.Count - 1)
                     sorted[i].DataLength = sorted[i + 1].DataOffset - sorted[i].DataOffset;
                 else sorted[i].DataLength = _header.DataChunkSize - sorted[i].DataOffset;
+                sorted[i].DataLength += sorted[i].DataLength % 16;
+            }
         }
         public string Report(bool onlyholes = false)
         {
@@ -196,17 +199,19 @@ namespace OpenSALib3.DatHandler
             sb.AppendFormat("{0}\n", Name);
             sb.AppendFormat("Total Size:{0}\n", Length);
             sb.AppendFormat("Bytes Parsed:{0}\n", usage);
-            sb.AppendFormat("% Complete:{0}\n", (float)usage / (Length+0x20));
+            sb.AppendFormat("% Complete:{0}\n", (float)usage / (Length + 0x20));
 
             var lastdata = 0;
             foreach (var ug in usagedata)
             {
+                if (ug.Offset == -1)
+                    continue;
                 if (ug.Offset < lastdata)
                     sb.AppendFormat("OVERLAP\n");
                 else if (ug.Offset > lastdata)
                     sb.AppendFormat("{1:X08} HOLE - {0:X08}\n", ug.Offset - lastdata, lastdata);
-                if(!onlyholes)
-                sb.AppendFormat("@0x{0:X08} - len {1:X08} - {2,25}\n", ug.Offset, ug.Length, ug.ID);
+                if (!onlyholes)
+                    sb.AppendFormat("@0x{0:X08} - len {1:X08} - {2,25}\n", ug.Offset, ug.Length, ug.ID);
                 lastdata = ug.Offset + ug.Length;
 
             }

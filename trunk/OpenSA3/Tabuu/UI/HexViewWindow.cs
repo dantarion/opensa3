@@ -38,7 +38,7 @@ namespace Tabuu.UI {
             hexBox1.Select(jumpto, 4);
         }
 
-        private void textBox2_TextChanged(object sender, EventArgs e)
+        private void textBox2_TextChanged2(object sender, EventArgs e)
         {
             var offset = hexBox1.SelectionStart - hexBox1.SelectionStart % 4;
             float value;
@@ -52,7 +52,7 @@ namespace Tabuu.UI {
                 
         }
 
-        private void textBox1_TextChanged(object sender, EventArgs e)
+        private void textBox1_TextChanged2(object sender, EventArgs e)
         {
             var offset = hexBox1.SelectionStart - hexBox1.SelectionStart % 4;
             int value;
