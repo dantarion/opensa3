@@ -101,9 +101,11 @@ namespace Tabuu.UI {
             var ds = new BrawlLib.SSBB.ResourceNodes.DataSource(fp);
             var rs = BrawlLib.SSBB.ResourceNodes.NodeFactory.FromSource(null, ds);
             var list = rs.FindChildrenByType(".", BrawlLib.SSBB.ResourceNodes.ResourceType.ARCEntry).Where(x => x.Name.Contains("MiscData"));
-            foreach (var node in list.Where(DatFile.IsDatFile)) {
+            foreach (var node in list.Where(x=>DatFile.IsDatFile(x))) {
                 TreeView.Items.Add(DatFile.FromNode(node));
             }
+            rs.Rebuild(true);
+            rs.Merge();
         }
 
         private static void LoadModelCommandExecuted(object sender, ExecutedRoutedEventArgs e) {
@@ -112,6 +114,7 @@ namespace Tabuu.UI {
                 return;
             var d = (DatFile)e.Parameter;
             d.LoadModel(dialog.FileName);
+            
         }
 
         private static void HexOpenCommandExecuted(object sender, ExecutedRoutedEventArgs e) {

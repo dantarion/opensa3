@@ -9,6 +9,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
@@ -27,6 +28,11 @@
         </Menu>
         <TreeView Margin="5" Grid.Row="1" Name="TreeView" ItemTemplate="{StaticResource TreeTemp}" SelectedItemChanged="TreeViewSelectedItemChanged" />
         <GridSplitter Grid.Column="1" Grid.Row="1" Grid.RowSpan="2" VerticalAlignment="Stretch" Margin="1 0" Width="1" ResizeBehavior="PreviousAndNext" Background="#FF828790" />
-        <ext:WpfPropertyGrid Margin="5" Grid.Row="1" Grid.Column="2" x:Name="PropertyGrid" SelectedObject="{Binding ElementName=TreeView,Path=SelectedValue}" />
+        <ext:WpfPropertyGrid Margin="5" Grid.Row="1" Grid.Column="2" x:Name="PropertyGrid" SelectedObject="{Binding ElementName=TreeView,Path=SelectedValue}"/>
+        <StatusBar Grid.Row="2" Grid.ColumnSpan="3" Name="statusBar1">
+            <Label Name="StatusLabel">Tabuu is at your command.</Label>
+            <ProgressBar Name="ProgressBar" Height="20" MinWidth="200" />
+        </StatusBar>
+       
     </Grid>
 </Window>
