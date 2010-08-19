@@ -181,6 +181,7 @@ namespace Tabuu.UI {
             d.Node.RootNode.Merge();
             d.Node.RootNode.Export(filename);
             d.Node.Merge();
+            d.MarkClean();
         }
 
         private static void AlwaysExecute(object sender, CanExecuteRoutedEventArgs e) {
