@@ -113,28 +113,34 @@ namespace OpenSALib3.Moveset
             for (int i = _header.Actions2Start; i < _header.Unknown11; i += 4)
                 _actions2.Add(new CommandList(this, i, "Action2 " + String.Format("0x{0:X}", count++), _subroutines));
             count = 0;
+
+            int first = int.MaxValue;
+            int last = 0;
             for (int i = _header.SubactionFlagsStart; i < _header.SubactionMainStart; i += 8)
             {
-                var subactiongroup = new UnknownElement(this, -1, String.Format("0x{0:X03}", count), 0);
+                var subactiongroup = new UnknownElement(this, -1, String.Format("0x{0:X03}", count++), 0);
                 _subactions.Add(subactiongroup);
                  var flags = new SubactionFlags(subactiongroup, i);
+                 if(flags.AnimationStringOffset != 0)
+                    first = Math.Min(first, flags.AnimationStringOffset);
+                 last = Math.Max(last, flags.AnimationStringOffset + flags.AnimationName.Length);
                  subactiongroup["Flags"] = flags;
                  subactiongroup.Name += " - " + flags.AnimationName;
             }
-            //var stringChunk = new UnknownElement(this, _subactionflags[0].AnimationStringOffset, "SubactionStrings", _subactionflags[_subactionflags.Count - 1].AnimationStringOffset + _subactionflags[_subactionflags.Count - 1].Name.Length+1 - _subactionflags[0].AnimationStringOffset);
+            var stringChunk = new UnknownElement(this, first, "SubactionStrings", last-first);
             count = 0;
             for (int i = _header.SubactionMainStart; i < _header.SubactionGFXStart; i += 4)
-                _subactions[count]["Main"] = new CommandList(_subactions[count], i, "Main ", _subroutines);
+                (_subactions[count] as DatElement)["Main"] = new CommandList(_subactions[count++], i, "Main ", _subroutines);
             count = 0;
             for (int i = _header.SubactionGFXStart; i < _header.SubactionSFXStart; i += 4)
-                _subactions[count]["GFX"] = new CommandList(_subactions[count], i,"GFX",_subroutines);
+                (_subactions[count] as DatElement)["GFX"] = new CommandList(_subactions[count++], i, "GFX", _subroutines);
             count = 0;
             for (int i = _header.SubactionSFXStart; i < _header.SubactionOtherStart; i += 4)
-                _subactions[count]["SFX"] = new CommandList(_subactions[count], i, "SFX ", _subroutines);
+                (_subactions[count] as DatElement)["SFX"] = new CommandList(_subactions[count++], i, "SFX ", _subroutines);
             var othercount = count;
             count = 0;
             for (int i = _header.SubactionOtherStart; i < _header.SubactionOtherStart + othercount * 4; i += 4)
-                _subactions[count]["Other"] = new CommandList(_subactions[count], i, "Other ", _subroutines);
+                (_subactions[count] as DatElement)["Other"] = new CommandList(_subactions[count++], i, "Other ", _subroutines);
 
             //LastOne
             var unknownK = new UnknownElement(this, _header.Unknown1, "UnknownKTree", 16);
@@ -222,7 +228,7 @@ namespace OpenSALib3.Moveset
             this.AddNamedList(_actions);
             this.AddNamedList( _actions2);    
             this.AddNamedList( _subactions);
-            //this["String Chunk"] = stringChunk;
+            this["String Chunk"] = stringChunk;
             AddNamedList(_subroutines);
             AddNamedList( _articles);
         }
