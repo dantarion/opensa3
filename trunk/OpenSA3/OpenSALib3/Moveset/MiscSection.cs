@@ -35,6 +35,16 @@ namespace OpenSALib3.Moveset
 #pragma warning restore 649 //'Field ____ is never assigned';
 
         private readonly Header _header;
+        private readonly NamedList<GenericElement<int>> _section1 = new NamedList<GenericElement<int>>("Section1");
+        private readonly NamedList<Hurtbox> _hurtboxes = new NamedList<Hurtbox>("Hurtboxes");
+        private readonly NamedList<UnknownType1> _unknowntype1List = new NamedList<UnknownType1>("UnknownT");
+        private readonly NamedList<LedgegrabBox> _ledgegrabboxes = new NamedList<LedgegrabBox>("LedgegrabBoxes");
+        private readonly NamedList<BoneRef> _boneref2 = new NamedList<BoneRef>("BoneRef");
+        private readonly MultiJumpData _multijumpdata;
+        private readonly GlideData _glidedata;
+        private readonly CrawlData _crawldata;
+        private readonly TetherData _tetherdata;
+        private readonly SoundData _sounddata;
 
         public unsafe MiscSection(DatElement parent, int fileOffset)
             : base(parent, fileOffset)
@@ -56,6 +66,7 @@ namespace OpenSALib3.Moveset
                 unknownX.Add(new UnknownElement(this, _header.UnknownSection2Offset + i * 32, "UnknownX", 32));
             for (int i = _header.BoneRef2Offset; i < _header.BoneRef2Offset + 4 * 14; i += 4)
                 _boneref2.Add(new BoneRef(this, i, "BoneRef2"));
+
             if (_header.MultiJumpOffset != 0)
                 _multijumpdata = new MultiJumpData(this, _header.MultiJumpOffset);
             if (_header.GlideOffset != 0)
@@ -66,6 +77,7 @@ namespace OpenSALib3.Moveset
                 _tetherdata = new TetherData(this, _header.TetherOffset);
             if (_header.UnknownSection4Offset != 0)
                 _sounddata = new SoundData(this, _header.UnknownSection4Offset);
+
             //LastOne
             var unknownY = new UnknownElement(this, _header.UnknownSection9Offset, "UnknownY", 8);
             var count = unknownY.ReadInt(4);

@@ -54,10 +54,9 @@ namespace OpenSALib3.DatHandler
         }
         /* Hidden list of children */
         protected Dictionary<string, IEnumerable> Dictionary = new Dictionary<string, IEnumerable>();
-        #endregion
         /* Printable Path 
-         TODO: Make it so that identical paths don't exist..i.e Hurtbox#0,Hurtbox# etc
-         */
+        TODO: Make it so that identical paths don't exist..i.e Hurtbox#0,Hurtbox# etc
+        */
         [Browsable(true)]
         [Category("Element")]
         public String Path
@@ -76,6 +75,8 @@ namespace OpenSALib3.DatHandler
         {
             get { return _address; }
         }
+        #endregion
+
         /* Color for HexView Display */
         [Browsable(false)]
         public Color Color { get; set; }
