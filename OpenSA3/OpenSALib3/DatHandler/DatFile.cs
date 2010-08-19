@@ -50,6 +50,7 @@ namespace OpenSALib3.DatHandler
         #endregion
 
         public MDL0Node Model { get; private set; }
+        public Dictionary<string,CHR0Node> Animations { get; private set; }
         private Dictionary<int, string> _boneNames;
         public void LoadModel(string filename)
         {
@@ -68,6 +69,23 @@ namespace OpenSALib3.DatHandler
             {
                 Model = null;
                 _boneNames = null;
+            }
+        }
+        public void LoadAnimations(string filename)
+        {
+            try
+            {
+                Animations = new Dictionary<string, CHR0Node>();
+                var node = NodeFactory.FromFile(null, filename);
+                foreach (CHR0Node innernode in node.FindChildrenByType("", ResourceType.CHR0))
+                {
+                    Animations[innernode.Name] = innernode;
+                }
+                node.Merge();
+            }
+            catch (Exception)
+            {
+                Animations = null;
             }
         }
         public string GetBoneName(int boneIndex)
