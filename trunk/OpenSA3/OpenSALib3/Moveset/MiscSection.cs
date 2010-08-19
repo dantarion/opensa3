@@ -8,7 +8,6 @@ namespace OpenSALib3.Moveset
     public sealed class MiscSection : DatElement {
 #pragma warning disable 169 //'Field ____ is never used'
 #pragma warning disable 649 //'Field ____ is never assigned';
-        /* TODO: Cleanup */
         private struct Header
         {
             public bint Section1;
