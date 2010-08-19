@@ -26,6 +26,7 @@ namespace OpenSALib3.DatHandler
             get
             {
                 if (name != null)
+                if (_dictionary.ContainsKey(name))
                     return _dictionary[name];
                 return null;
             }
@@ -39,8 +40,16 @@ namespace OpenSALib3.DatHandler
         }
         public IEnumerable this[int index]
         {
-            get { return _dictionary["_indexed" + index]; }
+            get { string key = "_indexed" + index; 
+                if(_dictionary.ContainsKey(key))
+                    return _dictionary[key];
+                return null;
+            }
             set { _dictionary["_indexed" + index] = value; }
+        }
+        public void AddNamedList(INamed list)
+        {
+            this[list.Name] = list;
         }
         private int i = 0;
         /* Hidden list of children */
@@ -73,7 +82,7 @@ namespace OpenSALib3.DatHandler
         /* Name */
         [Category("Element")]
         [Browsable(true)]
-        public string Name { get; protected set; }
+        public string Name { get; internal set; }
         /* The offset inside the RootFile */
         [Category("Element")]
         [Browsable(true)]

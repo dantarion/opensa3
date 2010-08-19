@@ -90,12 +90,12 @@ namespace OpenSALib3.DatHandler
         public ResourceNode Node;
 
         [Browsable(false)]
-        private NamedList<DatSection> _sections = new NamedList<DatSection>("Sections");
-        public List<DatSection> Sections { get { return _sections; } }
+        private UnknownElement _sections;
+        public UnknownElement Sections { get { return _sections; } }
 
-        private NamedList<DatSection> _references = new NamedList<DatSection>("References");
+        private UnknownElement _references;
         [Browsable(false)]
-        public List<DatSection> References { get { return _references; } }
+        public UnknownElement References { get { return _references; } }
 
         [Category("File")]
         [ReadOnly(true)]
@@ -140,11 +140,11 @@ namespace OpenSALib3.DatHandler
             var stringBase = (int)(section + (_header.SectionCount + _header.ReferenceCount) * 8);
             var section2 = section + _header.SectionCount * 8;
             //Parse References FIRST
-
+            _references = new UnknownElement(this, -1, "References", 0);
             for (var i = 0; i < _header.ReferenceCount; i++)
             {
                 var s = DatSection.Factory(this, section2, stringBase);
-                References.Add(s);
+                References[s.Name] = s;
                 var tmp = s.DataOffset;
                 do
                 {
@@ -155,10 +155,11 @@ namespace OpenSALib3.DatHandler
                 section2 += 8;
             }
             //Parse sections
+            _sections = new UnknownElement(this, -1, "Sections", 0);
             for (var i = 0; i < _header.SectionCount; i++)
             {
                 var s = DatSection.Factory(this, section, stringBase);
-                Sections.Add(s);
+                Sections[s.Name] = s;
                 section += 8;
             }
             var offsetchunk = new UnknownElement(this, _header.DataChunkSize, "OffsetChunk", _header.OffsetCount * 4);
@@ -175,9 +176,10 @@ namespace OpenSALib3.DatHandler
 
         }
 
-        private void ComputeDataLengths(IEnumerable<DatSection> sections)
+        private void ComputeDataLengths(IEnumerable sections)
         {
-            var sorted = sections.OrderBy(x => x.DataOffset).ToList();
+            
+            var sorted = sections.OfType<DatSection>().OrderBy(x => (x as DatSection).DataOffset).ToList();
             for (var i = 0; i < sorted.Count; i++)
                 if (i < sorted.Count - 1)
                     sorted[i].DataLength = sorted[i + 1].DataOffset - sorted[i].DataOffset;

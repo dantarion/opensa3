@@ -100,7 +100,7 @@ namespace Tabuu.UI {
             var fp = FileMap.FromFile(s, FileMapProtect.ReadWrite);
             var ds = new BrawlLib.SSBB.ResourceNodes.DataSource(fp);
             var rs = BrawlLib.SSBB.ResourceNodes.NodeFactory.FromSource(null, ds);
-            var list = rs.FindChildrenByType(".", BrawlLib.SSBB.ResourceNodes.ResourceType.ARCEntry);
+            var list = rs.FindChildrenByType(".", BrawlLib.SSBB.ResourceNodes.ResourceType.ARCEntry).Where(x => x.Name.Contains("MiscData"));
             foreach(BrawlLib.SSBB.ResourceNodes.ResourceNode node in list)
             {
                 if(DatFile.isDatFile(node))
