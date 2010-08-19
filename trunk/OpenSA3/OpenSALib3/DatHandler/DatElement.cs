@@ -119,14 +119,20 @@ namespace OpenSALib3.DatHandler
         }
         public void MarkClean()
         {
-            _ischanged = false;
-            foreach (IEnumerable el in this)
-            {
-                if (el is DatElement)
-                    ((DatElement)el).MarkClean();
-                el._ischanged = false;
-            }
 
+            MarkClean(this);
+        }
+        static void MarkClean(IEnumerable el)
+        {
+            if (el is DatElement)
+            {
+                   ((DatElement)el)._ischanged = false;
+            }
+            foreach (IEnumerable child in el)
+            {
+
+                MarkClean(el);
+            }
         }
         public void MarkDirty(object sender, PropertyChangedEventArgs e)
         {
