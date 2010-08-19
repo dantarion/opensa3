@@ -35,11 +35,11 @@ namespace OpenSALib3.Moveset
         }
 
         private readonly Header _header;
-        private readonly List<GenericElement<int>> _section1 = new NamedList<GenericElement<int>>("Section1");
-        private readonly List<Hurtbox> _hurtboxes = new NamedList<Hurtbox>("Hurtboxes");
-        private readonly List<UnknownType1> _unknowntype1List = new NamedList<UnknownType1>("UnknownT");
-        private readonly List<LedgegrabBox> _ledgegrabboxes = new NamedList<LedgegrabBox>("LedgegrabBoxes");
-        private readonly List<BoneRef> _boneref2 = new NamedList<BoneRef>("BoneRef");
+        private readonly NamedList<GenericElement<int>> _section1 = new NamedList<GenericElement<int>>("Section1");
+        private readonly NamedList<Hurtbox> _hurtboxes = new NamedList<Hurtbox>("Hurtboxes");
+        private readonly NamedList<UnknownType1> _unknowntype1List = new NamedList<UnknownType1>("UnknownT");
+        private readonly NamedList<LedgegrabBox> _ledgegrabboxes = new NamedList<LedgegrabBox>("LedgegrabBoxes");
+        private readonly NamedList<BoneRef> _boneref2 = new NamedList<BoneRef>("BoneRef");
         private readonly MultiJumpData _multijumpdata;
         private readonly GlideData _glidedata;
         private readonly CrawlData _crawldata;
@@ -77,41 +77,46 @@ namespace OpenSALib3.Moveset
             if (_header.UnknownSection4Offset != 0)
                 _sounddata = new SoundData(this, _header.UnknownSection4Offset);
             //LastOne
-            var _unknowny = new UnknownElement(this, _header.UnknownSection9Offset, "UnknownY",8);
+            var _unknowny = new UnknownElement(this, _header.UnknownSection9Offset, "UnknownY", 8);
             int count = _unknowny.ReadInt(4);
             for (int i = 0; i < count; i++)
             {
                 var offele = new GenericElement<int>(_unknowny, _unknowny.ReadInt(0) + i * 4, "Entry");
-                offele[null] =new UnknownElement(offele, (int)offele.Value, "Data", 24);
-                _unknowny[null] =offele;
+                offele[null] = new UnknownElement(offele, (int)offele.Value, "Data", 24);
+                _unknowny[null] = offele;
             }
             //LastOne
             var _unknownz = new UnknownElement(this, _header.UnknownSection12Offset, "UnknownY2", 8);
-            count = _unknownz.ReadInt(4)+1;
+            count = _unknownz.ReadInt(4) + 1;
             for (int i = 0; i < count; i++)
             {
                 var offele = new GenericElement<int>(_unknownz, _unknownz.ReadInt(0) + i * 4, "Entry");
-                offele[null] =new UnknownElement(offele, (int)offele.Value, "Data", 24);
-                _unknownz[null] =offele;
+                offele[null] = new UnknownElement(offele, (int)offele.Value, "Data", 24);
+                _unknownz[null] = offele;
             }
             var unknowno = new UnknownElement(this, _header.UnknownSection3Offset, "UnknownO", 24);
             for (int i = unknowno.ReadInt(16); i < unknowno.FileOffset; i += 4)
-                unknowno[null] =new GenericElement<int>(unknowno, i, "Unknown");
+                unknowno[null] = new GenericElement<int>(unknowno, i, "Unknown");
             //Setup Tree Structure
-            this["Section1"] = _section1;
-            this["Hurtboxes"] = _hurtboxes;
-            this["UnknownType1"] = _unknowntype1List;
-            this["LedgegrabBoxes"] = _ledgegrabboxes;
-            this["UnkonwnX"] = _unknownx;
-            this["BoneRef"] = _boneref2;
+            this.AddNamedList(_section1);
+            this.AddNamedList(_hurtboxes);
+            this.AddNamedList(_unknowntype1List);
+            this.AddNamedList(_ledgegrabboxes);
+            this.AddNamedList(_unknownx);
+            this.AddNamedList(_boneref2);
             this["UnknownY"] = _unknowny;
             this["UnknownZ"] = _unknownz;
             this["UnknownO"] = unknowno;
-            this["JumpData"] = _multijumpdata;
-            this["GlideData"] = _glidedata;
-            this["CrawlData"] = _crawldata;
-            this["TetherData"] = _tetherdata;
-            this["SoundData"] = _sounddata;
+            if (_multijumpdata != null)
+                this["JumpData"] = _multijumpdata;
+            if (_glidedata != null)
+                this["GlideData"] = _glidedata;
+            if (_crawldata != null)
+                this["CrawlData"] = _crawldata;
+            if (_tetherdata != null)
+                this["TetherData"] = _tetherdata;
+            if (_sounddata != null)
+                this["SoundData"] = _sounddata;
         }
     }
 }

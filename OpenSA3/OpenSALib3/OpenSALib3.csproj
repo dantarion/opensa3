@@ -102,6 +102,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="PSA\ActionFlags.cs" />
     <Compile Include="PSA\ActionOverride.cs" />
     <Compile Include="PSA\Article.cs" />
     <Compile Include="PSA\Command.cs" />

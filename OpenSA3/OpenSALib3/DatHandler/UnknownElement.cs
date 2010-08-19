@@ -6,7 +6,7 @@ using OpenSALib3.DatHandler;
 using System.Collections;
 namespace OpenSALib3.DatHandler
 {
-    class UnknownElement : DatElement
+    public class UnknownElement : DatElement
     {
         public unsafe UnknownElement(DatElement parent, int offset, String name, int length)
             : base(parent, offset)
