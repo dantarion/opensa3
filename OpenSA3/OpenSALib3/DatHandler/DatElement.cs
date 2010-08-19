@@ -20,7 +20,7 @@ namespace OpenSALib3.DatHandler
         public DatFile RootFile
         {
             get {
-                if (this is DatFile) return null;
+                if (this is DatFile) return (DatFile) this;
                 if (Parent is DatFile) return (DatFile) Parent;
                 return Parent.RootFile;
             }
