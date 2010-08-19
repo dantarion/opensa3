@@ -156,7 +156,7 @@ namespace Tabuu.UI {
         private void CloseFileCommandExecuted(object sender, ExecutedRoutedEventArgs e) {
             e.Parameter.ToString();
             var d = (DatFile)e.Parameter;
-            if (d.isChanged) {
+            if (d.IsChanged) {
                 var result = MessageBox.Show("Unsaved changes detected! Are you sure you want to close this file?",
                                              "Close file?", MessageBoxButton.OKCancel);
                 if (result != MessageBoxResult.OK)
@@ -170,16 +170,17 @@ namespace Tabuu.UI {
         private static void SaveFileCommandExecuted(object sender, ExecutedRoutedEventArgs e) {
             e.Parameter.ToString();
             var d = (DatFile)e.Parameter;
-            if (d.isChanged) {
+            if (d.IsChanged) {
                 var result = MessageBox.Show("This will overrite the file! Are you sure you want to save this file?",
                                              "Save file?", MessageBoxButton.OKCancel);
                 if (result != MessageBoxResult.OK)
                     return;
             }
-            var filename = d.Node.RootNode.OriginalSource.Map.FilePath;
+            var filename = d.Node.RootNode.FilePath;
             d.Node.Rebuild(true);
             d.Node.RootNode.Merge();
             d.Node.RootNode.Export(filename);
+            d.Node.Merge();
         }
 
         private static void AlwaysExecute(object sender, CanExecuteRoutedEventArgs e) {
@@ -193,7 +194,6 @@ namespace Tabuu.UI {
 
         private void TreeViewSelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e) 
         {
-            sender.ToString();
             if (ModelViewer != null && e.NewValue is OpenSALib3.PSA.SubactionFlags)
             {
                 OpenSALib3.PSA.SubactionFlags flags = (OpenSALib3.PSA.SubactionFlags)e.NewValue;

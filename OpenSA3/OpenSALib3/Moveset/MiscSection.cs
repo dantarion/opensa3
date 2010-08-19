@@ -35,16 +35,6 @@ namespace OpenSALib3.Moveset
 #pragma warning restore 649 //'Field ____ is never assigned';
 
         private readonly Header _header;
-        private readonly NamedList<GenericElement<int>> _section1 = new NamedList<GenericElement<int>>("Section1");
-        private readonly NamedList<Hurtbox> _hurtboxes = new NamedList<Hurtbox>("Hurtboxes");
-        private readonly NamedList<UnknownType1> _unknowntype1List = new NamedList<UnknownType1>("UnknownT");
-        private readonly NamedList<LedgegrabBox> _ledgegrabboxes = new NamedList<LedgegrabBox>("LedgegrabBoxes");
-        private readonly NamedList<BoneRef> _boneref2 = new NamedList<BoneRef>("BoneRef");
-        private readonly MultiJumpData _multijumpdata;
-        private readonly GlideData _glidedata;
-        private readonly CrawlData _crawldata;
-        private readonly TetherData _tetherdata;
-        private readonly SoundData _sounddata;
 
         public unsafe MiscSection(DatElement parent, int fileOffset)
             : base(parent, fileOffset)

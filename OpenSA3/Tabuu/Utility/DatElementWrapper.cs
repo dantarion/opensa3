@@ -20,7 +20,7 @@ namespace Tabuu.Utility {
         }
 
         public bool HasChanges() {
-            return _datelement.isChanged;
+            return _datelement.IsChanged;
         }
 
         public void InsertBytes(long index, byte[] bs) {
