@@ -25,7 +25,9 @@ namespace OpenSALib3.DatHandler
             }
         }
         private int _autoIndex;
-        public IEnumerable this[string name]
+        /* Hidden list of children */
+        protected Dictionary<string, DatElement> Dictionary = new Dictionary<string, DatElement>();
+        public DatElement this[string name]
         {
             get
             {
@@ -42,7 +44,7 @@ namespace OpenSALib3.DatHandler
                     Dictionary["_auto" + (_autoIndex++)] = value;
             }
         }
-        public IEnumerable this[int index]
+        public DatElement this[int index]
         {
             get
             {
@@ -51,12 +53,10 @@ namespace OpenSALib3.DatHandler
             }
             set { Dictionary["_indexed" + index] = value; }
         }
-        public void AddNamedList(INamed list)
+        public void AddByName(DatElement child)
         {
-            this[list.Name] = list;
+            this[child.Name] = child;
         }
-        /* Hidden list of children */
-        protected Dictionary<string, IEnumerable> Dictionary = new Dictionary<string, IEnumerable>();
         /* Printable Path 
         TODO: Make it so that identical paths don't exist..i.e Hurtbox#0,Hurtbox# etc
         */

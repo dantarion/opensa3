@@ -8,6 +8,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using BrawlLib.SSBB.ResourceNodes;
+using OpenSALib3.Moveset;
 
 namespace OpenSALib3.DatHandler
 {
@@ -58,13 +59,13 @@ namespace OpenSALib3.DatHandler
             {
                 _boneNames = new Dictionary<int, string>();
                 var node = NodeFactory.FromFile(null, filename);
-                Model = (MDL0Node) node.FindChildrenByType("", ResourceType.MDL0).First();
+                Model = (MDL0Node)node.FindChildrenByType("", ResourceType.MDL0).First();
                 Debug.Assert(Model != null);
                 foreach (MDL0BoneNode innernode in Model.FindChildrenByType("", ResourceType.MDL0Bone))
                 {
                     _boneNames[innernode.BoneIndex] = innernode.Name;
                 }
-                
+
             }
             catch (Exception)
             {
@@ -88,6 +89,34 @@ namespace OpenSALib3.DatHandler
             {
                 Animations = null;
             }
+        }
+        public List<BoneRef> GetDefaultHiddenBones()
+        {
+
+
+            var list = new List<BoneRef>();
+            var modelvis = this["Sections"]["data"]["Model Display"]["Hidden"];
+            foreach (DatElement de in modelvis)
+            {
+
+                var first = true;
+                foreach (DatElement dee in de)
+                {
+                    if (first)
+                    {
+                        first = false;
+                        continue;
+                    }
+                    
+
+                    foreach (BoneRef val in dee)
+                    {
+                        list.Add(val);
+                    }
+                }
+            }
+
+            return list;
         }
         public string GetBoneName(int boneIndex)
         {
@@ -246,6 +275,8 @@ namespace OpenSALib3.DatHandler
         readonly List<UsageData> _susagedata = new List<UsageData>();
         public string ReadString(int offset)
         {
+            if (offset > Length)
+                throw new Exception("Invalid Offset");
             var s = new String((sbyte*)(Address + offset));
             UsageData ud;
             ud.Offset = offset;

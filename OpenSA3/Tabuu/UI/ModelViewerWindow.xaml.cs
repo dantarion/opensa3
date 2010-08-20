@@ -3,6 +3,8 @@ using OpenSALib3.DatHandler;
 using BrawlLib.SSBB.ResourceNodes;
 using System.Windows.Threading;
 using System;
+using BrawlLib.OpenGL;
+using OpenSALib3.Moveset;
 namespace Tabuu.UI
 {
     /// <summary>
@@ -16,15 +18,25 @@ namespace Tabuu.UI
         public int frame = 0;
         private CHR0Node curentAnimation;
         DispatcherTimer timer = new DispatcherTimer();
+        GLContext ctx;
         public ModelViewerWindow(DatFile d)
         {
             InitializeComponent();
             windowsFormsHost1.Child = _mc;
             model = d.Model;
-            BrawlLib.OpenGL.GLContext.Attach(_mc);
-          
+
+            ctx = BrawlLib.OpenGL.GLContext.Attach(_mc);
+            foreach (BoneRef boneref in d.GetDefaultHiddenBones())
+            {
+                int tmp = 0;
+                var bone = d.Model.FindChild(boneref.BoneName, true);
+                (bone as MDL0BoneNode)._render = false;
+            }
             _mc.AddTarget(d.Model);
             _mc.AddReference(d.Node);
+            d.Model.RenderBones = false;
+            d.Model.RenderWireframe = false;
+
             timer.Tick += NextFrame;
             timer.Interval = new System.TimeSpan(166667);
         }
@@ -81,6 +93,12 @@ namespace Tabuu.UI
         private void Button_Click_1(object sender, System.Windows.RoutedEventArgs e)
         {
             Stop();
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            model.Detach(ctx);
+            ctx.Release();
         }
     }
 }

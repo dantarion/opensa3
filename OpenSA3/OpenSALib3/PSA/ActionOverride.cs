@@ -36,7 +36,7 @@ namespace OpenSALib3.PSA
             Name = "ActionOverride";
             Length = 8;
             if (_data.CommandListOffset > 0)
-                foreach (var cl in Command.ReadCommands(this, _data.CommandListOffset, null))
+                foreach (DatElement cl in Command.ReadCommands(this, _data.CommandListOffset, null))
                     this[null] = cl;
 
 
