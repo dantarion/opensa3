@@ -2,32 +2,20 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
-
+using OpenSALib3.DatHandler;
 namespace OpenSALib3.Utility {
-    public class NamedList<T> : List<T>,INamed {
-        [Browsable(true)]
-        public String Name { get; set; }
+    public class NamedList : DatHandler.DatElement{
 
-        public NamedList(String n)
+        public NamedList(DatElement parent,String n) : base(parent,-1)
         {
+            Length = 0;
             Name = n;
         }
         
-        public override string ToString() {
-            return Name;
-        }
-
         [Browsable(true)]
         public new int Count
         {
-            get { return base.Count; }
-        }
-    }
-    public interface INamed :IEnumerable
-    {
-        String Name
-        {
-            get;
+            get { return Dictionary.Count; }
         }
     }
 }
