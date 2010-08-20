@@ -112,6 +112,7 @@
     <Compile Include="RunScript.cs" />
     <Compile Include="Utility\NamedList.cs" />
     <Compile Include="Utility\PropertyEditors.cs" />
+    <Compile Include="Utility\PSANames.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="OpenSALib3.pfx" />

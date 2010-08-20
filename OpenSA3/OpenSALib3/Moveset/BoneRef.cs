@@ -9,7 +9,7 @@ namespace OpenSALib3.Moveset {
         public int BoneIndex
         {
             get { return _index; }
-            set { _index = value; }
+            set { _index = value; NotifyChanged("BoneIndex"); NotifyChanged("Name"); }
         }
         [Browsable(true),Category("BoneRef")]
         public string BoneName {
@@ -19,12 +19,15 @@ namespace OpenSALib3.Moveset {
         public unsafe BoneRef(DatElement parent, int offset, String name)
             : base(parent, offset) {
 
-            Name = name;
+            base.Name = name;
             _index = *(bint*) (RootFile.Address + offset);
         }
 
-        public override string ToString() {
-            return Name + ": " + BoneName;
+        public override String Name {
+            get
+            {
+                return base.Name + ": " + BoneName;
+            }
         }
     }
 }
