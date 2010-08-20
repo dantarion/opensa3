@@ -21,35 +21,35 @@ namespace OpenSALib3.Moveset
         public int BoneIndex
         {
             get { return _data.BoneIndex; }
-            set { _data.BoneIndex = value; }
+            set { _data.BoneIndex = value; NotifyChanged("BoneIndex"); NotifyChanged("BoneName"); }
         }
 
         [Category("Hurtbox")]
         public float X
         {
             get { return _data.X; }
-            set { _data.X = value; }
+            set { _data.X = value; NotifyChanged("X"); }
         }
 
         [Category("Hurtbox")]
         public float Y
         {
             get { return _data.Y; }
-            set { _data.Y = value; }
+            set { _data.Y = value; NotifyChanged("Y"); }
         }
 
         [Category("Hurtbox")]
         public float Width
         {
             get { return _data.Width; }
-            set { _data.Width = value; }
+            set { _data.Width = value; NotifyChanged("Width"); }
         }
 
         [Category("Hurtbox")]
         public float Height
         {
             get { return _data.Height; }
-            set { _data.Height = value; }
+            set { _data.Height = value; NotifyChanged("Height"); }
         }
 
         [Category("Hurtbox")]

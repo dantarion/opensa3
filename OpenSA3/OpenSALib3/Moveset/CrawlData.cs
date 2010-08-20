@@ -17,13 +17,13 @@ namespace OpenSALib3.Moveset
         public float ForwardAcceleration
         {
             get { return _data.ForwardAccel; }
-            set { _data.ForwardAccel = value; }
+            set { _data.ForwardAccel = value; NotifyChanged("ForwardAcceleration"); }
         }
         [Browsable(true), Category("CrawlData")]
         public float BackwardAcceleration
         {
             get { return _data.BackwardAccel; }
-            set { _data.BackwardAccel = value; }
+            set { _data.BackwardAccel = value; NotifyChanged("BackwardAcceleration"); }
         }
         public unsafe CrawlData(DatElement parent, int offset)
             : base(parent, offset)

@@ -21,15 +21,15 @@ namespace OpenSALib3.Moveset
             public bint TurnFrames;
         }
         [Browsable(true), Category("MultiJumpData")]
-        public float Unknown1 { get { return _data.Unknown1; } set { _data.Unknown1 = value; } }
+         public float Unknown1 { get { return _data.Unknown1; } set { _data.Unknown1 = value; NotifyChanged("Unknown1"); } }
         [Browsable(true), Category("MultiJumpData")]
-        public float Unknown2 { get { return _data.Unknown2; } set { _data.Unknown2 = value; } }
+        public float Unknown2 { get { return _data.Unknown2; } set { _data.Unknown2 = value; NotifyChanged("Unknown2"); } }
         [Browsable(true), Category("MultiJumpData")]
-        public float HorizontalBoost { get { return _data.HorizontalBoost; } set { _data.HorizontalBoost = value; } }
+        public float HorizontalBoost { get { return _data.HorizontalBoost; } set { _data.HorizontalBoost = value; NotifyChanged("HorizontalBoost"); } }
         [Browsable(true), Category("MultiJumpData")]
-        public float Unknown3 { get { return _data.Unknown3; } set { _data.Unknown3 = value; } }
+        public float Unknown3 { get { return _data.Unknown3; } set { _data.Unknown3 = value; NotifyChanged("Unknown3"); } }
         [Browsable(true), Category("MultiJumpData")]
-        public int TurnFrames { get { return _data.TurnFrames; } set { _data.TurnFrames = value; } }
+        public int TurnFrames { get { return _data.TurnFrames; } set { _data.TurnFrames = value; NotifyChanged("TurnFrames"); } }
         private readonly List<GenericElement<float>> _hoplist = new List<GenericElement<float>>();
         private readonly List<GenericElement<float>> _unknownlist = new List<GenericElement<float>>();
         public unsafe MultiJumpData(DatElement parent, int offset)

@@ -16,14 +16,14 @@ namespace OpenSALib3.Moveset
         [Browsable(true), Category("TetherData")]
         public int HangFrameCount
         {
-            get { return _data.HangFrameCount; }
-            set { _data.HangFrameCount = value; }
+            get { return _data.HangFrameCount;  }
+            set { _data.HangFrameCount = value; NotifyChanged("HangFrameCount"); }
         }
         [Browsable(true), Category("TetherData")]
         public float Unknown
         {
             get { return _data.Unknown; }
-            set { _data.Unknown = value; }
+            set { _data.Unknown = value; NotifyChanged("Unknown"); }
         }
         public unsafe TetherData(DatElement parent, int offset)
             : base(parent, offset)
