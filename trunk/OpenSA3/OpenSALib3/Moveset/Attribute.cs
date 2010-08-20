@@ -74,6 +74,7 @@ namespace OpenSALib3.Moveset {
                     *(bfloat*) (RootFile.Address + FileOffset) = Convert.ToSingle(value);
                 else
                     *(bint*) (RootFile.Address + FileOffset) = Convert.ToInt32(value);
+                NotifyChanged("Value");
             }
         }
     }

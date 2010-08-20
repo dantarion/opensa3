@@ -16,25 +16,25 @@ namespace OpenSALib3.Moveset {
         [Category("LedgegrabBox")]
         public float X {
             get { return _data.X; }
-            set { _data.X = value; }
+            set { _data.X = value; NotifyChanged("X"); }
         }
 
         [Category("LedgegrabBox")]
         public float Y {
             get { return _data.Y; }
-            set { _data.Y = value; }
+            set { _data.Y = value; NotifyChanged("Y"); }
         }
 
         [Category("LedgegrabBox")]
         public float Width {
             get { return _data.Width; }
-            set { _data.Width = value; }
+            set { _data.Width = value; NotifyChanged("Width"); }
         }
 
         [Category("LedgegrabBox")]
         public float Height {
             get { return _data.Height; }
-            set { _data.Height = value; }
+            set { _data.Height = value; NotifyChanged("Height"); }
         }
 
         public unsafe LedgegrabBox(DatElement parent, int offset)

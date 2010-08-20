@@ -93,8 +93,7 @@ namespace OpenSALib3.DatHandler
             internal set
             {
                 _name = value;
-                if (PropertyChanged != null)
-                    PropertyChanged(this, new PropertyChangedEventArgs("Name"));
+                NotifyChanged("Name");
             }
         }
         /* The offset inside the RootFile */
@@ -135,7 +134,8 @@ namespace OpenSALib3.DatHandler
         public void NotifyChanged(String name)
         {
             MarkDirty(this, new PropertyChangedEventArgs(name));
-            PropertyChanged(this, new PropertyChangedEventArgs(name));
+            if (PropertyChanged != null)
+                PropertyChanged(this, new PropertyChangedEventArgs(name));
         }
         public void MarkClean()
         {
