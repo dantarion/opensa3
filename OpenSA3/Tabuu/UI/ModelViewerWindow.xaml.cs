@@ -36,7 +36,6 @@ namespace Tabuu.UI
             _mc.AddReference(d.Node);
             d.Model.RenderBones = false;
             d.Model.RenderWireframe = false;
-
             timer.Tick += NextFrame;
             timer.Interval = new System.TimeSpan(166667);
         }
@@ -59,25 +58,27 @@ namespace Tabuu.UI
         }
         public void NextFrame(object sender, EventArgs e)
         {
+            if (curentAnimation == null)
+                return;
             if (frame > curentAnimation.FrameCount)
             {
-                frame = 1;
+                frame = 0;
                 if (!Loop.IsChecked.Value)
                     Stop();
 
             }
-            SetFrame(frame++);
+            SetFrame(++frame);
   
         }
         public void ChangeAnimation(CHR0Node animation)
         {
-            //timer.Stop();
+            Stop();
             label.Content = animation.Name;
             slider.Maximum = animation.FrameCount;
             slider.Value = 1;
             frame = 1;
             curentAnimation = animation;
-            timer.Start();
+            Play();
         }
 
         private void slider_ValueChanged(object sender, System.Windows.RoutedPropertyChangedEventArgs<double> e)
