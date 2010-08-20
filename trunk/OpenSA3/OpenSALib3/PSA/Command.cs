@@ -66,13 +66,13 @@ namespace OpenSALib3.PSA
         public byte Module
         {
             get { return _data.Module; }
-            set { _data.Module = value; }
+            set { _data.Module = value; NotifyChanged("Module"); NotifyChanged("Name"); }
         }
         [Category("Command")]
         public byte ID
         {
             get { return _data.ID; }
-            set { _data.ID = value; }
+            set { _data.ID = value; NotifyChanged("ID"); NotifyChanged("Name"); }
         }
 
         private Data _data;
@@ -99,6 +99,27 @@ namespace OpenSALib3.PSA
                     param.Name = eventdata.ParamNames[i];
             }
         }
+        #region FrameData Properties
+        [Browsable(true)]
+        public int Frame
+        {
+            get
+            {
+                var list = Parent;
+                int frame = 0;
+                foreach (Command cur in list)
+                {
+                    if(cur.Module == 0 && cur.ID == 1)
+                        frame += (int)(cur[0] as ScalarParameter).Value;
+                    if(cur.Module == 0 && cur.ID == 2)
+                        frame = (int)(cur[0] as ScalarParameter).Value;
+                    if (cur == this)
+                        return frame;
+                }
+                return -1;
+            }
+        }
+        #endregion
     }
 
 }
