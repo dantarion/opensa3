@@ -82,11 +82,22 @@ namespace OpenSALib3.PSA
             _data = *(Data*)(base.Address);
             Length = 8;
             Color = Color.Blue;
-            Name = String.Format("{0:X02}{1:X02}{2:X02}{3:X02}", Module, ID, _data.ParameterCount, _data.Unknown);
-            if (Module == 0xFF)
-                Debug.Fail("Command Module 0xFF");
+            Utility.PSANames.loadData();
+            var shortcommand = string.Format("{0:X02}{1:X02}", Module, ID);
+            Utility.PSANames.EventData eventdata;
+            Utility.PSANames.EventNames.TryGetValue(shortcommand,out eventdata);
+            if (eventdata == null)
+                Name = String.Format("{0:X02}{1:X02}{2:X02}{3:X02}", Module, ID, _data.ParameterCount, _data.Unknown);
+            else
+                Name = eventdata.Name;
+
             for (var i = 0; i < _data.ParameterCount; i++)
-                this[i] = new Parameter(this, (_data.ParameterOffset + i * 8));
+            {
+                var param = Parameter.Factory(this, (_data.ParameterOffset + i * 8));
+                this[i] = param;
+                if (eventdata != null && eventdata.ParamNames.Count > i)
+                    param.Name = eventdata.ParamNames[i];
+            }
         }
     }
 

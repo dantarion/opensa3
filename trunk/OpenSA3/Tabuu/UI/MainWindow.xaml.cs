@@ -105,19 +105,35 @@ namespace Tabuu.UI {
             var rs = BrawlLib.SSBB.ResourceNodes.NodeFactory.FromSource(null, ds);
             var list = rs.FindChildrenByType(".", BrawlLib.SSBB.ResourceNodes.ResourceType.ARCEntry).Where(x => x.Name.Contains("MiscData"));
             foreach (var node in list.Where(x=>DatFile.IsDatFile(x))) {
-                TreeView.Items.Add(DatFile.FromNode(node));
+                var df = DatFile.FromNode(node);
+                TreeView.Items.Add(df);
+                if(System.IO.File.Exists(s.Replace(".pac","00.pac")))
+                    df.LoadModel(s.Replace(".pac","00.pac"));
+                if (System.IO.File.Exists(s.Replace(".pac", "Motion.pac")))
+                    df.LoadAnimations(s.Replace(".pac", "Motion.pac"));
+                if (System.IO.File.Exists(s.Replace(".pac", "MotionEtc.pac")))
+                    df.LoadAnimations(s.Replace(".pac", "MotionEtc.pac"));
+                    
             }
             rs.Rebuild(true);
             rs.Merge();
         }
-
+        public void LoadModel(DatFile d, string s)
+        {
+            d.LoadModel(s);
+            TreeView.Items.Refresh();
+        }
+        public void LoadAnimations(DatFile d,string s)
+        {
+            d.LoadAnimations(s);
+            TreeView.Items.Refresh();
+        }
         private static void LoadModelCommandExecuted(object sender, ExecutedRoutedEventArgs e) {
             var dialog = new Microsoft.Win32.OpenFileDialog();
             if (!dialog.ShowDialog().Value)
                 return;
             var d = (DatFile)e.Parameter;
-            d.LoadModel(dialog.FileName);
-            (sender as MainWindow).TreeView.Items.Refresh();
+            (sender as MainWindow).LoadModel(d, dialog.FileName);
         }
         private static void LoadAnimationCommandExecuted(object sender, ExecutedRoutedEventArgs e)
         {
@@ -125,8 +141,8 @@ namespace Tabuu.UI {
             if (!dialog.ShowDialog().Value)
                 return;
             var d = (DatFile)e.Parameter;
-            d.LoadAnimations(dialog.FileName);
-            (sender as MainWindow).TreeView.Items.Refresh();
+            (sender as MainWindow).LoadAnimations(d,dialog.FileName);
+
         }
 
         private static void HexOpenCommandExecuted(object sender, ExecutedRoutedEventArgs e) {

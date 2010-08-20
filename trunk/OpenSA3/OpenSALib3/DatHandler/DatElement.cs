@@ -18,8 +18,9 @@ namespace OpenSALib3.DatHandler
         /* And a way to access the root file*/
         public DatFile RootFile
         {
-            get {
-                if (this is DatFile) return (DatFile) this;
+            get
+            {
+                if (this is DatFile) return (DatFile)this;
                 return Parent.RootFile;
             }
         }
@@ -29,8 +30,8 @@ namespace OpenSALib3.DatHandler
             get
             {
                 if (name != null)
-                if (Dictionary.ContainsKey(name))
-                    return Dictionary[name];
+                    if (Dictionary.ContainsKey(name))
+                        return Dictionary[name];
                 return null;
             }
             set
@@ -43,7 +44,9 @@ namespace OpenSALib3.DatHandler
         }
         public IEnumerable this[int index]
         {
-            get { var key = "_indexed" + index; 
+            get
+            {
+                var key = "_indexed" + index;
                 return Dictionary.ContainsKey(key) ? Dictionary[key] : null;
             }
             set { Dictionary["_indexed" + index] = value; }
@@ -83,7 +86,17 @@ namespace OpenSALib3.DatHandler
         /* Name */
         [Category("Element")]
         [Browsable(true)]
-        public string Name { get; internal set; }
+        private string _name;
+        public virtual string Name
+        {
+            get { return _name; }
+            internal set
+            {
+                _name = value;
+                if (PropertyChanged != null)
+                    PropertyChanged(this, new PropertyChangedEventArgs("Name"));
+            }
+        }
         /* The offset inside the RootFile */
         [Category("Element")]
         [Browsable(true)]
@@ -113,10 +126,16 @@ namespace OpenSALib3.DatHandler
         public bool IsChanged
         {
             get { return _ischanged; }
-            private set {
+            private set
+            {
                 _ischanged = value;
                 PropertyChanged(this, new PropertyChangedEventArgs("IsChanged"));
             }
+        }
+        public void NotifyChanged(String name)
+        {
+            MarkDirty(this, new PropertyChangedEventArgs(name));
+            PropertyChanged(this, new PropertyChangedEventArgs(name));
         }
         public void MarkClean()
         {
@@ -127,7 +146,7 @@ namespace OpenSALib3.DatHandler
         {
             if (el is DatElement)
             {
-                   ((DatElement)el)._ischanged = false;
+                ((DatElement)el)._ischanged = false;
             }
             foreach (IEnumerable child in el)
             {
@@ -137,8 +156,8 @@ namespace OpenSALib3.DatHandler
         }
         public void MarkDirty(object sender, PropertyChangedEventArgs e)
         {
-            if(Parent != null)
-                Parent.MarkDirty(sender,e);
+            if (Parent != null)
+                Parent.MarkDirty(sender, e);
             IsChanged = true;
         }
         public override string ToString()

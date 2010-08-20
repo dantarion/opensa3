@@ -2,9 +2,9 @@
     <Window.Resources>
         <utility:ItemToContextMenuConverter x:Key="ContextMenuConverter" />
         <HierarchicalDataTemplate x:Key="TreeTemp" ItemsSource="{Binding}">
-            <TextBlock Name="text" Text="{Binding StringFormat=S}" ContextMenu="{Binding Converter={StaticResource ContextMenuConverter}}" />
+            <TextBlock Name="text" Text="{Binding Name}" ContextMenu="{Binding Converter={StaticResource ContextMenuConverter}}" />
             <HierarchicalDataTemplate.Triggers>
-                <DataTrigger Binding="{Binding Path=IsChanged}" Value="true">
+                <DataTrigger Binding="{Binding IsChanged}" Value="true">
                     <Setter TargetName="text" Property="Foreground" Value="Red" />
                 </DataTrigger>
             </HierarchicalDataTemplate.Triggers>
