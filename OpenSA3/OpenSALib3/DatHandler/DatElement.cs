@@ -128,12 +128,14 @@ namespace OpenSALib3.DatHandler
             private set
             {
                 _ischanged = value;
-                PropertyChanged(this, new PropertyChangedEventArgs("IsChanged"));
+                if(PropertyChanged != null)
+                    PropertyChanged(this, new PropertyChangedEventArgs("IsChanged"));
             }
         }
         public void NotifyChanged(String name)
         {
-            MarkDirty(this, new PropertyChangedEventArgs(name));
+            if(name != "Name")
+                MarkDirty(this, new PropertyChangedEventArgs(name));
             if (PropertyChanged != null)
                 PropertyChanged(this, new PropertyChangedEventArgs(name));
         }

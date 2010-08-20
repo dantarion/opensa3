@@ -3,7 +3,7 @@ using OpenSALib3.DatHandler;
 
 namespace OpenSALib3.PSA
 {
-    public enum AnimationFlags : byte
+    public enum AnimationFlags
     {
         None = 0,
         NoOutTransition = 1,
@@ -22,7 +22,7 @@ namespace OpenSALib3.PSA
         struct Data
         {
             public byte InTransitionTime;
-            public AnimationFlags Flags;
+            public byte Flags;
             public byte Filler;
             public byte Filler2;
             public bint AnimationStringOffset;
@@ -30,9 +30,9 @@ namespace OpenSALib3.PSA
 #pragma warning restore 169 //'Field ____ is never used'
 #pragma warning restore 649 //'Field ____ is never assigned';
         private Data _data;
-        public byte InTransitionTime { get { return _data.InTransitionTime; } set { _data.InTransitionTime = value; } }
-        public AnimationFlags Flags { get { return _data.Flags; } set { _data.Flags = value; } }
-        public int AnimationStringOffset { get { return _data.AnimationStringOffset; } set { _data.AnimationStringOffset = value; } }
+        public byte InTransitionTime { get { return _data.InTransitionTime; } set { _data.InTransitionTime = value; NotifyChanged("InTransitionTime"); } }
+        public AnimationFlags Flags { get { return (AnimationFlags)_data.Flags; } set { _data.Flags = (byte)value; } }
+        public int AnimationStringOffset { get { return _data.AnimationStringOffset; } set { _data.AnimationStringOffset = value; NotifyChanged("AnimationStringOffset"); } }
         private readonly string _string;
         public String AnimationName
         {

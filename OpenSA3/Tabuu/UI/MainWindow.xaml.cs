@@ -5,12 +5,15 @@ using BrawlLib.IO;
 using OpenSALib3;
 using OpenSALib3.DatHandler;
 using Tabuu.Utility;
+using OpenSALib3.PSA;
 
-namespace Tabuu.UI {
+namespace Tabuu.UI
+{
     /// <summary>
     ///   Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow {
+    public partial class MainWindow
+    {
         public static RoutedCommand HexOpenCommand = new RoutedCommand();
         public static RoutedCommand HexOpenContentCommand = new RoutedCommand();
         public static RoutedCommand ModelOpenCommand = new RoutedCommand();
@@ -22,7 +25,8 @@ namespace Tabuu.UI {
         public static RoutedCommand CloseFileCommand = new RoutedCommand();
         public static ModelViewerWindow ModelViewer;
 
-        public MainWindow() {
+        public MainWindow()
+        {
             InitializeComponent();
             CommandBindings.Add(new CommandBinding(HexOpenCommand, HexOpenCommandExecuted, AlwaysExecute));
             CommandBindings.Add(new CommandBinding(HexOpenContentCommand, HexOpenContentCommandExecuted, AlwaysExecute));
@@ -35,14 +39,16 @@ namespace Tabuu.UI {
             Focus();
         }
 
-        private void MenuItemClickOpen(object sender, RoutedEventArgs e) {
+        private void MenuItemClickOpen(object sender, RoutedEventArgs e)
+        {
             var dialog = new Microsoft.Win32.OpenFileDialog();
             if (!dialog.ShowDialog().Value)
                 return;
             LoadFilename(dialog.FileName);
         }
 
-        private void MenuItemClickOpen2(object sender, RoutedEventArgs e) {
+        private void MenuItemClickOpen2(object sender, RoutedEventArgs e)
+        {
             var dialog = new System.Windows.Forms.FolderBrowserDialog();
             var result = dialog.ShowDialog();
             if (result != System.Windows.Forms.DialogResult.OK)
@@ -99,21 +105,23 @@ namespace Tabuu.UI {
                 LoadFilename(dialog.SelectedPath + @"\" + filename);
         }
 
-        private void LoadFilename(string s) {
+        private void LoadFilename(string s)
+        {
             var fp = FileMap.FromFile(s, FileMapProtect.ReadWrite);
             var ds = new BrawlLib.SSBB.ResourceNodes.DataSource(fp);
             var rs = BrawlLib.SSBB.ResourceNodes.NodeFactory.FromSource(null, ds);
             var list = rs.FindChildrenByType(".", BrawlLib.SSBB.ResourceNodes.ResourceType.ARCEntry).Where(x => x.Name.Contains("MiscData"));
-            foreach (var node in list.Where(x=>DatFile.IsDatFile(x))) {
+            foreach (var node in list.Where(x => DatFile.IsDatFile(x)))
+            {
                 var df = DatFile.FromNode(node);
                 TreeView.Items.Add(df);
-                if(System.IO.File.Exists(s.Replace(".pac","00.pac")))
-                    df.LoadModel(s.Replace(".pac","00.pac"));
+                if (System.IO.File.Exists(s.Replace(".pac", "00.pac")))
+                    df.LoadModel(s.Replace(".pac", "00.pac"));
                 if (System.IO.File.Exists(s.Replace(".pac", "Motion.pac")))
                     df.LoadAnimations(s.Replace(".pac", "Motion.pac"));
                 if (System.IO.File.Exists(s.Replace(".pac", "MotionEtc.pac")))
                     df.LoadAnimations(s.Replace(".pac", "MotionEtc.pac"));
-                    
+
             }
             rs.Rebuild(true);
             rs.Merge();
@@ -123,12 +131,13 @@ namespace Tabuu.UI {
             d.LoadModel(s);
             TreeView.Items.Refresh();
         }
-        public void LoadAnimations(DatFile d,string s)
+        public void LoadAnimations(DatFile d, string s)
         {
             d.LoadAnimations(s);
             TreeView.Items.Refresh();
         }
-        private static void LoadModelCommandExecuted(object sender, ExecutedRoutedEventArgs e) {
+        private static void LoadModelCommandExecuted(object sender, ExecutedRoutedEventArgs e)
+        {
             var dialog = new Microsoft.Win32.OpenFileDialog();
             if (!dialog.ShowDialog().Value)
                 return;
@@ -141,11 +150,12 @@ namespace Tabuu.UI {
             if (!dialog.ShowDialog().Value)
                 return;
             var d = (DatFile)e.Parameter;
-            (sender as MainWindow).LoadAnimations(d,dialog.FileName);
+            (sender as MainWindow).LoadAnimations(d, dialog.FileName);
 
         }
 
-        private static void HexOpenCommandExecuted(object sender, ExecutedRoutedEventArgs e) {
+        private static void HexOpenCommandExecuted(object sender, ExecutedRoutedEventArgs e)
+        {
             e.Parameter.ToString();
             var d = (DatElement)e.Parameter;
             new HexViewWindow(new DatElementWrapper(d), d.Path).Show();
@@ -169,10 +179,12 @@ namespace Tabuu.UI {
             }
         }
 
-        private void CloseFileCommandExecuted(object sender, ExecutedRoutedEventArgs e) {
+        private void CloseFileCommandExecuted(object sender, ExecutedRoutedEventArgs e)
+        {
             e.Parameter.ToString();
             var d = (DatFile)e.Parameter;
-            if (d.IsChanged) {
+            if (d.IsChanged)
+            {
                 var result = MessageBox.Show("Unsaved changes detected! Are you sure you want to close this file?",
                                              "Close file?", MessageBoxButton.OKCancel);
                 if (result != MessageBoxResult.OK)
@@ -183,10 +195,12 @@ namespace Tabuu.UI {
             TreeView.Items.Remove(e.Parameter);
         }
 
-        private static void SaveFileCommandExecuted(object sender, ExecutedRoutedEventArgs e) {
+        private static void SaveFileCommandExecuted(object sender, ExecutedRoutedEventArgs e)
+        {
             e.Parameter.ToString();
             var d = (DatFile)e.Parameter;
-            if (d.IsChanged) {
+            if (d.IsChanged)
+            {
                 var result = MessageBox.Show("This will overrite the file! Are you sure you want to save this file?",
                                              "Save file?", MessageBoxButton.OKCancel);
                 if (result != MessageBoxResult.OK)
@@ -200,24 +214,38 @@ namespace Tabuu.UI {
             d.MarkClean();
         }
 
-        private static void AlwaysExecute(object sender, CanExecuteRoutedEventArgs e) {
+        private static void AlwaysExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
             e.CanExecute = true;
         }
 
-        private void MenuItemClick(object sender, RoutedEventArgs e) {
+        private void MenuItemClick(object sender, RoutedEventArgs e)
+        {
             RunScript.SetVar("loadedFiles", TreeView.Items);
             new ScriptWindow().Show();
         }
 
-        private void TreeViewSelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e) 
+        private void TreeViewSelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
             if (ModelViewer != null && e.NewValue is OpenSALib3.PSA.SubactionFlags)
             {
-                OpenSALib3.PSA.SubactionFlags flags = (OpenSALib3.PSA.SubactionFlags)e.NewValue;
-                if(flags.RootFile.Animations.ContainsKey(flags.AnimationName))
+                SubactionFlags flags = (SubactionFlags)e.NewValue;
+                if (flags.RootFile.Animations.ContainsKey(flags.AnimationName))
                 {
                     ModelViewer.ChangeAnimation(flags.RootFile.Animations[flags.AnimationName]);
                 }
+            }
+            else if (ModelViewer != null && e.NewValue is OpenSALib3.PSA.Command)
+            {
+                Command c = (Command)e.NewValue;
+                var flags = (c.Parent.Parent["Flags"] as SubactionFlags);
+                if (flags.RootFile.Animations.ContainsKey(flags.AnimationName))
+                {
+                    ModelViewer.ChangeAnimation(flags.RootFile.Animations[flags.AnimationName]);
+                    ModelViewer.SetFrame(c.Frame);
+                    ModelViewer.Stop();
+                }
+
             }
         }
     }

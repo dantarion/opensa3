@@ -22,7 +22,7 @@ namespace OpenSALib3.PSA
         public int Value
         {
             get { return _data.RawData; }
-            set { _data.RawData = value; }
+            set { _data.RawData = value; NotifyChanged("Value"); }
         }
         public ValueParameter(DatElement parent, int offset)
             : base(parent, offset)
@@ -35,7 +35,7 @@ namespace OpenSALib3.PSA
         public float Value
         {
             get { return (float)(int)_data.RawData / 60000; }
-            set { _data.RawData = (int)value * 60000; }
+            set { _data.RawData = (int)value * 60000; NotifyChanged("Value"); }
         }
 
         public ScalarParameter(DatElement parent, int offset)
@@ -50,7 +50,7 @@ namespace OpenSALib3.PSA
         public int Value
         {
             get { return _data.RawData; }
-            set { _data.RawData = value; }
+            set { _data.RawData = value; NotifyChanged("Value"); }
         }
         public OffsetParameter(DatElement parent, int offset)
             : base(parent, offset)
