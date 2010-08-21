@@ -218,7 +218,7 @@ namespace OpenSALib3.DatHandler
 
         }
 
-        private void ComputeDataLengths(IEnumerable sections)
+        private void ComputeDataLengths(DatElement sections)
         {
 
             var sorted = sections.OfType<DatSection>().OrderBy(x => (x).DataOffset).ToList();
@@ -227,7 +227,7 @@ namespace OpenSALib3.DatHandler
                 if (i < sorted.Count - 1)
                     sorted[i].DataLength = sorted[i + 1].DataOffset - sorted[i].DataOffset;
                 else sorted[i].DataLength = _header.DataChunkSize - sorted[i].DataOffset;
-                sorted[i].DataLength += sorted[i].DataLength % 16;
+                sorted[i].DataLength += sorted[i].DataLength % 8;
             }
         }
         public string Report(bool onlyholes = false)
@@ -271,17 +271,20 @@ namespace OpenSALib3.DatHandler
                 return Offset - other.Offset;
             }
         }
-        public void CollectUsage(IEnumerable element, ref List<UsageData> list)
+        public void CollectUsage(DatElement element, ref List<UsageData> list)
         {
-            foreach (IEnumerable child in element)
+            foreach (DatElement child in element)
                 CollectUsage(child, ref list);//Get the child usage
-            var de = element as DatElement;
+            var de = (DatElement)element;
             if (de == null) return;
+            if (list.Exists(x => x.Offset == de.FileOffset))
+                return;
             UsageData ud;
+
             ud.Offset = de.FileOffset;
             ud.Length = de.Length;
             ud.ID = de.Path + " " + de.GetType().Name;
-            if (!list.Exists(x => x.Offset == de.FileOffset))
+            
                 list.Add(ud);
         }
 

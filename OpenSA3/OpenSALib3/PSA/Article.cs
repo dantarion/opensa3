@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using OpenSALib3.DatHandler;
 using OpenSALib3.Utility;
+using System.ComponentModel;
 
 namespace OpenSALib3.PSA
 {
@@ -14,7 +15,7 @@ namespace OpenSALib3.PSA
         {
             public bint Unknown1;
             public bint Unknown2;
-            public bint Unknown3;
+            public bint BoneID;
             public bint ActionFlagsStart;
             public bint SubactionFlagsStart;
             public bint ActionsStart;
@@ -37,10 +38,15 @@ namespace OpenSALib3.PSA
             get { return _data.Unknown2; }
             set { _data.Unknown2 = value; }
         }
-        public int Unknown3
+        [Browsable(true)]
+        public string BoneName
         {
-            get { return _data.Unknown3; }
-            set { _data.Unknown3 = value; }
+            get { return RootFile.GetBoneName(BoneID); }
+        }
+        public int BoneID
+        {
+            get { return _data.BoneID; }
+            set { _data.BoneID = value; }
         }
         public int UnknownD1
         {

@@ -19,10 +19,14 @@ namespace OpenSALib3.DatHandler {
             var ds = new GenericSection(parent, offset, stringBase);
             if (ds.Name == "data")
                 return new MovesetSection(parent, offset, stringBase);
+            if (ds.Name == "dataCommon")
+                return new DataCommonSection(parent, offset, stringBase);
             if (ds.Name.StartsWith("statusAnimCmdDisguiseList"))
                 return new CommandOverrideSection(parent, offset, stringBase);
             if (ds.Name.StartsWith("statusAnimCmdExitDisguiseList"))
                 return new CommandOverrideSection(parent, offset, stringBase);
+            if (ds.Name.Contains("AnimCmd"))
+                return new CommandSection(parent, offset, stringBase);
             return ds;
         }
         public abstract void Parse();
