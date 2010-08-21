@@ -40,6 +40,7 @@ namespace OpenSALib3.Moveset {
         public unsafe LedgegrabBox(DatElement parent, int offset)
             : base(parent, offset) {
                 Length = 4 * 4;
+                TreeColor = null;
             Name = "LedgegrabBox";
             _data = *(Data*) (Address);
         }

@@ -18,7 +18,7 @@ namespace OpenSALib3.Moveset {
 
         public unsafe BoneRef(DatElement parent, int offset, String name)
             : base(parent, offset) {
-
+            TreeColor = null;
             base.Name = name;
             _index = *(bint*) (RootFile.Address + offset);
         }

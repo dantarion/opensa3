@@ -41,8 +41,10 @@ namespace OpenSALib3.PSA
                 {
                     var paramOffset = c._data.ParameterOffset + 4;
                     var ext = c.RootFile.IsExternal(paramOffset);
-                    if (!ext)
+                    if (ext == null)
                         suboff = ((Parameter)c[0]).RawData;
+                    else
+                        c.Name += " - " + ext;
                     if (suboff > 0 && list[0].FileOffset != suboff)
                     {
                         subroutinelist[suboff] = (ReadCommands(parent, suboff, subroutinelist));
@@ -93,6 +95,7 @@ namespace OpenSALib3.PSA
         public unsafe Command(DatElement parent, int offset)
             : base(parent, offset)
         {
+            TreeColor = null;
             _data = *(Data*)(base.Address);
             Length = 8;
             Color = Color.Blue;

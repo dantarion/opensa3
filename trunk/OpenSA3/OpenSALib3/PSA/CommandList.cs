@@ -12,6 +12,7 @@ namespace OpenSALib3.PSA
         public unsafe CommandList(DatElement parent, int offset, string name, NamedList subroutines)
             : base(parent, offset)
         {
+            TreeColor = null;
             Name = name;
             _offset = *(bint*)(base.Address);
             if(_offset > 0)

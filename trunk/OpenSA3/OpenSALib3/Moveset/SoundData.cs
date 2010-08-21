@@ -16,6 +16,7 @@ namespace OpenSALib3.Moveset
         public unsafe SoundData(DatElement parent, int offset)
             : base(parent, offset)
         {
+            TreeColor = System.Windows.Media.Brushes.Orange;
             _data = *(Data*)base.Address;
             Name = "SoundData";
             Length = 8;

@@ -44,6 +44,7 @@ namespace OpenSALib3.PSA
         public unsafe SubactionFlags(DatElement parent, int offset)
             : base(parent, offset)
         {
+            TreeColor = null;
             if (AnimationStringOffset > RootFile.Length)
                 throw new Exception("Not valid offset"); 
             _data = *(Data*)base.Address;

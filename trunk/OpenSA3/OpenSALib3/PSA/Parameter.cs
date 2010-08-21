@@ -131,6 +131,7 @@ namespace OpenSALib3.PSA
         protected unsafe Parameter(DatElement parent, int offset)
             : base(parent, offset)
         {
+            TreeColor = null;
             _data = *(Data*)base.Address;
             Length = 8;
             if ((int)(Type) > 6)

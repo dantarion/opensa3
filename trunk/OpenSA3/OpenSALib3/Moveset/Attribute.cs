@@ -45,10 +45,11 @@ namespace OpenSALib3.Moveset {
         #endregion
 
         public Attribute(DatElement parent, int fileOffset) : base(parent, fileOffset) {
+            TreeColor = null;
             Length = 4;
             SetupDB();
-            Name = _db.ContainsKey(fileOffset)
-                 ? _db[fileOffset].Name
+            Name = _db.ContainsKey(fileOffset%0x2E4)
+                 ? _db[fileOffset % 0x2E4].Name
                  : String.Format("0x{0:X03}", fileOffset);
         }
 

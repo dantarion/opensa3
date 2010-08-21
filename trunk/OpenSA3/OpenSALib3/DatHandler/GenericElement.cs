@@ -11,6 +11,7 @@ namespace OpenSALib3.DatHandler
         public unsafe GenericElement(DatElement parent, int fileOffset, String name)
             : base(parent, fileOffset)
         {
+            TreeColor = null;
             Length = 4;
             Name = name;
             _intval = *(bint*)base.Address;

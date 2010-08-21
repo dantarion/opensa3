@@ -62,6 +62,7 @@ namespace OpenSALib3.Moveset
         public unsafe Hurtbox(DatElement parent, int offset)
             : base(parent, offset)
         {
+            TreeColor = null; 
             Length = 5 * 4;
             Name = "Hurtbox";
             _data = *(HurtboxData*)(RootFile.Address + offset);
