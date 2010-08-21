@@ -1,0 +1,289 @@
+#summary One-sentence summary of this page.
+#labels Featured
+
+= Introduction =
+
+Add your content here.
+
+== Character Node Types ==
+  * param - Parameters for moves. The main thing we ant to edit.
+  * hitData - Hurtboxes for subcharacters(D3 has them)
+  * mapCollData - Stage collision data for things that travel across the ground
+  * statusAnimCmd - PSA Subroutines for 
+  
+== Character Nodes ==
+
+>>
+===FitCaptain/MiscData[0]===
+|| *Offset* || *Node Name* || *Description* || *Format String* || *Credits* ||
+|| *0x0x22200* || *paramBlueFalcon__13ftCaptainNode* || Description || || `No one` ||
+|| *0x0x221e0* || *paramFalconKick__13ftCaptainNode* || Description || || `No one` ||
+|| *0x0x221a0* || *paramFalconKnuckle__13ftCaptainNode* || Description || || `No one` ||
+|| *0x0x22188* || *paramFalconPunch__13ftCaptainNode* || Description || || `No one` ||
+|| *0x0x221b8* || *paramSpecialHi__13ftCaptainNode* || Description || || `No one` ||
+
+===FitDedede/MiscData[0]===
+|| *Offset* || *Node Name* || *Description* || *Format String* || *Credits* ||
+|| *0x0x2a204* || *AreaDataSet__20wnDededeFollowerNode* || Description || || `No one` ||
+|| *0x0x2a1fc* || *addAreaDataSet__12ftDededeNode* || Description || || `No one` ||
+|| *0x0x2a14c* || *hitDataGoldo__17wnDededeGoldoNode* || Description || || `No one` ||
+|| *0x0x2a10c* || *hitDataWaddledee__21wnDededeWaddleDeeNode* || Description || || `No one` ||
+|| *0x0x2a12c* || *hitDataWaddledoo__21wnDededeWaddleDooNode* || Description || || `No one` ||
+|| *0x0x2a16c* || *mapCollData__20wnDededeFollowerNode* || Description || || `No one` ||
+|| *0x0x2a1cc* || *paramDededeFinal__12ftDededeNode* || Description || || `No one` ||
+|| *0x0x2a1b4* || *paramDededeJetHammer__12ftDededeNode* || Description || || `No one` ||
+|| *0x0x2a0c4* || *paramDededeStarmissile__23wnDededeStarMissileNode* || Description || || `No one` ||
+|| *0x0x2a17c* || *paramDededeSuperJump__12ftDededeNode* || Description || || `No one` ||
+|| *0x0x2a0dc* || *paramDededeWdThrow__12ftDededeNode* || Description || || `No one` ||
+
+===FitDiddy/MiscData[0]===
+|| *Offset* || *Node Name* || *Description* || *Format String* || *Credits* ||
+|| *0x0x22bd4* || *hitDataBarrel__20wnDiddyBarrelJetNode* || Description || || `No one` ||
+|| *0x0x22c14* || *mapCollData__18wnDiddyPeanutsNode* || Description || || `No one` ||
+|| *0x0x22bf4* || *mapCollData__20wnDiddyBarrelJetNode* || Description || || `No one` ||
+|| *0x0x22b94* || *paramDiddyBarrel__20wnDiddyBarrelJetNode* || Description || || `No one` ||
+|| *0x0x22c24* || *paramDiddyExplosion__20wnDiddyExplosionNode* || Description || || `No one` ||
+|| *0x0x22c04* || *paramDiddyPeanuts__18wnDiddyPeanutsNode* || Description || || `No one` ||
+
+===FitDonkey/MiscData[0]===
+|| *Offset* || *Node Name* || *Description* || *Format String* || *Credits* ||
+
+===FitFalco/MiscData[0]===
+|| *Offset* || *Node Name* || *Description* || *Format String* || *Credits* ||
+
+===FitFox/MiscData[0]===
+|| *Offset* || *Node Name* || *Description* || *Format String* || *Credits* ||
+
+===FitGameWatch/MiscData[0]===
+|| *Offset* || *Node Name* || *Description* || *Format String* || *Credits* ||
+|| *0x0x21714* || *statusAnimCmd_FinalAirChkJumpAerial__15ftGameWatchNode* || Description || || `No one` ||
+|| *0x0x216f4* || *statusAnimCmd_FinalAirChkLanding__15ftGameWatchNode* || Description || || `No one` ||
+|| *0x0x21754* || *statusAnimCmd_FinalTurnRunUniq__15ftGameWatchNode* || Description || || `No one` ||
+
+===FitGanon/MiscData[0]===
+|| *Offset* || *Node Name* || *Description* || *Format String* || *Credits* ||
+|| *0x0x22124* || *paramGanonExplosion__11ftGanonNode* || Description || || `No one` ||
+|| *0x0x22164* || *paramGanonKick__11ftGanonNode* || Description || || `No one` ||
+|| *0x0x2210c* || *paramGanonPunch__11ftGanonNode* || Description || || `No one` ||
+|| *0x0x22144* || *paramGanonSpecialHi__11ftGanonNode* || Description || || `No one` ||
+
+===FitGKoopa/MiscData[0]===
+|| *Offset* || *Node Name* || *Description* || *Format String* || *Credits* ||
+
+===FitIke/MiscData[0]===
+|| *Offset* || *Node Name* || *Description* || *Format String* || *Credits* ||
+|| *0x0x273ac* || *paramIkeFinal__9ftIkeNode* || Description || || `No one` ||
+|| *0x0x2735c* || *paramIkeSpecialHi__9ftIkeNode* || Description || || `No one` ||
+|| *0x0x27394* || *paramIkeSpecialLwShield__9ftIkeNode* || Description || || `No one` ||
+|| *0x0x2736c* || *paramIkeSpecialLw__9ftIkeNode* || Description || || `No one` ||
+|| *0x0x272fc* || *paramIkeSpecialN__9ftIkeNode* || Description || || `No one` ||
+|| *0x0x27314* || *paramIkeSpecialS__9ftIkeNode* || Description || || `No one` ||
+
+===FitKirby/MiscData[0]===
+|| *Offset* || *Node Name* || *Description* || *Format String* || *Credits* ||
+|| *0x0x43cb0* || *hitDataIceShot__17wnPopoIceShotNode* || Description || || `No one` ||
+|| *0x0x43b98* || *mapCollData__15wnKirbyNabeNode* || Description || || `No one` ||
+|| *0x0x44444* || *modelNodeConvertDataDonkeyToOriginal__17ftKirbyDonkeyNode* || Description || || `No one` ||
+|| *0x0x44350* || *modelNodeConvertDataDonkeyToReal__17ftKirbyDonkeyNode* || Description || || `No one` ||
+|| *0x0x4453c* || *modelNodeConvertDataDonkey__17ftKirbyDonkeyNode* || Description || || `No one` ||
+|| *0x0x44250* || *modelNodeConvertDataFalcoToOriginal__16ftKirbyFalcoNode* || Description || || `No one` ||
+|| *0x0x44158* || *modelNodeConvertDataFalcoToReal__16ftKirbyFalcoNode* || Description || || `No one` ||
+|| *0x0x44348* || *modelNodeConvertDataFalco__16ftKirbyFalcoNode* || Description || || `No one` ||
+|| *0x0x44c64* || *modelNodeConvertDataGameWatchToOriginal__20ftKirbyGameWatchNode* || Description || || `No one` ||
+|| *0x0x44b70* || *modelNodeConvertDataGameWatchToReal__20ftKirbyGameWatchNode* || Description || || `No one` ||
+|| *0x0x44d60* || *modelNodeConvertDataGameWatch__20ftKirbyGameWatchNode* || Description || || `No one` ||
+|| *0x0x44848* || *modelNodeConvertDataPikminToOriginal__17ftKirbyPikminNode* || Description || || `No one` ||
+|| *0x0x44750* || *modelNodeConvertDataPikminToReal__17ftKirbyPikminNode* || Description || || `No one` ||
+|| *0x0x44958* || *modelNodeConvertDataPikmin__17ftKirbyPikminNode* || Description || || `No one` ||
+|| *0x0x44a54* || *modelNodeConvertDataPurinToOriginal__16ftKirbyPurinNode* || Description || || `No one` ||
+|| *0x0x44960* || *modelNodeConvertDataPurinToReal__16ftKirbyPurinNode* || Description || || `No one` ||
+|| *0x0x44b68* || *modelNodeConvertDataPurin__16ftKirbyPurinNode* || Description || || `No one` ||
+|| *0x0x44638* || *modelNodeConvertDataSnakeToOriginal__16ftKirbySnakeNode* || Description || || `No one` ||
+|| *0x0x44544* || *modelNodeConvertDataSnakeToReal__16ftKirbySnakeNode* || Description || || `No one` ||
+|| *0x0x44748* || *modelNodeConvertDataSnake__16ftKirbySnakeNode* || Description || || `No one` ||
+|| *0x0x43da8* || *paramDededeStarmissile__23wnDededeStarMissileNode* || Description || || `No one` ||
+|| *0x0x43ba8* || *paramFalconPunch__11ftKirbyNode* || Description || || `No one` ||
+|| *0x0x43bc0* || *paramGanonPunch__11ftKirbyNode* || Description || || `No one` ||
+|| *0x0x43cd0* || *paramIkeSpecialN__11ftKirbyNode* || Description || || `No one` ||
+|| *0x0x43b48* || *paramKirbyStarmissile__22wnKirbyStarMissileNode* || Description || || `No one` ||
+|| *0x0x43ce8* || *paramMarthSpecialN__11ftKirbyNode* || Description || || `No one` ||
+|| *0x0x43bd8* || *paramMetaknightSpecialN__11ftKirbyNode* || Description || || `No one` ||
+|| *0x0x43c88* || *paramPeachSpecialN__11ftKirbyNode* || Description || || `No one` ||
+|| *0x0x44108* || *paramPikminSpecialN__11ftKirbyNode* || Description || || `No one` ||
+|| *0x0x44110* || *paramPikminSpecialS__11ftKirbyNode* || Description || || `No one` ||
+|| *0x0x43ca0* || *paramPopoSpecialN__11ftKirbyNode* || Description || || `No one` ||
+|| *0x0x43d00* || *paramPurinSpecialN__11ftKirbyNode* || Description || || `No one` ||
+|| *0x0x43c28* || *paramSonicSpecialN__11ftKirbyNode* || Description || || `No one` ||
+|| *0x0x43dc0* || *pikminPullOutParam__11ftKirbyNode* || Description || || `No one` ||
+
+===FitKoopa/MiscData[0]===
+|| *Offset* || *Node Name* || *Description* || *Format String* || *Credits* ||
+
+===FitLink/MiscData[0]===
+|| *Offset* || *Node Name* || *Description* || *Format String* || *Credits* ||
+
+===FitLucario/MiscData[0]===
+|| *Offset* || *Node Name* || *Description* || *Format String* || *Credits* ||
+
+===FitLucas/MiscData[0]===
+|| *Offset* || *Node Name* || *Description* || *Format String* || *Credits* ||
+
+===FitLuigi/MiscData[0]===
+|| *Offset* || *Node Name* || *Description* || *Format String* || *Credits* ||
+
+===FitMario/MiscData[0]===
+|| *Offset* || *Node Name* || *Description* || *Format String* || *Credits* ||
+
+===FitMarth/MiscData[0]===
+|| *Offset* || *Node Name* || *Description* || *Format String* || *Credits* ||
+|| *0x0x242d8* || *paramMarthFinal__11ftMarthNode* || Description || || `No one` ||
+|| *0x0x24270* || *paramMarthSpecialHi__11ftMarthNode* || Description || || `No one` ||
+|| *0x0x242c0* || *paramMarthSpecialLwShield__11ftMarthNode* || Description || || `No one` ||
+|| *0x0x24298* || *paramMarthSpecialLw__11ftMarthNode* || Description || || `No one` ||
+|| *0x0x24240* || *paramMarthSpecialN__11ftMarthNode* || Description || || `No one` ||
+|| *0x0x24258* || *paramMarthSpecialS__11ftMarthNode* || Description || || `No one` ||
+
+===FitMetaknight/MiscData[0]===
+|| *Offset* || *Node Name* || *Description* || *Format String* || *Credits* ||
+|| *0x0x25e40* || *paramFinal__16ftMetaknightNode* || Description || || `No one` ||
+|| *0x0x25e28* || *paramSpecialLw__16ftMetaknightNode* || Description || || `No one` ||
+|| *0x0x25dc0* || *paramSpecialN__16ftMetaknightNode* || Description || || `No one` ||
+|| *0x0x25e10* || *paramSpecialS__16ftMetaknightNode* || Description || || `No one` ||
+
+===FitNess/MiscData[0]===
+|| *Offset* || *Node Name* || *Description* || *Format String* || *Credits* ||
+
+===FitPeach/MiscData[0]===
+|| *Offset* || *Node Name* || *Description* || *Format String* || *Credits* ||
+|| *0x0x1d860* || *paramFinal__11ftPeachNode* || Description || || `No one` ||
+|| *0x0x1d81c* || *paramSpecialHi__11ftPeachNode* || Description || || `No one` ||
+|| *0x0x1d844* || *paramSpecialLw__11ftPeachNode* || Description || || `No one` ||
+|| *0x0x1d7c4* || *paramSpecialN__11ftPeachNode* || Description || || `No one` ||
+|| *0x0x1d7dc* || *paramSpecialS__11ftPeachNode* || Description || || `No one` ||
+|| *0x0x1d848* || *paramSpecialUniqItemTable__11ftPeachNode* || Description || || `No one` ||
+|| *0x0x1d7c0* || *paramUniqFloat__11ftPeachNode* || Description || || `No one` ||
+
+===FitPikachu/MiscData[0]===
+|| *Offset* || *Node Name* || *Description* || *Format String* || *Credits* ||
+
+===FitPikmin/MiscData[0]===
+|| *Offset* || *Node Name* || *Description* || *Format String* || *Credits* ||
+|| *0x0x28968* || *hitDataDolfin__18wnPikminDolfinNode* || Description || || `No one` ||
+|| *0x0x28928* || *hitDataPikmin__18wnPikminPikminNode* || Description || || `No one` ||
+|| *0x0x285ac* || *paramAttackHi4__12ftPikminNode* || Description || || `No one` ||
+|| *0x0x285b4* || *paramAttackLw4__12ftPikminNode* || Description || || `No one` ||
+|| *0x0x285a4* || *paramAttackS4__12ftPikminNode* || Description || || `No one` ||
+|| *0x0x285bc* || *paramCatch__12ftPikminNode* || Description || || `No one` ||
+|| *0x0x289c0* || *paramDamageFly__12ftPikminNode* || Description || || `No one` ||
+|| *0x0x28924* || *paramFinal__12ftPikminNode* || Description || || `No one` ||
+|| *0x0x2890c* || *paramSpecialN__12ftPikminNode* || Description || || `No one` ||
+|| *0x0x28914* || *paramSpecialS__12ftPikminNode* || Description || || `No one` ||
+|| *0x0x285c4* || *pullOutParam__12ftPikminNode* || Description || || `No one` ||
+
+===FitPit/MiscData[0]===
+|| *Offset* || *Node Name* || *Description* || *Format String* || *Credits* ||
+|| *0x0x23cf0* || *hitDataIkarus__15wnPitIkarusNode* || Description || || `No one` ||
+
+===FitPokeFushigisou/MiscData[0]===
+|| *Offset* || *Node Name* || *Description* || *Format String* || *Credits* ||
+|| *0x0x1e43c* || *statusAnimCmd_AirLassoFailureDisguise__20ftPokeFushigisouNode* || Description || || `No one` ||
+
+===FitPokeLizardon/MiscData[0]===
+|| *Offset* || *Node Name* || *Description* || *Format String* || *Credits* ||
+
+===FitPokeTrainer/MiscData[0]===
+|| *Offset* || *Node Name* || *Description* || *Format String* || *Credits* ||
+
+===FitPokeZenigame/MiscData[0]===
+|| *Offset* || *Node Name* || *Description* || *Format String* || *Credits* ||
+
+===FitPopo/MiscData[0]===
+|| *Offset* || *Node Name* || *Description* || *Format String* || *Credits* ||
+|| *0x0x346b0* || *hitDataIceBerg__17wnPopoIceBergNode* || Description || || `No one` ||
+|| *0x0x345cc* || *hitDataIceShot__17wnPopoIceShotNode* || Description || || `No one` ||
+|| *0x0x346ac* || *paramFinal__10ftPopoNode* || Description || || `No one` ||
+|| *0x0x34720* || *paramSpecialHiPartner__10ftPopoNode* || Description || || `No one` ||
+|| *0x0x34644* || *paramSpecialHi__10ftPopoNode* || Description || || `No one` ||
+|| *0x0x3469c* || *paramSpecialLw__10ftPopoNode* || Description || || `No one` ||
+|| *0x0x345bc* || *paramSpecialN__10ftPopoNode* || Description || || `No one` ||
+|| *0x0x345ec* || *paramSpecialS__10ftPopoNode* || Description || || `No one` ||
+
+===FitPurin/MiscData[0]===
+|| *Offset* || *Node Name* || *Description* || *Format String* || *Credits* ||
+|| *0x0x1c918* || *paramPurinFinal__11ftPurinNode* || Description || || `No one` ||
+|| *0x0x1c850* || *paramPurinSpecialN__11ftPurinNode* || Description || || `No one` ||
+|| *0x0x1c8f8* || *paramPurinSpecialS__11ftPurinNode* || Description || || `No one` ||
+
+===FitRobot/MiscData[0]===
+|| *Offset* || *Node Name* || *Description* || *Format String* || *Credits* ||
+
+===FitSamus/MiscData[0]===
+|| *Offset* || *Node Name* || *Description* || *Format String* || *Credits* ||
+|| *0x0x207b4* || *mapCollData__11ftSamusNode* || Description || || `No one` ||
+
+===FitSheik/MiscData[0]===
+|| *Offset* || *Node Name* || *Description* || *Format String* || *Credits* ||
+
+===FitSnake/MiscData[0]===
+|| *Offset* || *Node Name* || *Description* || *Format String* || *Credits* ||
+|| *0x0x22b6c* || *hitDataCypher__17wnSnakeCypherNode* || Description || || `No one` ||
+|| *0x0x22ad4* || *hitDataMine__15wnSnakeMineNode* || Description || || `No one` ||
+|| *0x0x22b4c* || *hitDataNikitaMissile__24wnSnakeNikitaMissileNode* || Description || || `No one` ||
+|| *0x0x22bc4* || *paramSnakeC4__13wnSnakeC4Node* || Description || || `No one` ||
+|| *0x0x22b8c* || *paramSnakeCypher__17wnSnakeCypherNode* || Description || || `No one` ||
+|| *0x0x22abc* || *paramSnakeMineParam__15wnSnakeMineNode* || Description || || `No one` ||
+|| *0x0x22af4* || *paramSnakeNikitaMissile__24wnSnakeNikitaMissileNode* || Description || || `No one` ||
+|| *0x0x22c04* || *paramSnakeRgb6Bullet__21wnSnakeRgb6BulletNode* || Description || || `No one` ||
+|| *0x0x22c0c* || *paramSnakeRgb6Sight__20wnSnakeRgb6SightNode* || Description || || `No one` ||
+|| *0x0x22bf4* || *paramSnakeRgb6__15wnSnakeRgb6Node* || Description || || `No one` ||
+|| *0x0x22a84* || *paramSnakeTrenchMortarBullet__29wnSnakeTrenchMortarBulletNode* || Description || || `No one` ||
+
+===FitSonic/MiscData[0]===
+|| *Offset* || *Node Name* || *Description* || *Format String* || *Credits* ||
+|| *0x0x24f3c* || *paramDash__11ftSonicNode* || Description || || `No one` ||
+|| *0x0x25030* || *paramSpecialHi__11ftSonicNode* || Description || || `No one` ||
+|| *0x0x25050* || *paramSpecialLw__11ftSonicNode* || Description || || `No one` ||
+|| *0x0x24f40* || *paramSpecialN__11ftSonicNode* || Description || || `No one` ||
+|| *0x0x24fa0* || *paramSpecialS__11ftSonicNode* || Description || || `No one` ||
+|| *0x0x25020* || *paramSpinJump__11ftSonicNode* || Description || || `No one` ||
+
+===FitSZerosuit/MiscData[0]===
+|| *Offset* || *Node Name* || *Description* || *Format String* || *Credits* ||
+
+===FitToonLink/MiscData[0]===
+|| *Offset* || *Node Name* || *Description* || *Format String* || *Credits* ||
+
+===FitWario/MiscData[0]===
+|| *Offset* || *Node Name* || *Description* || *Format String* || *Credits* ||
+
+===FitWarioMan/MiscData[0]===
+|| *Offset* || *Node Name* || *Description* || *Format String* || *Credits* ||
+
+===FitWolf/MiscData[0]===
+|| *Offset* || *Node Name* || *Description* || *Format String* || *Credits* ||
+
+===FitYoshi/MiscData[0]===
+|| *Offset* || *Node Name* || *Description* || *Format String* || *Credits* ||
+|| *0x0x1f6bc* || *statusAnimCmd_GuardContYoshi__11ftYoshiNode* || Description || || `No one` ||
+|| *0x0x1f7e4* || *statusAnimCmd_SpecialN__11ftYoshiNode* || Description || || `No one` ||
+|| *0x0x1f674* || *yoshiCatchDashData__11ftYoshiNode* || Description || || `No one` ||
+|| *0x0x1f644* || *yoshiCatchDashSkipFrame__11ftYoshiNode* || Description || || `No one` ||
+|| *0x0x1f638* || *yoshiCatchData__11ftYoshiNode* || Description || || `No one` ||
+|| *0x0x1f60c* || *yoshiCatchSkipFrame__11ftYoshiNode* || Description || || `No one` ||
+|| *0x0x1f6b0* || *yoshiCatchTurnData__11ftYoshiNode* || Description || || `No one` ||
+|| *0x0x1f684* || *yoshiCatchTurnSkipFrame__11ftYoshiNode* || Description || || `No one` ||
+
+===FitZakoBall/MiscData[0]===
+|| *Offset* || *Node Name* || *Description* || *Format String* || *Credits* ||
+
+===FitZakoBoy/MiscData[0]===
+|| *Offset* || *Node Name* || *Description* || *Format String* || *Credits* ||
+
+===FitZakoChild/MiscData[0]===
+|| *Offset* || *Node Name* || *Description* || *Format String* || *Credits* ||
+
+===FitZakoGirl/MiscData[0]===
+|| *Offset* || *Node Name* || *Description* || *Format String* || *Credits* ||
+
+===FitZelda/MiscData[0]===
+|| *Offset* || *Node Name* || *Description* || *Format String* || *Credits* ||
