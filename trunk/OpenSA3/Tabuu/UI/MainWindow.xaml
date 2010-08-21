@@ -30,6 +30,7 @@
                 <MenuItem Header="Open Script Window" Click="MenuItemClick" />
                 <MenuItem Header="Scripting Help" IsEnabled="False" />
             </MenuItem>
+            <CheckBox Name="AutoLoadResources">Automatically Load Model/Animation</CheckBox>
         </Menu>
         <TreeView Margin="5" Grid.Row="1" Name="TreeView" ItemTemplate="{StaticResource TreeTemp}" SelectedItemChanged="TreeViewSelectedItemChanged" />
         <GridSplitter Grid.Column="1" Grid.Row="1" Grid.RowSpan="2" VerticalAlignment="Stretch" Margin="1 0" Width="1" ResizeBehavior="PreviousAndNext" Background="#FF828790" />
