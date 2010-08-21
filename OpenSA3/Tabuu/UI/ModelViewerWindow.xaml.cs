@@ -34,6 +34,11 @@ namespace Tabuu.UI
             }
             _mc.AddTarget(d.Model);
             _mc.AddReference(d.Node);
+            var bone2 = (MDL0BoneNode)d.Model.FindChild("TopN", true);
+
+            _mc.Rotate(0, -90);
+            _mc.Translate(bone2.BoxMax._x/2, bone2.BoxMax._y/2, 30);
+            
             d.Model.RenderBones = false;
             d.Model.RenderWireframe = false;
             timer.Tick += NextFrame;
