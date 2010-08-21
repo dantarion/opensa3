@@ -1,9 +1,14 @@
 #summary One-sentence summary of this page.
 #labels Featured
 
-= Introduction =
+== About this page ==
+Every character has nodes that contain information that modifies their moves in some way. A lot of these sections are outside the realm of PSA, and even the *"data"* section that contains the bulk of the moveset data.
 
-Add your content here.
+These sections are just unlabeled chunks of data. In order to figure out what each value does, we need to test in game.
+
+*Anyone who reports something that can be used to fill in this thread will get their name in the credits, as well as respect from me*
+=== Tutorial ===
+Coming Soon!
 
 == Character Node Types ==
   * param - Parameters for moves. The main thing we ant to edit.
@@ -13,7 +18,6 @@ Add your content here.
   
 == Character Nodes ==
 
->>
 ===FitCaptain/MiscData[0]===
 || *Offset* || *Node Name* || *Description* || *Format String* || *Credits* ||
 || *0x0x22200* || *paramBlueFalcon__13ftCaptainNode* || Description || || `No one` ||
