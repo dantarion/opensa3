@@ -6,6 +6,10 @@ using OpenSALib3;
 using OpenSALib3.DatHandler;
 using Tabuu.Utility;
 using OpenSALib3.PSA;
+using System.Windows.Threading;
+using System.Threading;
+using System;
+using System.ComponentModel;
 
 namespace Tabuu.UI
 {
@@ -101,8 +105,15 @@ namespace Tabuu.UI
                                  @"zakogirl\FitZakoGirl.pac",
                                  @"zelda\FitZelda.pac"
                              };
+
+            int p = 0;
             foreach (var filename in paths.Where(filename => System.IO.File.Exists(dialog.SelectedPath + @"\" + filename)))
+            {
+                Thread.Sleep(0);
                 LoadFilename(dialog.SelectedPath + @"\" + filename);
+                ProgressBar.Value++;
+                ProgressBar.InvalidateVisual();
+            }
         }
 
         private void LoadFilename(string s)
@@ -115,12 +126,15 @@ namespace Tabuu.UI
             {
                 var df = DatFile.FromNode(node);
                 TreeView.Items.Add(df);
-                if (System.IO.File.Exists(s.Replace(".pac", "00.pac")))
-                    df.LoadModel(s.Replace(".pac", "00.pac"));
-                if (System.IO.File.Exists(s.Replace(".pac", "Motion.pac")))
-                    df.LoadAnimations(s.Replace(".pac", "Motion.pac"));
-                if (System.IO.File.Exists(s.Replace(".pac", "MotionEtc.pac")))
-                    df.LoadAnimations(s.Replace(".pac", "MotionEtc.pac"));
+                if (AutoLoadResources.IsChecked.Value)
+                {
+                    if (System.IO.File.Exists(s.Replace(".pac", "00.pac")))
+                        df.LoadModel(s.Replace(".pac", "00.pac"));
+                    if (System.IO.File.Exists(s.Replace(".pac", "Motion.pac")))
+                        df.LoadAnimations(s.Replace(".pac", "Motion.pac"));
+                    if (System.IO.File.Exists(s.Replace(".pac", "MotionEtc.pac")))
+                        df.LoadAnimations(s.Replace(".pac", "MotionEtc.pac"));
+                }
 
             }
             rs.Rebuild(true);
