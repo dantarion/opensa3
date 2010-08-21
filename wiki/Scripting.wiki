@@ -20,3 +20,7 @@ for file in loadedFiles:
 	print file
 }}}
 This example can be extended to do any operation on all files loaded in Tabuu.
+== Print usage report ==
+{{{
+print loadedFiles[0].Report(0)
+}}}
