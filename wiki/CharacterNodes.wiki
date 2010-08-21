@@ -20,11 +20,11 @@ Coming Soon!
 
 ===FitCaptain/MiscData[0]===
 || *Offset* || *Node Name* || *Description* || *Format String* || *Credits* ||
-|| *0x0x22200* || *paramBlueFalcon__13ftCaptainNode* || Description || || `No one` ||
-|| *0x0x221e0* || *paramFalconKick__13ftCaptainNode* || Description || || `No one` ||
-|| *0x0x221a0* || *paramFalconKnuckle__13ftCaptainNode* || Description || || `No one` ||
-|| *0x0x22188* || *paramFalconPunch__13ftCaptainNode* || Description || || `No one` ||
-|| *0x0x221b8* || *paramSpecialHi__13ftCaptainNode* || Description || || `No one` ||
+|| *0x0x22200* || *paramBlueFalcon__13ftCaptainNode* || Description || fff? || `Dantarion` ||
+|| *0x0x221e0* || *paramFalconKick__13ftCaptainNode* || Description || ffiffff? || `Dantarion` ||
+|| *0x0x221a0* || *paramFalconKnuckle__13ftCaptainNode* || Description || fffff?ff || `Dantarion` ||
+|| *0x0x22188* || *paramFalconPunch__13ftCaptainNode* || Description || fffff?ff || `Dantarion` ||
+|| *0x0x221b8* || *paramSpecialHi__13ftCaptainNode* || Description || fffffffff?ff || `Dantarion` ||
 
 ===FitDedede/MiscData[0]===
 || *Offset* || *Node Name* || *Description* || *Format String* || *Credits* ||
