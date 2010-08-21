@@ -85,7 +85,8 @@ namespace OpenSALib3.DatHandler
         public Color Color { get; set; }
         public virtual System.Windows.Media.Brush TreeColor
         {
-            get { return System.Windows.Media.Brushes.Yellow; }
+            get;
+            set;
         }
         /* Name */
         [Category("Element")]
@@ -116,7 +117,7 @@ namespace OpenSALib3.DatHandler
 
         protected DatElement(DatElement parent, int fileoffset)
         {
-            
+            TreeColor = System.Windows.Media.Brushes.Yellow;
             Length = 4;
             Parent = parent;
             FileOffset = fileoffset;

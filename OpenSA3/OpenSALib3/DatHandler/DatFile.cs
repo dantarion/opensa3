@@ -148,14 +148,21 @@ namespace OpenSALib3.DatHandler
             get { return Node.WorkingSource.Address + Marshal.SizeOf(_header); }
         }
 
-        private readonly List<int> _external = new List<int>();
-        public bool IsExternal(int offset)
+        private readonly Dictionary<int,DatSection> _external = new Dictionary<int,DatSection>();
+        public string IsExternal(int offset)
         {
-            return _external.Contains(offset);
+            bool result = _external.ContainsKey(offset);
+            if (result)
+            {
+                _external[offset].TreeColor = System.Windows.Media.Brushes.Green;
+                return _external[offset].Name;
+            }
+            return null;
         }
         protected DatFile(ResourceNode node)
             : base(null, 0)
         {
+            TreeColor = null;
             _source = node.OriginalSource;
             Node = node;
             _header = *(DatFileHeader*)node.WorkingUncompressed.Address;
@@ -170,14 +177,16 @@ namespace OpenSALib3.DatHandler
             var section2 = section + _header.SectionCount * 8;
             //Parse References FIRST
             _references = new UnknownElement(this, -1, "References", 0);
+            _references.TreeColor = null;
             for (var i = 0; i < _header.ReferenceCount; i++)
             {
                 var s = DatSection.Factory(References, section2, stringBase);
+                
                 References[s.Name] = s;
                 var tmp = s.DataOffset;
                 do
                 {
-                    _external.Add(tmp);
+                    _external[tmp] = s;
                     tmp = ReadInt(tmp);
                 }
                 while (tmp != -1);
@@ -185,17 +194,21 @@ namespace OpenSALib3.DatHandler
             }
             //Parse sections
             _sections = new UnknownElement(this, -1, "Sections", 0);
+            _sections.TreeColor = null;
             for (var i = 0; i < _header.SectionCount; i++)
             {
                 var s = DatSection.Factory(Sections, section, stringBase);
+                s.TreeColor = null;
                 Sections[s.Name] = s;
                 section += 8;
             }
             var offsetchunk = new UnknownElement(this, _header.DataChunkSize, "OffsetChunk", _header.OffsetCount * 4);
+            offsetchunk.TreeColor = null;
             ComputeDataLengths(Sections);
             foreach (DatSection s in Sections)
                 s.Parse();
             var stringChunk = new UnknownElement(this, stringBase, "StringChunk", _header.FileSize - stringBase);
+            stringChunk.TreeColor = null;
 
             //Setup Tree Structure
             this["Sections"] = Sections;

@@ -80,16 +80,25 @@ namespace OpenSALib3.Moveset
             MiscSection = new MiscSection(this, _header.MiscSectionOffset);
 
             var _attributes = new NamedList(this, "Attributes");
+            _attributes.TreeColor = null;
             var _sseattributes = new NamedList(this, "SSEAttributes");
+            _sseattributes.TreeColor = System.Windows.Media.Brushes.Orange;
             var _commonactionflags = new NamedList(this, "Common Action Flags");
+            _commonactionflags.TreeColor = System.Windows.Media.Brushes.Orange;
             var _actionflags = new NamedList(this, "Special Action Flags");
+            _actionflags.TreeColor = System.Windows.Media.Brushes.Orange;
             var _actions = new NamedList(this, "Actions");
+            _actions.TreeColor = null;
             var _actions2 = new NamedList(this, "Actions2");
+            _actions2.TreeColor = System.Windows.Media.Brushes.Orange;
             var _subactions = new NamedList(this, "Subactions");
+            _subactions.TreeColor = null;
             var _unknownb = new NamedList(this, "UnknownB");
             var _unknowne = new NamedList(this, "UnknownE");
+            _unknowne.TreeColor = null;
             var _articles = new NamedList(this, "Article");
             var _subroutines = new NamedList(this, "Subroutines");
+            _subroutines.TreeColor = null;
 
             var count = 0;
             for (int i = _header.AttributeStart; i < _header.SSEAttributeStart; i += 4)
@@ -108,9 +117,7 @@ namespace OpenSALib3.Moveset
             for (int i = _header.Unknown1; i < _header.Unknown19; i += 8)
                 _unknownb[null] = new UnknownElement(this, i, "UnknownB", 8);
 
-            var unknownd = new UnknownElement(this, _header.Unknown8, "UnknownD", 8);
-            for (var i = RootFile.ReadInt(unknownd.FileOffset); i < RootFile.ReadInt(unknownd.FileOffset) + RootFile.ReadInt(unknownd.FileOffset + 4) * 4; i += 4)
-                unknownd[i] = new GenericElement<int>(unknownd, i, "UnknownDEntry");
+
             count = 0x112;
             for (int i = _header.ActionsStart; i < _header.Actions2Start; i += 4)
                 _actions[count] = new CommandList(this, i, "Action " + String.Format("0x{0:X}", count++), _subroutines);
@@ -133,6 +140,7 @@ namespace OpenSALib3.Moveset
                 subactiongroup.Name += " - " + flags.AnimationName;
             }
             var stringChunk = new UnknownElement(this, first, "SubactionStrings", last - first);
+            stringChunk.TreeColor = null;
             count = 0;
             for (int i = _header.SubactionMainStart; i < _header.SubactionGFXStart; i += 4)
                 (_subactions[count] as DatElement)["Main"] = new CommandList(_subactions[count++], i, "Main ", _subroutines);
@@ -181,9 +189,10 @@ namespace OpenSALib3.Moveset
                 }
                 unknownK.AddByName(offele);
             }
+            count = 0;
             var unknowno = new UnknownElement(this, _header.Unknown19, "UnknownO", 24);
             for (var i = unknowno.ReadInt(20); i < unknowno.FileOffset; i += 4)
-                unknowno[null] = new GenericElement<int>(unknowno, i, "Unknown");
+                unknowno[null] = new GenericElement<int>(unknowno, i, String.Format("0x{0:X03}",count++));
             var bonerefs = new NamedList(this, "BoneRefs");
             for (int i = _header.Unknown18; i < MiscSection.ReadInt(4 * 9); i += 4)
                 bonerefs[null] = (new BoneRef(this, i, "Unknown"));
@@ -209,9 +218,29 @@ namespace OpenSALib3.Moveset
             for (int i = _header.Unknown16; i < _header.Unknown18; i += 0x1c)
                 unknownV[null] = new UnknownElement(this, i, "UnknownV", 0x1c);
             //TODO: Make Unknown letters make sense...
-            var unknownAO = new NamedList(this, "UnknownAO");
+            var unknownAO = new NamedList(this, "Action_Pre");
+            unknownAO.TreeColor = null;
+            count = 0;
             for (int i = _header.Unknown11; i < _header.Unknown11 + 4 * _unknowne.Count; i += 0x4)
-                unknownAO[null] = new GenericElement<int>(this, i, "UnknownAO");
+            {
+
+                var tmp = new GenericElement<int>(unknownAO, i, String.Format("0x{0:X03}", count++));
+                var str = RootFile.IsExternal(i);
+                if (str != null)
+                    tmp.Name +=" - "+ str;
+                unknownAO[null] = tmp;
+            }
+            var unknownd = new UnknownElement(this, _header.Unknown8, "Action_Group?", 8);
+            unknownd.TreeColor = null;
+            count = 0;
+            for (var i = RootFile.ReadInt(unknownd.FileOffset); i < RootFile.ReadInt(unknownd.FileOffset) + RootFile.ReadInt(unknownd.FileOffset + 4) * 4; i += 4)
+            {
+                var tmp = new GenericElement<int>(unknownd, i, String.Format("0x{0:X03}", count++));
+                var str = RootFile.IsExternal(i);
+                if (str != null)
+                    tmp.Name += " - " + str;
+                unknownd[i] = tmp;
+            }
 
             //Setup Tree Structure
             this["Header"] = new UnknownElement(this, DataOffset, "Header", 31 * 4);
@@ -222,13 +251,15 @@ namespace OpenSALib3.Moveset
 
             AddByName(_unknowne);
             AddByName(unknownV);
-            AddByName(unknownAO);
+            
             AddByName(unknownK);
             this["UnknownO"] = unknowno;
 
-            this["UnknownD"] = unknownd;
+            
             this["MiscSection"] = MiscSection;
             this["BoneRefs"] = bonerefs;
+            AddByName(unknownd);
+            AddByName(unknownAO);
             AddByName(_commonactionflags);
             AddByName(_actionflags);
             AddByName(_actions);

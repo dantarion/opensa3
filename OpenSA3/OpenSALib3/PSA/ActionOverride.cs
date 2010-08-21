@@ -32,6 +32,7 @@ namespace OpenSALib3.PSA
         public unsafe ActionOverride(DatElement parent, int offset)
             : base(parent, offset)
         {
+            TreeColor = null;
             _data = *(Data*)base.Address;
             Name = "ActionOverride";
             Length = 8;

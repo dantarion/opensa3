@@ -49,8 +49,10 @@ namespace OpenSALib3.Moveset
             //tmp vars
             NamedList _section1 = new NamedList(this, "Section1");
             NamedList _hurtboxes = new NamedList(this, "Hurtboxes");
+            _hurtboxes.TreeColor = System.Windows.Media.Brushes.Orange;
             NamedList _unknowntype1List = new NamedList(this, "UnknownT");
             NamedList _ledgegrabboxes = new NamedList(this, "LedgegrabBoxes");
+            _hurtboxes.TreeColor = System.Windows.Media.Brushes.Orange;
             NamedList _boneref2 = new NamedList(this, "BoneRef");
             MultiJumpData _multijumpdata = null;
             GlideData _glidedata = null;
