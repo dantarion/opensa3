@@ -86,7 +86,9 @@
     <Compile Include="Moveset\Attribute.cs" />
     <Compile Include="Moveset\BoneRef.cs" />
     <Compile Include="Moveset\CommandOverrideSection.cs" />
+    <Compile Include="Moveset\CommandSection.cs" />
     <Compile Include="Moveset\CrawlData.cs" />
+    <Compile Include="Moveset\DataCommonSection.cs" />
     <Compile Include="Moveset\GlideData.cs" />
     <Compile Include="Moveset\Hurtbox.cs" />
     <Compile Include="Moveset\LedgegrabBox.cs" />

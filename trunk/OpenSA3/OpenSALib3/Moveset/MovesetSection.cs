@@ -139,7 +139,8 @@ namespace OpenSALib3.Moveset
                 subactiongroup["Flags"] = flags;
                 subactiongroup.Name += " - " + flags.AnimationName;
             }
-            var stringChunk = new UnknownElement(this, first, "SubactionStrings", last - first);
+            var size = _header.SubactionFlagsStart - first;
+            var stringChunk = new UnknownElement(this, first, "SubactionStrings", size);
             stringChunk.TreeColor = null;
             count = 0;
             for (int i = _header.SubactionMainStart; i < _header.SubactionGFXStart; i += 4)
