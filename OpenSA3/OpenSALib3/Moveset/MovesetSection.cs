@@ -193,7 +193,7 @@ namespace OpenSALib3.Moveset
 
             //}
             var headerExtension = new UnknownElement(this, DataOffset + 31 * 4, "HeaderEXT", DataLength - 31 * 4);
-            for (var i = headerExtension.FileOffset; i < headerExtension.FileOffset + headerExtension.Length; i += 4)
+            for (var i = headerExtension.FileOffset; i < headerExtension.FileOffset + Math.Min(headerExtension.Length,0x20); i += 4)
             {
                 Article art = null;
                 try

@@ -239,7 +239,7 @@ namespace Tabuu.UI
             {
                 Command c = (Command)e.NewValue;
                 var flags = (c.Parent.Parent["Flags"] as SubactionFlags);
-                if (flags.RootFile.Animations.ContainsKey(flags.AnimationName))
+                if (flags != null && flags.RootFile.Animations.ContainsKey(flags.AnimationName))
                 {
                     ModelViewer.ChangeAnimation(flags.RootFile.Animations[flags.AnimationName]);
                     ModelViewer.SetFrame(c.Frame);

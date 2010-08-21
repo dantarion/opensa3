@@ -83,6 +83,10 @@ namespace OpenSALib3.DatHandler
         /* Color for HexView Display */
         [Browsable(false)]
         public Color Color { get; set; }
+        public virtual System.Windows.Media.Brush TreeColor
+        {
+            get { return System.Windows.Media.Brushes.Yellow; }
+        }
         /* Name */
         [Category("Element")]
         [Browsable(true)]
@@ -112,6 +116,7 @@ namespace OpenSALib3.DatHandler
 
         protected DatElement(DatElement parent, int fileoffset)
         {
+            
             Length = 4;
             Parent = parent;
             FileOffset = fileoffset;
@@ -119,6 +124,8 @@ namespace OpenSALib3.DatHandler
                 _address = RootFile.Address + FileOffset;
             Color = Color.FromArgb(255 / 2, Random.Next(255), Random.Next(255), Random.Next(255));
             //PropertyChanged += new PropertyChangedEventHandler(MarkDirty);
+            if (fileoffset < -1 || fileoffset > RootFile.Length)
+                throw new Exception("Invalid Offset");
         }
         [ReadOnly(true), Browsable(true)]
         private bool _ischanged;

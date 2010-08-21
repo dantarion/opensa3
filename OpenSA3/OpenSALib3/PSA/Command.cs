@@ -13,19 +13,26 @@ namespace OpenSALib3.PSA
     {
         public static NamedList ReadCommands(DatElement parent, int offset, NamedList subroutinelist)
         {
+            
             int count = 0;
             var list = new NamedList(parent,String.Format("@0x{0:X}", offset));
             if (offset == -1)
                 return list;
-            var command = new Command(parent, offset);
-            while (command.Module != 0 || command.ID != 0)
+            try
             {
-                offset += 8;
+                var command = new Command(parent, offset);
+                while (command != null && command.Module != 0 || command.ID != 0)
+                {
+                    offset += 8;
+                    list[count++] = command;
+                    command = new Command(parent, offset);
+                }
                 list[count++] = command;
-                command = new Command(parent, offset);
             }
-            list[count++] = command;
-
+            catch (Exception e)
+            {
+                Debug.Fail(e.Message);
+            }
             //Search for subroutines
             foreach (Command c in list)
             {
