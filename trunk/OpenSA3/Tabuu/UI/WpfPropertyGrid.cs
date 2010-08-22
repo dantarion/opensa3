@@ -84,8 +84,8 @@ namespace Tabuu.UI
             var mis = new List<ModelItem>();
             foreach (var obj in objects)
             {
-                if (obj is INotifyPropertyChanged)
-                    ((INotifyPropertyChanged)obj).PropertyChanged += pg.PropertyGridPropertyChanged;
+                //if (obj is INotifyPropertyChanged)
+                    //((INotifyPropertyChanged)obj).PropertyChanged += pg.PropertyGridPropertyChanged;
                 //if object is deleted obj is null therefore don't load and add...
                 if (obj == null) continue;
                 pg.ModelTreeManager.Load(obj);

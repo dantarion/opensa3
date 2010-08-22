@@ -215,7 +215,7 @@ namespace OpenSALib3.Moveset
             var unknowno = new UnknownElement(this, _header.Unknown19, "UnknownO", 24);
             for (var i = unknowno.ReadInt(20); i < unknowno.FileOffset; i += 4)
                 unknowno[null] = new GenericElement<int>(unknowno, i, String.Format("0x{0:X03}",count++));
-            var bonerefs = new NamedList(this, "BoneRefs");
+            var bonerefs = new NamedList(this, "Smash Ball Bones?");
             for (int i = _header.Unknown18; i < MiscSection.ReadInt(4 * 9); i += 4)
                 bonerefs[null] = (new BoneRef(this, i, "Unknown"));
             if (_header.Unknown26 > 0)
