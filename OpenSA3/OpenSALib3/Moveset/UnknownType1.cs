@@ -2,6 +2,7 @@
 using OpenSALib3.DatHandler;
 using System.ComponentModel;
 using System.Activities.Presentation.PropertyEditing;
+using OpenSALib3.Utility;
 
 namespace OpenSALib3.Moveset {
     public sealed class UnknownType1 : DatElement {

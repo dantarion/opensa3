@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using OpenSALib3.DatHandler;
 using OpenSALib3.Utility;
 using System.ComponentModel;
+using System.Activities.Presentation.PropertyEditing;
 
 namespace OpenSALib3.PSA
 {
@@ -63,22 +64,28 @@ namespace OpenSALib3.PSA
             get { return _data.UnknownD3; }
             set { _data.UnknownD3 = value; }
         }
+        [Editor(typeof(HexPropertyEditor), typeof(PropertyValueEditor))]
+        public int DataOffset
+        {
+            get { return _data.UnknownD3; }
+            set { _data.UnknownD3 = value; }
+        }
         public unsafe Article(DatElement parent, int offset)
             : base(parent, offset)
         {
-            var _actionflags = new NamedList(this,"Action Flags");
-            NamedList _actions = new NamedList(this,"Actions");
-            NamedList _subactionflags = new NamedList(this,"Flags");
-            NamedList _subactionmain = new NamedList(this,"Main");
-            NamedList _subactiongfx = new NamedList(this,"GFX");
-            NamedList _subactionsfx = new NamedList(this,"SFX");
-            NamedList _subactionother = new NamedList(this,"OTHER");
-            NamedList _subroutines = new NamedList(this,"Subroutines");
+            var _actionflags = new NamedList(this, "Action Flags");
+            NamedList _actions = new NamedList(this, "Actions");
+            NamedList _subactionflags = new NamedList(this, "Flags");
+            NamedList _subactionmain = new NamedList(this, "Main");
+            NamedList _subactiongfx = new NamedList(this, "GFX");
+            NamedList _subactionsfx = new NamedList(this, "SFX");
+            NamedList _subactionother = new NamedList(this, "OTHER");
+            NamedList _subroutines = new NamedList(this, "Subroutines");
             _data = *(Data*)Address;
             Name = "Article";
             Length = 4 * 14;
             if (
-                _data.SubactionFlagsStart < 1||
+                _data.SubactionFlagsStart < 1 ||
                 _data.ActionsStart > RootFile.Length || _data.ActionsStart % 4 != 0 ||
                 _data.SubactionFlagsStart > RootFile.Length || _data.SubactionFlagsStart % 4 != 0 ||
                 _data.SubactionGFXStart > RootFile.Length || _data.SubactionGFXStart % 4 != 0 ||
@@ -98,8 +105,8 @@ namespace OpenSALib3.PSA
             var count = 0;
             for (var i = 0; i < actions; i++)
             {
-                _actionflags[i] = new ActionFlags(this,_data.ActionFlagsStart,i);
-                _actions[i] = new CommandList(this, _data.ActionsStart + i * 4, "Action " + String.Format("0x{0:X}", i), _subroutines);     
+                _actionflags[i] = new ActionFlags(this, _data.ActionFlagsStart, i);
+                _actions[i] = new CommandList(this, _data.ActionsStart + i * 4, "Action " + String.Format("0x{0:X}", i), _subroutines);
             }
             for (var i = 0; i < subactions; i++)
                 _subactionflags[i] = new SubactionFlags(this, _data.SubactionFlagsStart + i * 8);
@@ -123,7 +130,7 @@ namespace OpenSALib3.PSA
             //    for (var i = 0; i < subactions; i++)
             //        _subactionother.Add(new CommandList(this, _data.OtherStart + i * 4, "Subaction Other " + String.Format("0x{0:X}", count++), _subroutines));
 
-            
+
             this["Action Flags"] = _actionflags;
             this["Actions"] = _actions;
             this["Subaction Flags"] = _subactionflags;
