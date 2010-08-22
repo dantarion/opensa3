@@ -108,7 +108,7 @@ namespace OpenSALib3.DatHandler
                         first = false;
                         continue;
                     }
-                    
+
 
                     foreach (BoneRef val in dee)
                     {
@@ -149,7 +149,7 @@ namespace OpenSALib3.DatHandler
             get { return Node.WorkingSource.Address + Marshal.SizeOf(_header); }
         }
 
-        private readonly Dictionary<int,DatSection> _external = new Dictionary<int,DatSection>();
+        private readonly Dictionary<int, DatSection> _external = new Dictionary<int, DatSection>();
         public string IsExternal(int offset)
         {
             bool result = _external.ContainsKey(offset);
@@ -182,7 +182,7 @@ namespace OpenSALib3.DatHandler
             for (var i = 0; i < _header.ReferenceCount; i++)
             {
                 var s = DatSection.Factory(References, section2, stringBase);
-                
+
                 References[s.Name] = s;
                 var tmp = s.DataOffset;
                 do
@@ -238,7 +238,6 @@ namespace OpenSALib3.DatHandler
             var usagedata = new List<UsageData>();
             foreach (var child in Dictionary.Values)
                 CollectUsage(child, ref usagedata);
-            usagedata.AddRange(_susagedata);
             usagedata.Sort();
             var usage = usagedata.Sum(ug => ug.Length);
             var sb = new StringBuilder(0x150000);
@@ -278,33 +277,19 @@ namespace OpenSALib3.DatHandler
         {
             foreach (DatElement child in element)
                 CollectUsage(child, ref list);//Get the child usage
-            var de = (DatElement)element;
-            if (de == null) return;
-            if (list.Exists(x => x.Offset == de.FileOffset))
+            if (list.Exists(x => x.Offset == element.FileOffset))
                 return;
             UsageData ud;
-
-            ud.Offset = de.FileOffset;
-            ud.Length = de.Length;
-            ud.ID = de.Path + " " + de.GetType().Name;
-            
-                list.Add(ud);
+            ud.Offset = element.FileOffset;
+            ud.Length = element.Length;
+            ud.ID = element.Path + " " + element.GetType().Name;
+            list.Add(ud);
         }
-
-        readonly List<UsageData> _susagedata = new List<UsageData>();
         public string ReadString(int offset)
         {
             if (offset > Length)
                 throw new Exception("Invalid Offset");
-            var s = new String((sbyte*)(Address + offset));
-            UsageData ud;
-            ud.Offset = offset;
-            ud.Length = s.Length + 1;
-            ud.Length += ud.Length % 8;
-            ud.ID = "String";
-            // if (susagedata.Count(x => x.offset == offset) == 0)
-            //     susagedata.Add(ud);
-            return s;
+            return new String((sbyte*)(Address + offset));
         }
     }
 }
