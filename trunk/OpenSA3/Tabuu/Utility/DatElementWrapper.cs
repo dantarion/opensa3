@@ -3,11 +3,14 @@ using System.Collections;
 using System.Linq;
 using OpenSALib3.DatHandler;
 using System.Collections.Generic;
-namespace Tabuu.Utility {
-    public class DatElementWrapper : Be.Windows.Forms.IByteProvider {
+namespace Tabuu.Utility
+{
+    public class DatElementWrapper : Be.Windows.Forms.IByteProvider
+    {
         private readonly DatElement _datelement;
         readonly bool _contentmode;
-        public DatElementWrapper(DatElement datElement, bool contentmode = false) {
+        public DatElementWrapper(DatElement datElement, bool contentmode = false)
+        {
             _datelement = datElement;
             _contentmode = contentmode;
         }
@@ -15,20 +18,24 @@ namespace Tabuu.Utility {
         #region IByteProvider
         public void ApplyChanges() { }
 
-        public void DeleteBytes(long index, long length) {
+        public void DeleteBytes(long index, long length)
+        {
             throw new NotImplementedException();
         }
 
-        public bool HasChanges() {
+        public bool HasChanges()
+        {
             return _datelement.IsChanged;
         }
 
-        public void InsertBytes(long index, byte[] bs) {
+        public void InsertBytes(long index, byte[] bs)
+        {
             throw new NotImplementedException();
         }
 
-        public long Length {
-            get { return _contentmode ? ((DatSection) _datelement).DataLength: _datelement.Length; }
+        public long Length
+        {
+            get { return _contentmode ? ((DatSection)_datelement).DataLength : _datelement.Length; }
         }
 
 #pragma warning disable 067 //The event '____' is never used
@@ -36,20 +43,25 @@ namespace Tabuu.Utility {
         public event EventHandler LengthChanged;
 #pragma warning restore 067
 
-        public unsafe byte ReadByte(long index) {
-            var offset = _contentmode ? ((DatSection) _datelement).DataOffset : _datelement.FileOffset;
+        public unsafe byte ReadByte(long index)
+        {
+            var offset = _contentmode ? ((DatSection)_datelement).DataOffset : _datelement.FileOffset;
             return *(byte*)(_datelement.RootFile.Address + offset + (uint)index);
         }
 
-        public System.Drawing.Color GetByteColor(long index) {
+        public System.Drawing.Color GetByteColor(long index)
+        {
 
-            long offset = _contentmode ? ((DatSection) _datelement).DataOffset : _datelement.FileOffset;
+            long offset = _contentmode ? ((DatSection)_datelement).DataOffset : _datelement.FileOffset;
             offset += index;
             offset -= offset % 4;
             if (!_colorCache.ContainsKey(offset))
             {
                 var ele = SearchForDatElement(_datelement, offset);
-                _colorCache[offset] =  ele != null ? ele.Color : System.Drawing.Color.Transparent;
+                var defaultcolor = System.Drawing.Color.Transparent;
+                if (ele.RootFile.OffsetList.Contains((int)index))
+                    defaultcolor = System.Drawing.Color.Azure;
+                _colorCache[offset] = ele != null ? ele.Color : defaultcolor;
             }
             return _colorCache[offset];
         }
@@ -63,8 +75,8 @@ namespace Tabuu.Utility {
             var asDatElement = node as DatElement;
             if (asDatElement == null) //If its not a DatElement though, the search failed
                 return null;
-            return IsIndexInDatElement(index,asDatElement)
-                ? asDatElement //But if it is, and we are in there, we found it!
+            return IsIndexInDatElement(index,asDatElement) ?
+                 asDatElement //But if it is, and we are in there, we found it!
                 : null;        //But if its not we failed
 
 
@@ -74,19 +86,23 @@ namespace Tabuu.Utility {
             return element.FileOffset <= index && index < element.FileOffset + element.Length;
         }
 
-        public bool SupportsDeleteBytes() {
+        public bool SupportsDeleteBytes()
+        {
             return false;
         }
 
-        public bool SupportsInsertBytes() {
+        public bool SupportsInsertBytes()
+        {
             return false;
         }
 
-        public bool SupportsWriteByte() {
+        public bool SupportsWriteByte()
+        {
             return true;
         }
 
-        public unsafe void WriteByte(long index, byte value) {
+        public unsafe void WriteByte(long index, byte value)
+        {
             var src = (byte*)(_datelement.RootFile.Address + _datelement.FileOffset + (uint)index);
             *src = value;
             _datelement.MarkDirty(this, null);
