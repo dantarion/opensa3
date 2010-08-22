@@ -3,6 +3,8 @@ using System.ComponentModel;
 #pragma warning disable 649 //'Field ____ is never assigned'
 using System.Drawing;
 using OpenSALib3.DatHandler;
+using OpenSALib3.Utility;
+using System.Activities.Presentation.PropertyEditing;
 
 namespace OpenSALib3.PSA
 {
@@ -124,6 +126,7 @@ namespace OpenSALib3.PSA
             get { return (ParameterType)(int)_data.Type; }
         }
         [Category("Parameter"), Browsable(true)]
+        [Editor(typeof(HexPropertyEditor), typeof(PropertyValueEditor))]
         public int RawData
         {
             get { return _data.RawData; }

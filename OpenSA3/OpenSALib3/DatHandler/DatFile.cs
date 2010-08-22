@@ -53,6 +53,7 @@ namespace OpenSALib3.DatHandler
         public MDL0Node Model { get; private set; }
         public Dictionary<string, CHR0Node> Animations { get; private set; }
         private Dictionary<int, string> _boneNames;
+        public List<int> OffsetList = new List<int>();
         public void LoadModel(string filename)
         {
             try
@@ -203,6 +204,8 @@ namespace OpenSALib3.DatHandler
                 section += 8;
             }
             var offsetchunk = new UnknownElement(this, _header.DataChunkSize, "OffsetChunk", _header.OffsetCount * 4);
+            for (int i = 0; i < _header.OffsetCount; i++)
+                OffsetList.Add(ReadInt(_header.DataChunkSize + i * 4));
             offsetchunk.TreeColor = null;
             ComputeDataLengths(Sections);
             foreach (DatSection s in Sections)

@@ -7,7 +7,7 @@ using System.IO;
 
 namespace OpenSALib3.Utility
 {
-    static class PSANames
+    public static class PSANames
     {
         public static bool loaded = false;
         public static Dictionary<string, EventData> EventNames = new Dictionary<string, EventData>();
