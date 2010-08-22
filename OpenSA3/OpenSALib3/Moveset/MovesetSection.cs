@@ -89,10 +89,10 @@ namespace OpenSALib3.Moveset
             /* Attributes */
             var count = 0;
             for (int i = _header.AttributeStart; i < _header.SSEAttributeStart; i += 4)
-                _attributes[count++] =new Attribute(this, i);
+                _attributes[count++] = new Attribute(_attributes, i);
             count = 0;
             for (int i = _header.SSEAttributeStart; i < _header.CommonActionFlagsStart; i += 4)
-                _sseattributes[count++] = new Attribute(this, i);
+                _sseattributes[count++] = new Attribute(_sseattributes, i);
 
             /* Action Interrupts */
             var _actioninterrupts = new UnknownElement(this, _header.Unknown8, "Action Interrupts", 8);
@@ -110,14 +110,14 @@ namespace OpenSALib3.Moveset
             /* Action Flags */
             count = 0;
             for (int i = _header.CommonActionFlagsStart; i < _header.Unknown7; i += 16)
-                _commonactionflags[count] = new ActionFlags(this, i, count++);
+                _commonactionflags[count] = new ActionFlags(_commonactionflags, i, count++);
             for (int i = _header.ActionFlagsStart; i < _header.ActionsStart; i += 16)
-                _actionflags[count] = new ActionFlags(this, i, count++);
+                _actionflags[count] = new ActionFlags(_actionflags, i, count++);
             count = 0;
             for (int i = _header.Unknown7; i < _header.Unknown7 + 8 * (_commonactionflags.Count + _actionflags.Count); i += 8)
-                _unknowne[null] = new UnknownElement(this, i, String.Format("0x{0:X03}", count++), 8);
+                _unknowne[null] = new UnknownElement(_unknowne, i, String.Format("0x{0:X03}", count++), 8);
             for (int i = _header.Unknown1; i < _header.Unknown19; i += 8)
-                _unknownb[null] = new UnknownElement(this, i, "UnknownB", 8);
+                _unknownb[null] = new UnknownElement(_unknownb, i, "UnknownB", 8);
 
             /* Action _Pre */
             var _actionpre = new NamedList(this, "Action_Pre");
@@ -136,10 +136,10 @@ namespace OpenSALib3.Moveset
             /* Actions */
             count = 0x112;
             for (int i = _header.ActionsStart; i < _header.Actions2Start; i += 4)
-                _actions[count] = new CommandList(this, i, "Action " + String.Format("0x{0:X03}", count++), _subroutines);
+                _actions[count] = new CommandList(_actions, i, "Action " + String.Format("0x{0:X03}", count++), _subroutines);
             count = 0x112;
             for (int i = _header.Actions2Start; i < _header.Unknown11; i += 4)
-                _actions2[count] = new CommandList(this, i, "Action2 " + String.Format("0x{0:X03}", count++), _subroutines);
+                _actions2[count] = new CommandList(_actions2, i, "Action2 " + String.Format("0x{0:X03}", count++), _subroutines);
             count = 0;
 
             /* Subaction Flags */
@@ -217,9 +217,9 @@ namespace OpenSALib3.Moveset
                 unknowno[null] = new GenericElement<int>(unknowno, i, String.Format("0x{0:X03}",count++));
             var bonerefs = new NamedList(this, "Smash Ball Bones?");
             for (int i = _header.Unknown18; i < MiscSection.ReadInt(4 * 9); i += 4)
-                bonerefs[null] = (new BoneRef(this, i, "Unknown"));
+                bonerefs[null] = (new BoneRef(bonerefs, i, "Unknown"));
             if (_header.Unknown26 > 0)
-                _articles[null] = (new Article(this, _header.Unknown26));
+                _articles[null] = (new Article(_articles, _header.Unknown26));
 
             var headerExtension = new UnknownElement(this, DataOffset + 31 * 4, "HeaderEXT", DataLength - 31 * 4);
             for (var i = headerExtension.FileOffset; i < headerExtension.FileOffset + Math.Min(headerExtension.Length,0x40); i += 4)
@@ -227,7 +227,7 @@ namespace OpenSALib3.Moveset
                 Article art = null;
                 try
                 {
-                    art = new Article(this, RootFile.ReadInt(i));
+                    art = new Article(_articles, RootFile.ReadInt(i));
                     _articles[null] = art;
                 }
                 catch (Exception)
@@ -236,7 +236,7 @@ namespace OpenSALib3.Moveset
             }
             var unknownV = new NamedList(this, "UnknownV");
             for (int i = _header.Unknown16; i < _header.Unknown18; i += 0x1c)
-                unknownV[null] = new UnknownElement(this, i, "UnknownV", 0x1c);
+                unknownV[null] = new UnknownElement(unknownV, i, "UnknownV", 0x1c);
             //TODO: Make Unknown letters make sense...
 
             //Setup Tree Structure

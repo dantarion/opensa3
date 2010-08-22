@@ -105,7 +105,11 @@ namespace Tabuu.Utility
         {
             var src = (byte*)(_datelement.RootFile.Address + _datelement.FileOffset + (uint)index);
             *src = value;
-            _datelement.MarkDirty(this, null);
+            var element = SearchForDatElement(_datelement, (index));
+            if (element != null)
+                element.MarkDirty(this, new System.ComponentModel.PropertyChangedEventArgs(""));
+            else
+                _datelement.MarkDirty(this, new System.ComponentModel.PropertyChangedEventArgs(""));
         }
         #endregion
 

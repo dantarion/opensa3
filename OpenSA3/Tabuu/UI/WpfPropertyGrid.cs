@@ -69,7 +69,7 @@ namespace Tabuu.UI
             // if we're an observable collection, listen for change and update our selection in that case
             // make sure that the grid updates with changes to dependency property properties on individual objects
 
-            var objects = new List<object> {e.NewValue};
+            var objects = new List<object> { e.NewValue };
             //var objects = e.NewValue as IEnumerable ?? new[] { e.NewValue };
 
             if (e.OldValue is INotifyCollectionChanged)
@@ -80,11 +80,10 @@ namespace Tabuu.UI
             if (e.OldValue is IEnumerable)
                 foreach (var old in ((IEnumerable)e.OldValue).OfType<INotifyPropertyChanged>())
                     (old).PropertyChanged -= pg.PropertyGridPropertyChanged;
-                ;
             var mis = new List<ModelItem>();
             foreach (var obj in objects)
             {
-                //if (obj is INotifyPropertyChanged)
+               // if (obj is INotifyPropertyChanged)
                     //((INotifyPropertyChanged)obj).PropertyChanged += pg.PropertyGridPropertyChanged;
                 //if object is deleted obj is null therefore don't load and add...
                 if (obj == null) continue;
