@@ -94,19 +94,6 @@ namespace OpenSALib3.Moveset
             for (int i = _header.SSEAttributeStart; i < _header.CommonActionFlagsStart; i += 4)
                 _sseattributes[count++] = new Attribute(this, i);
 
-            /* Action _Pre */
-            var _actionpre = new NamedList(this, "Action_Pre");
-            _actionpre.TreeColor = null;
-            count = 0;
-            for (int i = _header.Unknown11; i < _header.Unknown11 + 4 * _unknowne.Count; i += 0x4)
-            {
-
-                var tmp = new GenericElement<int>(_actionpre, i, String.Format("0x{0:X03}", count++));
-                var str = RootFile.IsExternal(i);
-                if (str != null)
-                    tmp.Name += " - " + str;
-                _actionpre[null] = tmp;
-            }
             /* Action Interrupts */
             var _actioninterrupts = new UnknownElement(this, _header.Unknown8, "Action Interrupts", 8);
             _actioninterrupts.TreeColor = null;
@@ -131,6 +118,20 @@ namespace OpenSALib3.Moveset
                 _unknowne[null] = new UnknownElement(this, i, String.Format("0x{0:X03}", count++), 8);
             for (int i = _header.Unknown1; i < _header.Unknown19; i += 8)
                 _unknownb[null] = new UnknownElement(this, i, "UnknownB", 8);
+
+            /* Action _Pre */
+            var _actionpre = new NamedList(this, "Action_Pre");
+            _actionpre.TreeColor = null;
+            count = 0;
+            for (int i = _header.Unknown11; i < _header.Unknown11 + 4 * _unknowne.Count; i += 0x4)
+            {
+
+                var tmp = new GenericElement<int>(_actionpre, i, String.Format("0x{0:X03}", count++));
+                var str = RootFile.IsExternal(i);
+                if (str != null)
+                    tmp.Name += " - " + str;
+                _actionpre[null] = tmp;
+            }
 
             /* Actions */
             count = 0x112;
@@ -221,7 +222,7 @@ namespace OpenSALib3.Moveset
                 _articles[null] = (new Article(this, _header.Unknown26));
 
             var headerExtension = new UnknownElement(this, DataOffset + 31 * 4, "HeaderEXT", DataLength - 31 * 4);
-            for (var i = headerExtension.FileOffset; i < headerExtension.FileOffset + Math.Min(headerExtension.Length,0x20); i += 4)
+            for (var i = headerExtension.FileOffset; i < headerExtension.FileOffset + Math.Min(headerExtension.Length,0x40); i += 4)
             {
                 Article art = null;
                 try
