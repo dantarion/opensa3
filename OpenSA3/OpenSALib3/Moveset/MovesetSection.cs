@@ -9,20 +9,6 @@ namespace OpenSALib3.Moveset
 {
     public sealed class MovesetSection : DatSection
     {
-        /* TODO
-         private const int SUBACTION_FLAG_START = 0;
-        private const int SOMETHING = 1;
-        private const int ATTRIBUTE_START = 2;
-        private const int SSE_ATTRIBUTE_START = 3;
-        private const int ATTRIBUTE2_START = 4;
-        private const int ACTION_OFFSETS_START = 9;
-        private const int HIDDEN_ACTION_START = 10;
-        private const int HIDDEN_ACTION_END = 11;
-        private const int SUBACTION_MAIN_OFFSETS_START = 12;
-        private const int SUBACTION_GFX_OFFSETS_START = 13;
-        private const int SUBACTION_SFX_OFFSETS_START = 14;
-        private const int SUBACTION_OTHER_OFFSETS_START = 15;
-         */
 #pragma warning disable 169 //'Field ____ is never used'
 #pragma warning disable 649 //'Field ____ is never assigned'
         private struct MovesetHeader
@@ -32,8 +18,8 @@ namespace OpenSALib3.Moveset
             public bint AttributeStart;
             public bint SSEAttributeStart;
             public bint MiscSectionOffset;
-            public bint Unknown5Start;//UnknownA
-            public bint Unknown6Start;//UnknownC
+            public bint CommonActionFlagsStart;//UnknownA
+            public bint ActionFlagsStart;//UnknownC
             public bint Unknown7;
             public bint Unknown8;
             public bint ActionsStart;
@@ -94,38 +80,68 @@ namespace OpenSALib3.Moveset
             var _subactions = new NamedList(this, "Subactions");
             _subactions.TreeColor = null;
             var _unknownb = new NamedList(this, "UnknownB");
-            var _unknowne = new NamedList(this, "UnknownE");
+            var _unknowne = new NamedList(this, "Action ???");
             _unknowne.TreeColor = null;
             var _articles = new NamedList(this, "Article");
             var _subroutines = new NamedList(this, "Subroutines");
             _subroutines.TreeColor = null;
 
+            /* Attributes */
             var count = 0;
             for (int i = _header.AttributeStart; i < _header.SSEAttributeStart; i += 4)
                 _attributes[count++] =new Attribute(this, i);
             count = 0;
-            for (int i = _header.SSEAttributeStart; i < _header.Unknown5Start; i += 4)
+            for (int i = _header.SSEAttributeStart; i < _header.CommonActionFlagsStart; i += 4)
                 _sseattributes[count++] = new Attribute(this, i);
 
+            /* Action _Pre */
+            var _actionpre = new NamedList(this, "Action_Pre");
+            _actionpre.TreeColor = null;
             count = 0;
-            for (int i = _header.Unknown5Start; i < _header.Unknown7; i += 16)
+            for (int i = _header.Unknown11; i < _header.Unknown11 + 4 * _unknowne.Count; i += 0x4)
+            {
+
+                var tmp = new GenericElement<int>(_actionpre, i, String.Format("0x{0:X03}", count++));
+                var str = RootFile.IsExternal(i);
+                if (str != null)
+                    tmp.Name += " - " + str;
+                _actionpre[null] = tmp;
+            }
+            /* Action Interrupts */
+            var _actioninterrupts = new UnknownElement(this, _header.Unknown8, "Action Interrupts", 8);
+            _actioninterrupts.TreeColor = null;
+            count = 0;
+            for (var i = RootFile.ReadInt(_actioninterrupts.FileOffset); i < RootFile.ReadInt(_actioninterrupts.FileOffset) + RootFile.ReadInt(_actioninterrupts.FileOffset + 4) * 4; i += 4)
+            {
+                var tmp = new GenericElement<int>(_actioninterrupts, i, String.Format("0x{0:X03}", count++));
+                var str = RootFile.IsExternal(i);
+                if (str != null)
+                    tmp.Name += " - " + str;
+                _actioninterrupts[i] = tmp;
+            }
+
+            /* Action Flags */
+            count = 0;
+            for (int i = _header.CommonActionFlagsStart; i < _header.Unknown7; i += 16)
                 _commonactionflags[count] = new ActionFlags(this, i, count++);
-            for (int i = _header.Unknown6Start; i < _header.ActionsStart; i += 16)
+            for (int i = _header.ActionFlagsStart; i < _header.ActionsStart; i += 16)
                 _actionflags[count] = new ActionFlags(this, i, count++);
+            count = 0;
             for (int i = _header.Unknown7; i < _header.Unknown7 + 8 * (_commonactionflags.Count + _actionflags.Count); i += 8)
-                _unknowne[null] = new UnknownElement(this, i, "UnknownE", 8);
+                _unknowne[null] = new UnknownElement(this, i, String.Format("0x{0:X03}", count++), 8);
             for (int i = _header.Unknown1; i < _header.Unknown19; i += 8)
                 _unknownb[null] = new UnknownElement(this, i, "UnknownB", 8);
 
-
+            /* Actions */
             count = 0x112;
             for (int i = _header.ActionsStart; i < _header.Actions2Start; i += 4)
-                _actions[count] = new CommandList(this, i, "Action " + String.Format("0x{0:X}", count++), _subroutines);
-            count = 0;
+                _actions[count] = new CommandList(this, i, "Action " + String.Format("0x{0:X03}", count++), _subroutines);
+            count = 0x112;
             for (int i = _header.Actions2Start; i < _header.Unknown11; i += 4)
-                _actions2[count] = new CommandList(this, i, "Action2 " + String.Format("0x{0:X}", count++), _subroutines);
+                _actions2[count] = new CommandList(this, i, "Action2 " + String.Format("0x{0:X03}", count++), _subroutines);
             count = 0;
 
+            /* Subaction Flags */
             int first = int.MaxValue;
             int last = 0;
             for (int i = _header.SubactionFlagsStart; i < _header.SubactionMainStart; i += 8)
@@ -139,9 +155,12 @@ namespace OpenSALib3.Moveset
                 subactiongroup["Flags"] = flags;
                 subactiongroup.Name += " - " + flags.AnimationName;
             }
+            /* Subaction Strings */
             var size = _header.SubactionFlagsStart - first;
             var stringChunk = new UnknownElement(this, first, "SubactionStrings", size);
             stringChunk.TreeColor = null;
+
+            /* Subaction Main,GFX,SFX,Other */
             count = 0;
             for (int i = _header.SubactionMainStart; i < _header.SubactionGFXStart; i += 4)
                 (_subactions[count] as DatElement)["Main"] = new CommandList(_subactions[count++], i, "Main ", _subroutines);
@@ -156,7 +175,7 @@ namespace OpenSALib3.Moveset
             for (int i = _header.SubactionOtherStart; i < _header.SubactionOtherStart + othercount * 4; i += 4)
                 (_subactions[count] as DatElement)["Other"] = new CommandList(_subactions[count++], i, "Other ", _subroutines);
 
-            //LastOne
+            //Model Display
             var unknownK = new UnknownElement(this, _header.Unknown1, "Model Display", 16);
             for (var i = 0; i < unknownK.ReadInt(12); i++)
                 unknownK[i] = new UnknownElement(unknownK, unknownK.ReadInt(8) + i * 8, "Stats", 8);
@@ -191,6 +210,7 @@ namespace OpenSALib3.Moveset
                 unknownK.AddByName(offele);
             }
             count = 0;
+
             var unknowno = new UnknownElement(this, _header.Unknown19, "UnknownO", 24);
             for (var i = unknowno.ReadInt(20); i < unknowno.FileOffset; i += 4)
                 unknowno[null] = new GenericElement<int>(unknowno, i, String.Format("0x{0:X03}",count++));
@@ -200,8 +220,6 @@ namespace OpenSALib3.Moveset
             if (_header.Unknown26 > 0)
                 _articles[null] = (new Article(this, _header.Unknown26));
 
-
-            //}
             var headerExtension = new UnknownElement(this, DataOffset + 31 * 4, "HeaderEXT", DataLength - 31 * 4);
             for (var i = headerExtension.FileOffset; i < headerExtension.FileOffset + Math.Min(headerExtension.Length,0x20); i += 4)
             {
@@ -219,48 +237,21 @@ namespace OpenSALib3.Moveset
             for (int i = _header.Unknown16; i < _header.Unknown18; i += 0x1c)
                 unknownV[null] = new UnknownElement(this, i, "UnknownV", 0x1c);
             //TODO: Make Unknown letters make sense...
-            var unknownAO = new NamedList(this, "Action_Pre");
-            unknownAO.TreeColor = null;
-            count = 0;
-            for (int i = _header.Unknown11; i < _header.Unknown11 + 4 * _unknowne.Count; i += 0x4)
-            {
-
-                var tmp = new GenericElement<int>(unknownAO, i, String.Format("0x{0:X03}", count++));
-                var str = RootFile.IsExternal(i);
-                if (str != null)
-                    tmp.Name +=" - "+ str;
-                unknownAO[null] = tmp;
-            }
-            var unknownd = new UnknownElement(this, _header.Unknown8, "Action_Group?", 8);
-            unknownd.TreeColor = null;
-            count = 0;
-            for (var i = RootFile.ReadInt(unknownd.FileOffset); i < RootFile.ReadInt(unknownd.FileOffset) + RootFile.ReadInt(unknownd.FileOffset + 4) * 4; i += 4)
-            {
-                var tmp = new GenericElement<int>(unknownd, i, String.Format("0x{0:X03}", count++));
-                var str = RootFile.IsExternal(i);
-                if (str != null)
-                    tmp.Name += " - " + str;
-                unknownd[i] = tmp;
-            }
 
             //Setup Tree Structure
             this["Header"] = new UnknownElement(this, DataOffset, "Header", 31 * 4);
             this["HeaderEXT"] = headerExtension;
             AddByName(_attributes);
             AddByName(_sseattributes);
-
-
-            AddByName(_unknowne);
-            AddByName(unknownV);
             
+            AddByName(unknownV);          
             AddByName(unknownK);
-            this["UnknownO"] = unknowno;
-
-            
+            this["UnknownO"] = unknowno;       
             this["MiscSection"] = MiscSection;
             this["BoneRefs"] = bonerefs;
-            AddByName(unknownd);
-            AddByName(unknownAO);
+            AddByName(_unknowne);
+            AddByName(_actioninterrupts);
+            AddByName(_actionpre);
             AddByName(_commonactionflags);
             AddByName(_actionflags);
             AddByName(_actions);

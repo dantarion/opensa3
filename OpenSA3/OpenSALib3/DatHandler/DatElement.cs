@@ -192,6 +192,10 @@ namespace OpenSALib3.DatHandler
         {
             return *(bint*)(RootFile.Address + FileOffset + offset);
         }
+        public unsafe uint ReadUInt(int offset)
+        {
+            return *(buint*)(RootFile.Address + FileOffset + offset);
+        }
         public unsafe float ReadFloat(int offset)
         {
             return *(bfloat*)(RootFile.Address + FileOffset + offset);
