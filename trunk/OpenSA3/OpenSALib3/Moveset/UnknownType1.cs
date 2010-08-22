@@ -1,5 +1,7 @@
 ﻿using System;
 using OpenSALib3.DatHandler;
+using System.ComponentModel;
+using System.Activities.Presentation.PropertyEditing;
 
 namespace OpenSALib3.Moveset {
     public sealed class UnknownType1 : DatElement {
@@ -48,7 +50,7 @@ namespace OpenSALib3.Moveset {
             get { return _data.Float7; }
             set { _data.Float7 = value; }
         }
-
+        [Editor(typeof(HexPropertyEditor), typeof(PropertyValueEditor))]
         public int Flags {
             get { return _data.Flags; }
             set { _data.Flags = value; }
