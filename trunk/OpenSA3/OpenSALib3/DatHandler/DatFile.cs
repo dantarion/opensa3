@@ -227,7 +227,7 @@ namespace OpenSALib3.DatHandler
                 if (i < sorted.Count - 1)
                     sorted[i].DataLength = sorted[i + 1].DataOffset - sorted[i].DataOffset;
                 else sorted[i].DataLength = _header.DataChunkSize - sorted[i].DataOffset;
-                sorted[i].DataLength += sorted[i].DataLength % 8;
+                sorted[i].DataLength += sorted[i].DataLength % 4;
             }
         }
         public string Report(bool onlyholes = false)
