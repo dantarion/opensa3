@@ -163,27 +163,34 @@ namespace Tabuu.UI
         #region Functions
         private void LoadFilename(string s)
         {
-            var fp = FileMap.FromFile(s, FileMapProtect.ReadWrite);
-            var ds = new BrawlLib.SSBB.ResourceNodes.DataSource(fp);
-            var rs = BrawlLib.SSBB.ResourceNodes.NodeFactory.FromSource(null, ds);
-            var list = rs.FindChildrenByType(".", BrawlLib.SSBB.ResourceNodes.ResourceType.ARCEntry).Where(x => x.Name.Contains("MiscData"));
-            foreach (var node in list.Where(x => DatFile.IsDatFile(x)))
+            try
             {
-                var df = DatFile.FromNode(node);
-                TreeView.Items.Add(df);
-                if (AutoLoadResources.IsChecked.Value)
+                var fp = FileMap.FromFile(s, FileMapProtect.ReadWrite);
+                var ds = new BrawlLib.SSBB.ResourceNodes.DataSource(fp);
+                var rs = BrawlLib.SSBB.ResourceNodes.NodeFactory.FromSource(null, ds);
+                var list = rs.FindChildrenByType(".", BrawlLib.SSBB.ResourceNodes.ResourceType.ARCEntry).Where(x => x.Name.Contains("MiscData"));
+                foreach (var node in list.Where(x => DatFile.IsDatFile(x)))
                 {
-                    if (System.IO.File.Exists(s.Replace(".pac", "00.pac")))
-                        df.LoadModel(s.Replace(".pac", "00.pac"));
-                    if (System.IO.File.Exists(s.Replace(".pac", "Motion.pac")))
-                        df.LoadAnimations(s.Replace(".pac", "Motion.pac"));
-                    if (System.IO.File.Exists(s.Replace(".pac", "MotionEtc.pac")))
-                        df.LoadAnimations(s.Replace(".pac", "MotionEtc.pac"));
-                }
+                    var df = DatFile.FromNode(node);
+                    TreeView.Items.Add(df);
+                    if (AutoLoadResources.IsChecked.Value)
+                    {
+                        if (System.IO.File.Exists(s.Replace(".pac", "00.pac")))
+                            df.LoadModel(s.Replace(".pac", "00.pac"));
+                        if (System.IO.File.Exists(s.Replace(".pac", "Motion.pac")))
+                            df.LoadAnimations(s.Replace(".pac", "Motion.pac"));
+                        if (System.IO.File.Exists(s.Replace(".pac", "MotionEtc.pac")))
+                            df.LoadAnimations(s.Replace(".pac", "MotionEtc.pac"));
+                    }
 
+                }
+                rs.Rebuild(true);
+                rs.Merge();
             }
-            rs.Rebuild(true);
-            rs.Merge();
+            catch (System.IO.IOException err)
+            {
+                StatusLabel.Content = err.Message;
+            }
         }
         public void LoadModel(DatFile d, string s)
         {
