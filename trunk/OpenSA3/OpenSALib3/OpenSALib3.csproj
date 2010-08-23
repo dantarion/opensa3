@@ -78,6 +78,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CommandReceiver.cs" />
     <Compile Include="DatHandler\DatElement.cs" />
     <Compile Include="DatHandler\DatSection.cs" />
     <Compile Include="DatHandler\DatFile.cs" />
@@ -116,6 +117,9 @@
     <Compile Include="Utility\NamedList.cs" />
     <Compile Include="Utility\PropertyEditors.cs" />
     <Compile Include="Utility\PSANames.cs" />
+    <Compile Include="WPFControls\IntelliBox.xaml.cs">
+      <DependentUpon>IntelliBox.xaml</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="OpenSALib3.pfx" />
@@ -135,6 +139,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Requirements.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="WPFControls\IntelliBox.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
