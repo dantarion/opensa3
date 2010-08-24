@@ -90,4 +90,28 @@ namespace OpenSALib3
             GenericHandler(data, pList, values);
         }
     }
+    public enum Requirements : int
+    {
+        AnimationEnd=0x1,
+        OnGround=0x4,
+        InAir=0x4,
+        Compare=0x7,
+        BitIsSet=0x8,
+        FacingRight=0x9,
+        FacingLeft=0xA,
+        HitBoxConnects=0xB,
+        TouchWall=0xC,
+        ButtonTap=0xF,
+        ArticleExists=0x15,
+        ArticleAvailable=0x1C,
+        HoldingItem=0x1F,
+        RollADie=0x2B,
+        ButtonPress=0x30,
+        ButtonRelease=0x31,
+        ButtonPressed=0x32,
+        ButtonNotPressed=0x33,
+        HasNotTethered3Times=0x39,
+        HasPassedOverLedge=0x3A,
+        FacingAwayFromLedge=0x3B
+    }
 }
