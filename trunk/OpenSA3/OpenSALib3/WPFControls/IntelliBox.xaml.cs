@@ -3,12 +3,13 @@ using System.Linq;
 using System.Windows.Input;
 using OpenSALib3;
 using System.Reflection;
-
+using System.Runtime.InteropServices;
 namespace System.Windows.Controls
 {
     /// <summary>
     /// IntelListBox.xaml の相互作用ロジック
     /// </summary>
+    /// 
     public partial class IntelliBox:System.Windows.Controls.UserControl
     {
         private static readonly string[] keywords = 
@@ -50,9 +51,9 @@ namespace System.Windows.Controls
             }
 
             int index = textBox.CaretIndex - 1;
-            int space = textBox.Text.LastIndexOfAny(tokens, index) + 1;
-
-            return textBox.Text.Substring(space, textBox.CaretIndex - space);
+            int space = textBox.Text.LastIndexOfAny(tokens, index)+1;
+            int plus = textBox.Text.IndexOfAny(tokens, index);
+            return textBox.Text.Substring(space,plus-space>0? plus - space:textBox.CaretIndex-space);
         }
 
         private bool IsComment()
@@ -69,12 +70,23 @@ namespace System.Windows.Controls
             return false;
         }
         /// <summary>
+        /// Is this key a letter key?
+        /// </summary>
+        /// <param name="e">pressed key data</param>
+        /// <returns>Letter or not</returns>
+        private bool IsLetter(Key e)
+        {
+            if ((e>= Key.A && e<= Key.Z) || (e>= Key.NumPad0 && e<= Key.NumPad9) || (e>= Key.D0 && e<= Key.D9))
+                return true;
+            return false;
+        }
+
+        /// <summary>
         /// Generates ListViewItem
         /// </summary>
         private void GenerateItems()
         {
             ListView.Items.Clear();
-
             string currentWord = GetCurrentWord(CodeBox);
             string longestWord="";
             if (!IsComment())
@@ -91,7 +103,7 @@ namespace System.Windows.Controls
                 {
                     ListView.SelectedIndex = 0;
                     popup.IsOpen = true;
-                    ListView.Width = longestWord.Length * 10;
+                    ListView.Width = longestWord.Length * 15;
                 }
                 else
                     popup.IsOpen = false;
@@ -162,6 +174,7 @@ namespace System.Windows.Controls
                 {
                     if (popup.IsOpen)
                     {
+                        //アイテムを選んだ、ということなので行変えを無効にする
                         CodeBox.AcceptsReturn = false;
                         SelectItem();
                         ListView.Items.Clear();
@@ -169,7 +182,9 @@ namespace System.Windows.Controls
                     }
                     else
                     {
+                        //アイテムを選んで無いときは行変えを有効にする
                         CodeBox.AcceptsReturn = true;
+                        //こっから先、インデントの文字数を取得
                         insertIndent = true;
                         currentIndent = "";
                         int i = CodeBox.SelectionStart - 1;
@@ -244,7 +259,7 @@ namespace System.Windows.Controls
                 CodeBox.AcceptsReturn = false;
                 completed = true;
             }
-            else if ((e.Key >= Key.A && e.Key <= Key.Z) || (e.Key >= Key.NumPad0 && e.Key <= Key.NumPad9) || (e.Key >= Key.D0 && e.Key <= Key.D9)||e.Key==Key.Back)
+            else if (IsLetter(e.Key)||e.Key==Key.Back)
             {
                 CodeBox.Focus();
             }
@@ -264,13 +279,14 @@ namespace System.Windows.Controls
             {
                 if (insertIndent)
                 {
+                    //インデント挿入するよ
                     int caretIndex = CodeBox.CaretIndex;
                     CodeBox.Text = CodeBox.Text.Insert(CodeBox.SelectionStart, currentIndent+colonStack);
                     CodeBox.CaretIndex = caretIndex + currentIndent.Length+colonStack.Length;
                     colonStack = "";
                     insertIndent = false;
                 }
-                if (!completed)
+                if (!completed&&IsLetter(e.Key))
                 {
                     GenerateItems();
                     popup.PlacementTarget = CodeBox;
@@ -279,6 +295,48 @@ namespace System.Windows.Controls
                 else
                     completed = false;
             }
+        }
+
+        private void CodeBox_SelectionChanged(object sender, RoutedEventArgs e)
+        {
+            string word;
+            List<char> temp = new List<char>();
+            string ca;
+            string text=CodeBox.Text;
+            int kakkoIndex=CodeBox.CaretIndex-1;
+            while (kakkoIndex > 0)
+                if (text[kakkoIndex--] == '(')//括弧見つけた！
+                {
+                    for (; kakkoIndex > -1; kakkoIndex--)
+                        if (tokens.Contains(text[kakkoIndex]))
+                            break;
+                        else
+                            temp.Add(text[kakkoIndex]);//一個一個後ろに進みつつ、文字を手に入れる
+                    break;
+                }
+                else if (text[kakkoIndex] == ' ' || text[kakkoIndex] == '\n' || text[kakkoIndex] == '\r' || text[kakkoIndex] == '\t' || text[kakkoIndex] == ')')
+                    //もし行のはじめ、閉じ括弧、空白に到達したら走査終了
+                    break;
+            //文字は逆向きなので反対に直す
+            temp.Reverse();
+            ca = new String(temp.ToArray());
+
+            //テキストボックス頭の文字列でなければ走査したものを、そうでなければ現在の文字列を得る
+            word = ca!="clr.AddReference"&&!String.IsNullOrEmpty(ca)? ca : GetCurrentWord(CodeBox);
+                if (!string.IsNullOrEmpty(word))
+                    foreach (var pair in descriptions)
+                        if (pair.Key.Contains(word))
+                        {
+                            descriptionLabel.Content = pair.Value;
+                            return;
+                        }
+                descriptionLabel.Content = null;
+        }
+
+        private void UserControl_Loaded(object sender, RoutedEventArgs e)
+        {
+            //ステータスバーのラベルの大きさを調整
+            descriptionLabel.Width = this.Width;
         }
     }
 }

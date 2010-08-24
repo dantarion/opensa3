@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             mc:Ignorable="d" >
+             mc:Ignorable="d" Loaded="UserControl_Loaded">
     <UserControl.Resources>
         <LinearGradientBrush x:Key="selectedItemBrush">
             <GradientStop Color="#E6FFFFFF" Offset="0.0"/>
@@ -23,7 +23,12 @@
         </Style>
     </UserControl.Resources>
     <Grid>
-        <TextBox AcceptsReturn="True" VerticalScrollBarVisibility="Visible" Name="CodeBox" PreviewKeyDown="TextBox_PreviewKeyDown" PreviewKeyUp="CodeBox_PreviewKeyUp" />
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="33" x:Name="statusRow"/>
+        </Grid.RowDefinitions>
+        <TextBox Grid.Row="1" AcceptsReturn="True" VerticalScrollBarVisibility="Visible" Name="CodeBox" PreviewKeyDown="TextBox_PreviewKeyDown" PreviewKeyUp="CodeBox_PreviewKeyUp" SelectionChanged="CodeBox_SelectionChanged" HorizontalScrollBarVisibility="Visible" Grid.ColumnSpan="3" />
         <Popup  x:Name="popup" PopupAnimation="Fade" StaysOpen="False" OpacityMask="Black" Opacity="0.5">
             <ListView x:Name="ListView" Focusable="True" SelectionMode="Single" ItemContainerStyle="{StaticResource itemStyle}" OpacityMask="White" PreviewKeyDown="ListView_PreviewKeyDown" PreviewMouseDoubleClick="ListView_PreviewMouseDoubleClick">
                 <ListView.BorderBrush>
@@ -36,5 +41,8 @@
                 </ListView.View>
             </ListView>
         </Popup>
+        <StatusBar Grid.Row="2" HorizontalAlignment="Left" Margin="0,0,0,0" Name="statusBar1" VerticalAlignment="Top" Width="Auto" Grid.ColumnSpan="3">
+            <Label Name="descriptionLabel" Height="33"></Label>
+        </StatusBar>
     </Grid>
 </UserControl>
