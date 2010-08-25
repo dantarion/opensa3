@@ -93,8 +93,6 @@ namespace OpenSALib3.DatHandler
         }
         public List<BoneRef> GetDefaultHiddenBones()
         {
-
-
             var list = new List<BoneRef>();
             var modelvis = this["Sections"]["data"]["Model Display"]["Hidden"];
             foreach (DatElement de in modelvis)
@@ -125,9 +123,10 @@ namespace OpenSALib3.DatHandler
                 return "No Model Ref Loaded";
             return !_boneNames.ContainsKey(boneIndex) ? "????" : _boneNames[boneIndex];
         }
-        public LedgegrabBox getLedgegrabBox()
+        public DatElement getLedgegrabBoxes()
         {
-            return (LedgegrabBox)this["Sections"]["data"]["Misc"]["LedgegrabBoxes"][0];
+            var misc = this["Sections"]["data"]["MiscSection"];
+            return misc["LedgegrabBoxes"];
         }
         private DatFileHeader _header;
         private VoidPtr _dataChunk;

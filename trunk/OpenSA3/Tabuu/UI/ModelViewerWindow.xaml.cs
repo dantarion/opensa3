@@ -12,7 +12,8 @@ namespace Tabuu.UI
     /// </summary>
     /// 
 
-    public partial class ModelViewerWindow {
+    public partial class ModelViewerWindow
+    {
         private readonly ModelPanel _mc = new ModelPanel();
         public int frame = 0;
         private CHR0Node curentAnimation;
@@ -33,38 +34,44 @@ namespace Tabuu.UI
                 (bone as MDL0BoneNode)._render = false;
             }
             //Hitbox Rendering
-            foreach (MDL0BoneNode bone in d.Model.FindChildrenByType(".",ResourceType.MDL0Bone))
+            foreach (MDL0BoneNode bone in d.Model.FindChildrenByType(".", ResourceType.MDL0Bone))
             {
-                if(bone.Name == "HipN")
-                    ;// bone.CustomRenderEvent += RenderLedgegrab;
+
+                if (bone.Name == "TopN")
+                    bone.CustomRenderEvent += RenderLedgegrab;
+                else
+                    bone.CustomRenderEvent -= RenderLedgegrab;
             }
             _mc.AddTarget(d.Model);
             _mc.AddReference(d.Node);
             var bone2 = (MDL0BoneNode)d.Model.FindChild("TopN", true);
 
             _mc.Rotate(0, -90);
-            _mc.Translate(bone2.BoxMax._x/2, bone2.BoxMax._y/2, 30);
-            
+            _mc.Translate(bone2.BoxMax._x / 2, bone2.BoxMax._y / 2, 30);
+
             d.Model.RenderBones = false;
             d.Model.RenderWireframe = false;
             timer.Tick += NextFrame;
             timer.Interval = new System.TimeSpan(166667);
         }
-        /*
+
         public void RenderLedgegrab(object sender, EventArgs e)
         {
-            var ledgegrab = datfile.getLedgegrabBox();
-            MDL0BoneNode bone = (MDL0BoneNode)sender;
-            bone.RenderBox(ctx, ledgegrab.X, ledgegrab.Y, ledgegrab.Width, ledgegrab.Height);
+            var ledgegrabs = datfile.getLedgegrabBoxes();
+            foreach (LedgegrabBox ledgegrab in ledgegrabs)
+            {
+                MDL0BoneNode bone = (MDL0BoneNode)sender;
+                bone.DrawBox(ctx, ledgegrab.X, ledgegrab.Y, ledgegrab.Width,ledgegrab.Height);
+            }
             //bone.RenderSphere(ctx, 4);
         }
-         
-        public void RenderHitboxes(object sender, EventArgs e)
-        {
-            MDL0BoneNode bone = (MDL0BoneNode)sender;
-            bone.RenderSphere(ctx, 4);
-        }
-        */
+        /*
+       public void RenderHitboxes(object sender, EventArgs e)
+       {
+           MDL0BoneNode bone = (MDL0BoneNode)sender;
+           bone.RenderSphere(ctx, 4);
+       }
+       */
         public void Stop()
         {
             timer.Stop();
@@ -94,7 +101,7 @@ namespace Tabuu.UI
 
             }
             SetFrame(++frame);
-  
+
         }
         public void ChangeAnimation(CHR0Node animation)
         {
