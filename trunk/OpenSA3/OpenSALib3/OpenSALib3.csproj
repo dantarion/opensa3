@@ -39,10 +39,6 @@
     <AssemblyOriginatorKeyFile>OpenSALib3.pfx</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="BrawlLib, Version=0.10.3691.33773, Culture=neutral, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>res\BrawlLib.dll</HintPath>
-    </Reference>
     <Reference Include="IronPython, Version=2.6.10920.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>res\IronPython.dll</HintPath>
@@ -96,7 +92,7 @@
     <Compile Include="Moveset\MiscSection.cs" />
     <Compile Include="Moveset\MovesetSection.cs" />
     <Compile Include="Moveset\MultiJumpData.cs" />
-    <Compile Include="Moveset\SoundData.cs" />
+    <Compile Include="PSA\SoundData.cs" />
     <Compile Include="Moveset\TetherData.cs" />
     <Compile Include="Moveset\UnknownType1.cs" />
     <Compile Include="DatHandler\UnknownElement.cs" />
@@ -145,6 +141,12 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\BrawlLib\BrawlLib.csproj">
+      <Project>{462D0BBF-CE82-405B-8848-2F91E9E14C55}</Project>
+      <Name>BrawlLib</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

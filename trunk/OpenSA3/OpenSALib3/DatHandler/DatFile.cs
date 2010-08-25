@@ -125,7 +125,10 @@ namespace OpenSALib3.DatHandler
                 return "No Model Ref Loaded";
             return !_boneNames.ContainsKey(boneIndex) ? "????" : _boneNames[boneIndex];
         }
-
+        public LedgegrabBox getLedgegrabBox()
+        {
+            return (LedgegrabBox)this["Sections"]["data"]["Misc"]["LedgegrabBoxes"][0];
+        }
         private DatFileHeader _header;
         private VoidPtr _dataChunk;
         private DataSource _source;

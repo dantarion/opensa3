@@ -14,6 +14,7 @@ namespace OpenSALib3.DatHandler
         /* Every Node has a parent */
         [Browsable(false)]
         public DatElement Parent { get; private set; }
+
         [Browsable(false)]
         /* And a way to access the root file*/
         public DatFile RootFile
@@ -27,6 +28,7 @@ namespace OpenSALib3.DatHandler
         private int _autoIndex;
         /* Hidden list of children */
         protected Dictionary<string, DatElement> Dictionary = new Dictionary<string, DatElement>();
+
         public DatElement this[string name]
         {
             get
@@ -83,6 +85,8 @@ namespace OpenSALib3.DatHandler
         /* Color for HexView Display */
         [Browsable(false)]
         public Color Color { get; set; }
+        /* Color for TreeView Display */
+        [Browsable(false)]
         public virtual System.Windows.Media.Brush TreeColor
         {
             get;
@@ -128,6 +132,7 @@ namespace OpenSALib3.DatHandler
             if (fileoffset < -1 || fileoffset > RootFile.Length)
                 throw new Exception("Invalid Offset");
         }
+        #region Change Tracking
         [ReadOnly(true), Browsable(true)]
         private bool _ischanged;
         public bool IsChanged
@@ -136,33 +141,26 @@ namespace OpenSALib3.DatHandler
             private set
             {
                 _ischanged = value;
-                if(PropertyChanged != null)
+                if (PropertyChanged != null)
                     PropertyChanged(this, new PropertyChangedEventArgs("IsChanged"));
             }
         }
         public void NotifyChanged(String name)
         {
-            if(name != "Name")
+            if (name != "Name")
                 MarkDirty(this, new PropertyChangedEventArgs(name));
             if (PropertyChanged != null)
                 PropertyChanged(this, new PropertyChangedEventArgs(name));
         }
         public void MarkClean()
         {
-
             MarkClean(this);
         }
-        static void MarkClean(IEnumerable el)
+        static void MarkClean(DatElement el)
         {
-            if (el is DatElement)
-            {
-                ((DatElement)el)._ischanged = false;
-            }
-            foreach (IEnumerable child in el)
-            {
-
+            el._ischanged = false;
+            foreach (DatElement child in el)
                 MarkClean(el);
-            }
         }
         public void MarkDirty(object sender, PropertyChangedEventArgs e)
         {
@@ -170,6 +168,8 @@ namespace OpenSALib3.DatHandler
                 Parent.MarkDirty(sender, e);
             IsChanged = true;
         }
+        public event PropertyChangedEventHandler PropertyChanged;
+        #endregion
         public override string ToString()
         {
             return Name ?? "NullName";
@@ -202,6 +202,6 @@ namespace OpenSALib3.DatHandler
         }
         #endregion
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        
     }
 }

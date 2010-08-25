@@ -14,7 +14,7 @@ namespace OpenSALib3.Moveset
         private struct MovesetHeader
         {
             public bint SubactionFlagsStart;
-            public bint Unknown1;//UnknownB
+            public bint ModelVisibilityStart;//UnknownB
             public bint AttributeStart;
             public bint SSEAttributeStart;
             public bint MiscSectionOffset;
@@ -24,7 +24,7 @@ namespace OpenSALib3.Moveset
             public bint Unknown8;
             public bint ActionsStart;
             public bint Actions2Start;
-            public bint Unknown11;
+            public bint ActionPreStart;
             public bint SubactionMainStart;
             public bint SubactionGFXStart;
             public bint SubactionSFXStart;
@@ -39,7 +39,7 @@ namespace OpenSALib3.Moveset
             public bint Unknown23;
             public bint Unknown24;
             public bint Unknown25;
-            public bint Unknown26;//Entry Article
+            public bint EntryArticleStart;
             public bint Unknown27;
             public bint Unknown28;
             public bint Unknown29;
@@ -116,14 +116,14 @@ namespace OpenSALib3.Moveset
             count = 0;
             for (int i = _header.Unknown7; i < _header.Unknown7 + 8 * (_commonactionflags.Count + _actionflags.Count); i += 8)
                 _unknowne[null] = new UnknownElement(_unknowne, i, String.Format("0x{0:X03}", count++), 8);
-            for (int i = _header.Unknown1; i < _header.Unknown19; i += 8)
+            for (int i = _header.ModelVisibilityStart; i < _header.Unknown19; i += 8)
                 _unknownb[null] = new UnknownElement(_unknownb, i, "UnknownB", 8);
 
             /* Action _Pre */
             var _actionpre = new NamedList(this, "Action_Pre");
             _actionpre.TreeColor = null;
             count = 0;
-            for (int i = _header.Unknown11; i < _header.Unknown11 + 4 * _unknowne.Count; i += 0x4)
+            for (int i = _header.ActionPreStart; i < _header.ActionPreStart + 4 * _unknowne.Count; i += 0x4)
             {
 
                 var tmp = new GenericElement<int>(_actionpre, i, String.Format("0x{0:X03}", count++));
@@ -138,7 +138,7 @@ namespace OpenSALib3.Moveset
             for (int i = _header.ActionsStart; i < _header.Actions2Start; i += 4)
                 _actions[count] = new CommandList(_actions, i, "Action " + String.Format("0x{0:X03}", count++), _subroutines);
             count = 0x112;
-            for (int i = _header.Actions2Start; i < _header.Unknown11; i += 4)
+            for (int i = _header.Actions2Start; i < _header.ActionPreStart; i += 4)
                 _actions2[count] = new CommandList(_actions2, i, "Action2 " + String.Format("0x{0:X03}", count++), _subroutines);
             count = 0;
 
@@ -177,7 +177,7 @@ namespace OpenSALib3.Moveset
                 (_subactions[count] as DatElement)["Other"] = new CommandList(_subactions[count++], i, "Other ", _subroutines);
 
             //Model Display
-            var unknownK = new UnknownElement(this, _header.Unknown1, "Model Display", 16);
+            var unknownK = new UnknownElement(this, _header.ModelVisibilityStart, "Model Display", 16);
             for (var i = 0; i < unknownK.ReadInt(12); i++)
                 unknownK[i] = new UnknownElement(unknownK, unknownK.ReadInt(8) + i * 8, "Stats", 8);
             count = unknownK.ReadInt(4);
@@ -218,8 +218,8 @@ namespace OpenSALib3.Moveset
             var bonerefs = new NamedList(this, "Smash Ball Bones?");
             for (int i = _header.Unknown18; i < MiscSection.ReadInt(4 * 9); i += 4)
                 bonerefs[null] = (new BoneRef(bonerefs, i, "Unknown"));
-            if (_header.Unknown26 > 0)
-                _articles[null] = (new Article(_articles, _header.Unknown26));
+            if (_header.EntryArticleStart > 0)
+                _articles[null] = (new Article(_articles, _header.EntryArticleStart));
 
             var headerExtension = new UnknownElement(this, DataOffset + 31 * 4, "HeaderEXT", DataLength - 31 * 4);
             for (var i = headerExtension.FileOffset; i < headerExtension.FileOffset + Math.Min(headerExtension.Length,0x40); i += 4)

@@ -51,7 +51,7 @@ namespace OpenSALib3
             try
             {
                 SetupScope();
-                var ms = new MemoryStream();
+                var ms = new MemoryStream(0x1000000);
                 SB.Clear();
                 _runtime.IO.SetOutput(ms, new StringWriter(SB, new CultureInfo("en-US")));
                 _scope.SetVariable("currentDat", file);
@@ -62,7 +62,7 @@ namespace OpenSALib3
             }
             catch (Exception err)
             {
-                return err.Message + "\n";
+                return err.Message + "\n" + err.StackTrace+"\n";
             }
         }
     }

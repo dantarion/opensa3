@@ -14,16 +14,16 @@ namespace Tabuu.UI
 
     public partial class ModelViewerWindow {
         private readonly ModelPanel _mc = new ModelPanel();
-        private readonly MDL0Node model;
         public int frame = 0;
         private CHR0Node curentAnimation;
         DispatcherTimer timer = new DispatcherTimer();
         GLContext ctx;
+        DatFile datfile;
         public ModelViewerWindow(DatFile d)
         {
+            this.datfile = d;
             InitializeComponent();
             windowsFormsHost1.Child = _mc;
-            model = d.Model;
 
             ctx = BrawlLib.OpenGL.GLContext.Attach(_mc);
             foreach (BoneRef boneref in d.GetDefaultHiddenBones())
@@ -31,6 +31,12 @@ namespace Tabuu.UI
                 int tmp = 0;
                 var bone = d.Model.FindChild(boneref.BoneName, true);
                 (bone as MDL0BoneNode)._render = false;
+            }
+            //Hitbox Rendering
+            foreach (MDL0BoneNode bone in d.Model.FindChildrenByType(".",ResourceType.MDL0Bone))
+            {
+                if(bone.Name == "HipN")
+                    ;// bone.CustomRenderEvent += RenderLedgegrab;
             }
             _mc.AddTarget(d.Model);
             _mc.AddReference(d.Node);
@@ -44,6 +50,21 @@ namespace Tabuu.UI
             timer.Tick += NextFrame;
             timer.Interval = new System.TimeSpan(166667);
         }
+        /*
+        public void RenderLedgegrab(object sender, EventArgs e)
+        {
+            var ledgegrab = datfile.getLedgegrabBox();
+            MDL0BoneNode bone = (MDL0BoneNode)sender;
+            bone.RenderBox(ctx, ledgegrab.X, ledgegrab.Y, ledgegrab.Width, ledgegrab.Height);
+            //bone.RenderSphere(ctx, 4);
+        }
+         
+        public void RenderHitboxes(object sender, EventArgs e)
+        {
+            MDL0BoneNode bone = (MDL0BoneNode)sender;
+            bone.RenderSphere(ctx, 4);
+        }
+        */
         public void Stop()
         {
             timer.Stop();
@@ -57,7 +78,7 @@ namespace Tabuu.UI
         public void SetFrame(int i)
         {
             frame = i;
-            model.ApplyCHR(curentAnimation, frame);
+            datfile.Model.ApplyCHR(curentAnimation, frame);
             slider.Value = i;
             _mc.Invalidate();
         }
@@ -103,7 +124,7 @@ namespace Tabuu.UI
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            model.Detach(ctx);
+            datfile.Model.Detach(ctx);
             ctx.Release();
         }
     }
