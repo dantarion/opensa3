@@ -37,7 +37,7 @@ namespace Tabuu.UI
             foreach (MDL0BoneNode bone in d.Model.FindChildrenByType(".", ResourceType.MDL0Bone))
             {
 
-                if (bone.Name == "TopN")
+                if (bone.Name == "TransN")
                     bone.CustomRenderEvent += RenderLedgegrab;
                 else
                     bone.CustomRenderEvent -= RenderLedgegrab;
