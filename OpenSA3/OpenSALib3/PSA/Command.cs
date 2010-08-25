@@ -136,6 +136,13 @@ namespace OpenSALib3.PSA
                 return -1;
             }
         }
+        public struct HitBoxData
+        {
+            public float x;
+            public float y;
+            public float z;
+
+        }
         #endregion
     }
 
