@@ -28,9 +28,9 @@ namespace OpenSALib3.Moveset
         public unsafe CrawlData(DatElement parent, int offset)
             : base(parent, offset)
         {
-            TreeColor = null;
+            base.TreeColor = null;
             _data = *(Data*)base.Address;
-            Name = "CrawlData";
+            base.Name = "CrawlData";
             Length = 8;
         }
     }

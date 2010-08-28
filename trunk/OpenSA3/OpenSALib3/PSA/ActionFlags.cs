@@ -109,9 +109,9 @@ namespace OpenSALib3.PSA
         public unsafe ActionFlags(DatElement parent, int offset, int index)
             : base(parent, offset)
         {
-            TreeColor = System.Windows.Media.Brushes.Orange;
+            base.TreeColor = System.Windows.Media.Brushes.Orange;
             _data = *(Data*)base.Address;
-            Name = String.Format("{0:X03}",index);
+            base.Name = String.Format("{0:X03}",index);
             Length = 16;
         }
     }

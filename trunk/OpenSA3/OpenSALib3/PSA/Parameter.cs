@@ -83,8 +83,8 @@ namespace OpenSALib3.PSA
             get
             {
                 string name;
-                Utility.PSANames.ReqNames.TryGetValue(RawData, out name);
-                return name != null ? name : "Unknown";
+                PSANames.ReqNames.TryGetValue(RawData, out name);
+                return name ?? "Unknown";
             }
         }
         public RequirementParameter(DatElement parent, int offset)
@@ -119,7 +119,7 @@ namespace OpenSALib3.PSA
             public bint Type;
             public bint RawData;
         }
-        protected Data _data;
+        protected Data _data; //TODO
         [Category("Parameter")]
         public ParameterType Type
         {
@@ -134,12 +134,12 @@ namespace OpenSALib3.PSA
         protected unsafe Parameter(DatElement parent, int offset)
             : base(parent, offset)
         {
-            TreeColor = null;
+            base.TreeColor = null;
             _data = *(Data*)base.Address;
             Length = 8;
             if ((int)(Type) > 6)
                 throw new Exception("Improper Parameter");
-            Name = Type + " Parameter";
+            base.Name = Type + " Parameter";
             Color = Color.BlueViolet;
         }
     }

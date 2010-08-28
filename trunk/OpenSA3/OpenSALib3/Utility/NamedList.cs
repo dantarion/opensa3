@@ -1,19 +1,17 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.ComponentModel;
 using OpenSALib3.DatHandler;
 namespace OpenSALib3.Utility {
-    public class NamedList : DatHandler.DatElement{
+    public class NamedList : DatElement{
 
-        public NamedList(DatElement parent,String n) : base(parent,-1)
+        public NamedList(DatElement parent,String name) : base(parent,-1)
         {
             Length = 0;
-            Name = n;
+            base.Name = name;
         }
         
         [Browsable(true)]
-        public new int Count
+        public int Count
         {
             get { return Dictionary.Count; }
         }

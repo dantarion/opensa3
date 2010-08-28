@@ -1,5 +1,6 @@
 ﻿#pragma warning disable 649 //'Field ____ is never assigned'
 using System;
+using System.Windows.Media;
 using OpenSALib3.DatHandler;
 
 namespace OpenSALib3.Moveset
@@ -14,11 +15,10 @@ namespace OpenSALib3.Moveset
             public bint  ListCount;
         }
         public unsafe SoundData(DatElement parent, int offset)
-            : base(parent, offset)
-        {
-            TreeColor = System.Windows.Media.Brushes.Orange;
+            : base(parent, offset) {
+            base.TreeColor = Brushes.Orange;
             _data = *(Data*)base.Address;
-            Name = "SoundData";
+            base.Name = "SoundData";
             Length = 8;
             for (var i = 0; i < _data.ListCount; i++)
             {
@@ -39,7 +39,7 @@ namespace OpenSALib3.Moveset
             : base(parent, offset)
         {
             _data = *(Data*)base.Address;
-            Name = "SoundDataList";
+            base.Name = "SoundDataList";
             Length = 8;
             for (var i = 0; i < _data.ListCount; i++)
             {

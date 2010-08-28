@@ -1,14 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using OpenSALib3.DatHandler;
 using OpenSALib3.Utility;
 using OpenSALib3.PSA;
 namespace OpenSALib3.Moveset
 {
-    public class DataCommonSection :DatSection
-    {
+    public class DataCommonSection :DatSection {
+#pragma warning disable 169 //'Field ____ is never used'
+#pragma warning disable 649 //'Field ____ is never assigned';
         struct Header
         {
             public bint Unknown0;
@@ -38,6 +36,8 @@ namespace OpenSALib3.Moveset
             public bint Unknown24;
             public bint Unknown25;
         }
+#pragma warning restore 169 //'Field ____ is never used'
+#pragma warning restore 649 //'Field ____ is never assigned';
         private Header _header;
         public unsafe DataCommonSection(DatElement parent, int offset, int stringbase)
             : base(parent,offset, stringbase)
@@ -46,7 +46,7 @@ namespace OpenSALib3.Moveset
         }
         public override void Parse()
         {
-            int count = 0;
+            var count = 0;
             var subroutines = new NamedList(this, "Subroutines");
             var actions = new NamedList(this, "Actions");
             for (int i = _header.Unknown4; i < _header.Unknown5; i += 4)

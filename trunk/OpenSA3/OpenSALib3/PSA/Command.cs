@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using OpenSALib3.DatHandler;
@@ -14,24 +13,24 @@ namespace OpenSALib3.PSA
         public static NamedList ReadCommands(DatElement parent, int offset, NamedList subroutinelist)
         {
             
-            int count = 0;
+            var count = 0;
             var list = new NamedList(parent,String.Format("@0x{0:X}", offset));
             if (offset == -1)
                 return list;
             try
             {
                 var command = new Command(parent, offset);
-                while (command != null && command.Module != 0 || command.ID != 0)
+                while (command.Module != 0 || command.ID != 0)
                 {
                     offset += 8;
                     list[count++] = command;
                     command = new Command(parent, offset);
                 }
-                list[count++] = command;
+                list[count] = command;
             }
-            catch (Exception e)
+            catch (Exception exception)
             {
-                Debug.Fail(e.Message);
+                Debug.Fail(exception.ToString());
             }
             //Search for subroutines
             foreach (Command c in list)
@@ -95,18 +94,17 @@ namespace OpenSALib3.PSA
         public unsafe Command(DatElement parent, int offset)
             : base(parent, offset)
         {
-            TreeColor = null;
+            base.TreeColor = null;
             _data = *(Data*)(base.Address);
             Length = 8;
             Color = Color.Blue;
-            Utility.PSANames.loadData();
+            PSANames.LoadData();
             var shortcommand = string.Format("{0:X02}{1:X02}", Module, ID);
-            Utility.PSANames.EventData eventdata;
-            Utility.PSANames.EventNames.TryGetValue(shortcommand, out eventdata);
-            if (eventdata == null)
-                Name = String.Format("{0:X02}{1:X02}{2:X02}{3:X02}", Module, ID, _data.ParameterCount, _data.Unknown);
-            else
-                Name = eventdata.Name;
+            PSANames.EventData eventdata;
+            PSANames.EventNames.TryGetValue(shortcommand, out eventdata);
+            base.Name = eventdata == null 
+                ? String.Format("{0:X02}{1:X02}{2:X02}{3:X02}", Module, ID, _data.ParameterCount, _data.Unknown)
+                : eventdata.Name;
 
             for (var i = 0; i < _data.ParameterCount; i++)
             {
@@ -123,13 +121,13 @@ namespace OpenSALib3.PSA
             get
             {
                 var list = Parent;
-                int frame = 0;
+                var frame = 0;
                 foreach (Command cur in list)
                 {
                     if (cur.Module == 0 && cur.ID == 1)
-                        frame += (int)(cur[0] as ScalarParameter).Value;
+                        frame += (int)((ScalarParameter) cur[0]).Value;
                     if (cur.Module == 0 && cur.ID == 2)
-                        frame = (int)(cur[0] as ScalarParameter).Value;
+                        frame = (int)((ScalarParameter) cur[0]).Value;
                     if (cur == this)
                         return frame;
                 }
@@ -138,9 +136,9 @@ namespace OpenSALib3.PSA
         }
         public struct HitBoxData
         {
-            public float x;
-            public float y;
-            public float z;
+            public float X;
+            public float Y;
+            public float Z;
 
         }
         #endregion

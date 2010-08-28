@@ -51,10 +51,10 @@ namespace OpenSALib3.DatHandler {
         protected DatSection(DatElement parent, int offset, int stringbase)
             : base(parent, offset)
         {
-            TreeColor = null;
+            base.TreeColor = null;
             _header = *(DatSectionHeader*)base.Address;
             Length = 8;
-            Name = RootFile.ReadString(stringbase + StringOffset);
+            base.Name = RootFile.ReadString(stringbase + StringOffset);
         }
     }
 }

@@ -3,12 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Drawing;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using BrawlLib.SSBB.ResourceNodes;
 using OpenSALib3.Moveset;
+using Brushes = System.Windows.Media.Brushes;
 
 namespace OpenSALib3.DatHandler
 {
@@ -99,19 +99,13 @@ namespace OpenSALib3.DatHandler
             {
 
                 var first = true;
-                foreach (DatElement dee in de)
-                {
+                foreach (DatElement dee in de) {
                     if (first)
                     {
                         first = false;
                         continue;
                     }
-
-
-                    foreach (BoneRef val in dee)
-                    {
-                        list.Add(val);
-                    }
+                    list.AddRange(dee.Cast<BoneRef>());
                 }
             }
 
@@ -123,14 +117,15 @@ namespace OpenSALib3.DatHandler
                 return "No Model Ref Loaded";
             return !_boneNames.ContainsKey(boneIndex) ? "????" : _boneNames[boneIndex];
         }
-        public DatElement getLedgegrabBoxes()
+        public DatElement LedgegrabBoxes
         {
-            var misc = this["Sections"]["data"]["MiscSection"];
-            return misc["LedgegrabBoxes"];
+            get {
+                var misc = this["Sections"]["data"]["MiscSection"];
+                return misc["LedgegrabBoxes"];
+            }
         }
         private DatFileHeader _header;
-        private VoidPtr _dataChunk;
-        private DataSource _source;
+        public readonly DataSource Source;
         public ResourceNode Node;
 
         [Browsable(false)]
@@ -154,10 +149,9 @@ namespace OpenSALib3.DatHandler
         private readonly Dictionary<int, DatSection> _external = new Dictionary<int, DatSection>();
         public string IsExternal(int offset)
         {
-            bool result = _external.ContainsKey(offset);
-            if (result)
+            if (_external.ContainsKey(offset))
             {
-                _external[offset].TreeColor = System.Windows.Media.Brushes.Green;
+                _external[offset].TreeColor = Brushes.Green;
                 return _external[offset].Name;
             }
             return null;
@@ -165,22 +159,21 @@ namespace OpenSALib3.DatHandler
         protected DatFile(ResourceNode node)
             : base(null, 0)
         {
-            TreeColor = null;
-            _source = node.OriginalSource;
+            base.TreeColor = null;
+            Source = node.OriginalSource;
             Node = node;
             _header = *(DatFileHeader*)node.WorkingUncompressed.Address;
             if (_header.FileSize != node.WorkingUncompressed.Length)
                 throw new Exception("This is not a valid moveset file");
-            Name = node.TreePathAbsolute;
+            base.Name = node.TreePathAbsolute;
             Length = (_header.FileSize - Marshal.SizeOf(_header));
-            Color = Color.Transparent;
+            Color = System.Drawing.Color.Transparent;
             //Start Parse
             var section = _header.DataChunkSize + _header.OffsetCount * 4;
             var stringBase = (section + (_header.SectionCount + _header.ReferenceCount) * 8);
             var section2 = section + _header.SectionCount * 8;
             //Parse References FIRST
-            _references = new UnknownElement(this, -1, "References", 0);
-            _references.TreeColor = null;
+            _references = new UnknownElement(this, -1, "References", 0) {TreeColor = null};
             for (var i = 0; i < _header.ReferenceCount; i++)
             {
                 var s = DatSection.Factory(References, section2, stringBase);
@@ -196,8 +189,7 @@ namespace OpenSALib3.DatHandler
                 section2 += 8;
             }
             //Parse sections
-            _sections = new UnknownElement(this, -1, "Sections", 0);
-            _sections.TreeColor = null;
+            _sections = new UnknownElement(this, -1, "Sections", 0) {TreeColor = null};
             for (var i = 0; i < _header.SectionCount; i++)
             {
                 var s = DatSection.Factory(Sections, section, stringBase);
@@ -206,15 +198,17 @@ namespace OpenSALib3.DatHandler
                 section += 8;
             }
             var offsetchunk = new UnknownElement(this, _header.DataChunkSize, "OffsetChunk", _header.OffsetCount * 4);
-            for (int i = 0; i < _header.OffsetCount; i++)
+            for (var i = 0; i < _header.OffsetCount; i++)
                 OffsetList.Add(ReadInt(_header.DataChunkSize + i * 4));
             offsetchunk.TreeColor = null;
             ComputeDataLengths(Sections);
             foreach (DatSection s in Sections)
                 s.Parse();
-            var stringChunk = new UnknownElement(this, stringBase, "StringChunk", _header.FileSize - stringBase);
-            stringChunk.TreeColor = null;
-
+            var stringChunk =
+                new UnknownElement(this, stringBase, "StringChunk", _header.FileSize - stringBase) 
+                {
+                              TreeColor = null
+                };
             //Setup Tree Structure
             this["Sections"] = Sections;
             this["References"] = References;
@@ -223,7 +217,7 @@ namespace OpenSALib3.DatHandler
 
         }
 
-        private void ComputeDataLengths(DatElement sections)
+        private void ComputeDataLengths(IEnumerable sections)
         {
 
             var sorted = sections.OfType<DatSection>().OrderBy(x => (x).DataOffset).ToList();
@@ -249,10 +243,7 @@ namespace OpenSALib3.DatHandler
             sb.AppendFormat("% Complete:{0}\n", (float)usage / (Length + 0x20));
 
             var lastdata = 0;
-            foreach (var ug in usagedata)
-            {
-                if (ug.Offset == -1)
-                    continue;
+            foreach (var ug in usagedata.Where(ug => ug.Offset != -1)) {
                 if (ug.Offset < lastdata)
                     sb.AppendFormat("OVERLAP\n");
                 else if (ug.Offset > lastdata)
@@ -260,7 +251,6 @@ namespace OpenSALib3.DatHandler
                 if (!onlyholes)
                     sb.AppendFormat("@0x{0:X08} - len {1:X08} - {2,25}\n", ug.Offset, ug.Length, ug.ID);
                 lastdata = ug.Offset + ug.Length;
-
             }
             return sb.ToString();
         }

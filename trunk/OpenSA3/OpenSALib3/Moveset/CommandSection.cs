@@ -9,7 +9,7 @@ namespace OpenSALib3.Moveset
         public CommandSection(DatElement parent, int offset, VoidPtr stringPtr)
             : base(parent, offset, stringPtr)
         {
-            TreeColor = null;
+            base.TreeColor = null;
         }
         public override void Parse()
         {

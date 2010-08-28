@@ -28,9 +28,9 @@ namespace OpenSALib3.Moveset
         public unsafe TetherData(DatElement parent, int offset)
             : base(parent, offset)
         {
-            TreeColor = System.Windows.Media.Brushes.Orange;
+            base.TreeColor = System.Windows.Media.Brushes.Orange;
             _data = *(Data*)base.Address;
-            Name = "TetherData";
+            base.Name = "TetherData";
             Length = 8;
         }
     }

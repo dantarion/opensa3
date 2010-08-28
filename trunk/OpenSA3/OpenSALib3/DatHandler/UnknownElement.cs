@@ -7,7 +7,7 @@ namespace OpenSALib3.DatHandler
         public UnknownElement(DatElement parent, int offset, String name, int length)
             : base(parent, offset)
         {
-            Name = name;
+            base.Name = name;
             Length = length;
         }
 
