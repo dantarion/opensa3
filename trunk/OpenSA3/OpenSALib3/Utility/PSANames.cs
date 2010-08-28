@@ -15,6 +15,7 @@ namespace OpenSALib3.Utility
             public String Name;
             public String Description;
             public List<string> ParamNames = new List<string>();
+            public String FormatString;
         }
         public static String VersionString()
         {
@@ -32,11 +33,14 @@ namespace OpenSALib3.Utility
                 var data = new EventData {Name = t.ReadLine(), Description = t.ReadLine()};
                 var varname = t.ReadLine();
                 if (varname == null) break;
-                while (varname.Length > 0)
+                while (!varname.StartsWith("F:")&&varname.Length>0)
                 {
                     data.ParamNames.Add(varname);
                     varname = t.ReadLine();
                 }
+                varname= varname.Remove(0, 2);//remove "F:"
+                data.FormatString = varname;
+                t.ReadLine();//read empty space
                 EventNames.Add(hex, data);
             }
             t = new StringReader(Properties.Resources.Requirements);

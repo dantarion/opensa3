@@ -114,6 +114,17 @@ namespace OpenSALib3.PSA
                     param.Name = eventdata.ParamNames[i];
             }
         }
+        //for creating new node
+        public unsafe Command(DatElement parent, byte module, byte id,byte paramCount):base(parent,0)
+        {
+            TreeColor = null;
+            Length = 8;
+            Color = Color.Blue;
+            _data.Module = module;
+            _data.ParameterCount = paramCount;
+            _data.Unknown = 0;
+            _data.ID = id;
+        }
         #region FrameData Properties
         [Browsable(true)]
         public int Frame

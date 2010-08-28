@@ -125,7 +125,7 @@ namespace OpenSALib3.WPFControls {
                     _descriptions[i.Name] += paraminfo.ParameterType.Name + " " + paraminfo.Name + ",";
                 _descriptions[i.Name] += ")";
             }
-
+                catch { }
             foreach (var s in Keywords)
                 _targetSource.Add(s);
         }

@@ -30,6 +30,9 @@ namespace OpenSALib3.PSA
             : base(parent, offset)
         {
         }
+        public ValueParameter(DatElement parent,int type,int rawdata):base(parent,type,rawdata)
+        {
+        }
     }
     public class ScalarParameter : Parameter
     {
@@ -45,6 +48,10 @@ namespace OpenSALib3.PSA
         {
 
         }
+        public ScalarParameter(DatElement parent, int type, int rawdata)
+            : base(parent, type, rawdata)
+        {
+        }
     }
     public class OffsetParameter : Parameter
     {
@@ -59,6 +66,10 @@ namespace OpenSALib3.PSA
         {
 
         }
+        public OffsetParameter(DatElement parent, int type, int rawdata)
+            : base(parent, type, rawdata)
+        {
+        }
     }
     public class BooleanParameter : Parameter
     {
@@ -67,6 +78,10 @@ namespace OpenSALib3.PSA
         {
 
         }
+        public BooleanParameter(DatElement parent, int type, int rawdata)
+            : base(parent, type, rawdata)
+        {
+        }
     }
     public class VariableParameter : Parameter
     {
@@ -74,6 +89,10 @@ namespace OpenSALib3.PSA
             : base(parent, offset)
         {
 
+        }
+        public VariableParameter(DatElement parent, int type, int rawdata)
+            : base(parent, type, rawdata)
+        {
         }
     }
     public class RequirementParameter : Parameter
@@ -91,6 +110,10 @@ namespace OpenSALib3.PSA
             : base(parent, offset)
         {
 
+        }
+        public RequirementParameter(DatElement parent, int type, int rawdata)
+            : base(parent, type, rawdata)
+        {
         }
     }
     public class Parameter : DatElement
@@ -140,6 +163,14 @@ namespace OpenSALib3.PSA
             if ((int)(Type) > 6)
                 throw new Exception("Improper Parameter");
             base.Name = Type + " Parameter";
+            Color = Color.BlueViolet;
+        }
+        public unsafe Parameter(DatElement parent, int type, int rawData):base(parent,0)
+        {
+            TreeColor = null;
+            _data.Type = type;
+            _data.RawData = rawData;
+            Name = Type + "Parameter";
             Color = Color.BlueViolet;
         }
     }

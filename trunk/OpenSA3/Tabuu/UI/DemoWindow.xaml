@@ -1,9 +1,9 @@
 ﻿<Window x:Class="Tabuu.UI.Window1"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="PSALanguageDemo" Height="397" Width="300" xmlns:my="clr-namespace:System.Windows.Controls;assembly=OpenSALib3">
+        Title="PSALanguageDemo" Height="397" Width="829" xmlns:my="clr-namespace:OpenSALib3.WPFControls;assembly=OpenSALib3">
     <Grid>
-        <my:IntelliBox Height="212" HorizontalAlignment="Left" Margin="2,146,0,0" Name="intelliBox1" VerticalAlignment="Top" Width="276" />
+        <my:IntelliBox Height="212" HorizontalAlignment="Left" Margin="2,146,0,0" Name="intelliBox1" VerticalAlignment="Top" Width="805" />
         <Button Content="Finished editing" Height="26" HorizontalAlignment="Left" Margin="64,114,0,0" Name="button1" VerticalAlignment="Top" Width="147" Click="button1_Click" />
         <Label Content="This is PSALanguage demo. Please delete this" Height="24" HorizontalAlignment="Left" Name="label1" VerticalAlignment="Top" Width="276" />
         <Label Content=" if you have understood my plan" Height="33" HorizontalAlignment="Left" Margin="1,24,0,0" Name="label2" VerticalAlignment="Top" Width="265" />
