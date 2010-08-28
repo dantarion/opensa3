@@ -57,7 +57,7 @@ namespace Tabuu.UI
 
         public void RenderLedgegrab(object sender, EventArgs e)
         {
-            var ledgegrabs = datfile.getLedgegrabBoxes();
+            var ledgegrabs = datfile.LedgegrabBoxes;
             foreach (LedgegrabBox ledgegrab in ledgegrabs)
             {
                 MDL0BoneNode bone = (MDL0BoneNode)sender;

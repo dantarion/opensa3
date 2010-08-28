@@ -5,7 +5,7 @@ using OpenSALib3.Utility;
 
 namespace OpenSALib3.PSA
 {
-    class CommandList : DatElement
+    public class CommandList : DatElement
     {
         readonly bint _offset;
         public unsafe CommandList(DatElement parent, int offset, string name, NamedList subroutines)

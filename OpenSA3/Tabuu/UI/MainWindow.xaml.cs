@@ -18,6 +18,7 @@ namespace Tabuu.UI
     /// </summary>
     public partial class MainWindow
     {
+        
         /* Context Menu Commands */
         public static RoutedCommand HexOpenCommand = new RoutedCommand();
         public static RoutedCommand HexOpenContentCommand = new RoutedCommand();

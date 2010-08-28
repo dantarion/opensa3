@@ -30,13 +30,8 @@ namespace Tabuu.UI
 
         private void button1_Click(object sender, RoutedEventArgs e)
         {
-            var commandList = new List<Data>();// this is list of commands which is passed to CommandReceiver class
-            var parameters = new Dictionary<int, Dictionary<ParameterType, object>>();//parameters
-
             //set reference to CommandReceiver class.
-            CommandReceiver.CommandList = commandList;
-            CommandReceiver.Parameter = parameters;
-
+            //CommandReceiver._commandList=～～～～～
             ScriptEngine engine = Python.CreateEngine();
             ScriptScope scope = engine.CreateScope();
             ScriptSource source = engine.CreateScriptSourceFromString(intelliBox1.Text);
