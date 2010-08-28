@@ -8,8 +8,8 @@ namespace OpenSALib3.Moveset
         public GlideData(DatElement parent, int offset)
             : base(parent, offset)
         {
-            TreeColor = System.Windows.Media.Brushes.Orange;
-            Name = "GlideData";
+            base.TreeColor = System.Windows.Media.Brushes.Orange;
+            base.Name = "GlideData";
             Length = 0;
             for (var i = 0; i < 20; i++)
             {

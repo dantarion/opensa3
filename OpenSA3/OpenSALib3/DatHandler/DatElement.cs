@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using OpenSALib3.Utility;
+using Brush = System.Windows.Media.Brush;
 
 namespace OpenSALib3.DatHandler
 {
@@ -86,11 +87,13 @@ namespace OpenSALib3.DatHandler
         [Browsable(false)]
         public Color Color { get; set; }
         /* Color for TreeView Display */
+
+        private Brush _treeColor;
         [Browsable(false)]
-        public virtual System.Windows.Media.Brush TreeColor
+        public virtual Brush TreeColor
         {
-            get;
-            set;
+            get { return _treeColor; }
+            set { _treeColor = value; }
         }
         /* Name */
         [Category("Element")]
@@ -121,7 +124,8 @@ namespace OpenSALib3.DatHandler
 
         protected DatElement(DatElement parent, int fileoffset)
         {
-            TreeColor = System.Windows.Media.Brushes.Yellow;
+            //TODO: Sort out the default brush nonsense.
+            _treeColor = System.Windows.Media.Brushes.Yellow;
             Length = 4;
             Parent = parent;
             FileOffset = fileoffset;
@@ -160,7 +164,7 @@ namespace OpenSALib3.DatHandler
         {
             el._ischanged = false;
             foreach (DatElement child in el)
-                MarkClean(el);
+                MarkClean(child);
         }
         public void MarkDirty(object sender, PropertyChangedEventArgs e)
         {

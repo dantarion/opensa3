@@ -1,6 +1,6 @@
 ﻿#pragma warning disable 649 //'Field ____ is never assigned'
 using System;
-using System.Collections.Generic;
+using System.Windows.Media;
 using OpenSALib3.DatHandler;
 using System.ComponentModel;
 using OpenSALib3.Utility;
@@ -33,20 +33,19 @@ namespace OpenSALib3.Moveset
         public int TurnFrames { get { return _data.TurnFrames; } set { _data.TurnFrames = value; NotifyChanged("TurnFrames"); } }
 
         public unsafe MultiJumpData(DatElement parent, int offset)
-            : base(parent, offset)
-        {
-            TreeColor = System.Windows.Media.Brushes.Orange;
+            : base(parent, offset) {
+            base.TreeColor = Brushes.Orange;
             _data = *(Data*)base.Address;
-            Name = "MultiJumpData";
+            base.Name = "MultiJumpData";
             Length = 7*4;
-            var _hoplist = new NamedList(this,"HopList");
-            var _unknownlist = new NamedList(this, "Unknown");
+            var hoplist = new NamedList(this,"HopList");
+            var unknownlist = new NamedList(this, "Unknown");
             for (int i = _data.HopListOffset; i < FileOffset; i += 4)
-                _hoplist[null] = new GenericElement<float>(this, i, "Unknown");
-            this["HopList"] = _hoplist;
+                hoplist[null] = new GenericElement<float>(this, i, "Unknown");
+            this["HopList"] = hoplist;
             for (int i = _data.UnknownListOffset; i < _data.HopListOffset; i += 4)
-                _unknownlist[null] = new GenericElement<float>(this, i, "Unknown");
-            this["UnknownList"] = _unknownlist;
+                unknownlist[null] = new GenericElement<float>(this, i, "Unknown");
+            this["UnknownList"] = unknownlist;
 
 
         }

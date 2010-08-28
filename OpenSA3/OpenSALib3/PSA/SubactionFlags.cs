@@ -44,13 +44,13 @@ namespace OpenSALib3.PSA
         public unsafe SubactionFlags(DatElement parent, int offset)
             : base(parent, offset)
         {
-            TreeColor = null;
+            base.TreeColor = null;
             if (AnimationStringOffset > RootFile.Length)
                 throw new Exception("Not valid offset"); 
             _data = *(Data*)base.Address;
             Length = 8;
             _string = _data.AnimationStringOffset > 0 ? RootFile.ReadString(_data.AnimationStringOffset) : "N/A";
-            Name = AnimationName;
+            base.Name = AnimationName;
         }
     }
 }
