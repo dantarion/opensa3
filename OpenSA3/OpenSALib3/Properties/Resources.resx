@@ -124,6 +124,9 @@
   <data name="Events" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Events.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
   </data>
+  <data name="HitboxFlags" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\HitboxFlags.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;shift_jis</value>
+  </data>
   <data name="Requirements" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Requirements.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
   </data>

@@ -115,17 +115,21 @@ namespace OpenSALib3.WPFControls {
         private void GetMembers() {
             //Get PSAName
             var type = typeof(CommandReceiver);
-            var info = type.GetMethods();
-            foreach (var i in info.Where(i => 
-                    i.IsPublic && !i.Name.Contains("set_") && !i.Name.Contains("get_") &&
-                    i.DeclaringType == typeof (CommandReceiver))) {
-                _targetSource.Add(i.Name); _descriptions.Add(i.Name, i.Name + "(");
-                var param = i.GetParameters();
-                foreach (var paraminfo in param)
-                    _descriptions[i.Name] += paraminfo.ParameterType.Name + " " + paraminfo.Name + ",";
-                _descriptions[i.Name] += ")";
+            var info = type.GetMethods(); 
+            try
+            {
+                foreach (var i in info.Where(i =>
+                        i.IsPublic && !i.Name.Contains("set_") && !i.Name.Contains("get_") &&
+                        i.DeclaringType == typeof(CommandReceiver)))
+                {
+                    _targetSource.Add(i.Name); _descriptions.Add(i.Name, i.Name + "(");
+                    var param = i.GetParameters();
+                    foreach (var paraminfo in param)
+                        _descriptions[i.Name] += paraminfo.ParameterType.Name + " " + paraminfo.Name + ",";
+                    _descriptions[i.Name] += ")";
+                }
             }
-                catch { }
+            catch { }
             foreach (var s in Keywords)
                 _targetSource.Add(s);
         }

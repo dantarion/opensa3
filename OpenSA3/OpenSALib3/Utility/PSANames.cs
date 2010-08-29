@@ -10,6 +10,7 @@ namespace OpenSALib3.Utility
         public static bool Loaded { get; private set; }
         public static Dictionary<string, EventData> EventNames = new Dictionary<string, EventData>();
         public static Dictionary<int, string> ReqNames = new Dictionary<int, string>();
+        public static Dictionary<string,int> FlagNames = new Dictionary<string,int>();
         public class EventData
         {
             public String Name;
@@ -49,6 +50,14 @@ namespace OpenSALib3.Utility
             {
                 ReqNames.Add(i, t.ReadLine());
                 i++;
+            }
+            t = new StringReader(Properties.Resources.HitboxFlags);
+            while (t.Peek() != -1)
+            {
+                    var value = Convert.ToInt32(t.ReadLine(), 16);
+                    var name = t.ReadLine();
+                    FlagNames.Add(name, value);
+                    t.ReadLine();//read empty line
             }
             Loaded = true;
         }
