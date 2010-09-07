@@ -151,7 +151,6 @@ namespace Tabuu.UI
             d.Node.Rebuild(true);
             d.Node.RootNode.Merge();
             d.Node.RootNode.Export(filename);
-            d.Node.Merge();
             d.MarkClean();
         }
 

@@ -59,7 +59,7 @@ namespace Tabuu.Utility
             {
                 var ele = SearchForDatElement(_datelement, offset);
                 var defaultcolor = System.Drawing.Color.Transparent;
-                if (ele.RootFile.OffsetList.Contains((int)index))
+                if (ele != null && ele.RootFile.OffsetList.Contains((int)index))
                     defaultcolor = System.Drawing.Color.Azure;
                 _colorCache[offset] = ele != null ? ele.Color : defaultcolor;
             }

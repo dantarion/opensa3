@@ -121,7 +121,7 @@ namespace OpenSALib3.PSA
             {
                 //var datalen = new  GenericElement<int>(this,_data.DataOffset,"DataLength");
                 //this["DataLength"] = datalen;
-                //this["Data"] = new UnknownElement(this, _data.DataOffset + 4, "Data", (int)datalen.Value);
+                this["Data"] = new UnknownElement(this, _data.DataOffset, "Data", 4);
             }
             //if (_data.OtherStart > 0)
             //    for (var i = 0; i < subactions; i++)

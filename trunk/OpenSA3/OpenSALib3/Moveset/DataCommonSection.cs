@@ -13,8 +13,8 @@ namespace OpenSALib3.Moveset
             public bint Unknown1;
             public bint Unknown2;
             public bint Unknown3;
-            public bint Unknown4;
-            public bint Unknown5;
+            public bint ActionsStart;
+            public bint Actions2Start;
             public bint Unknown6;
             public bint Unknown7;
             public bint Unknown8;
@@ -49,11 +49,11 @@ namespace OpenSALib3.Moveset
             var count = 0;
             var subroutines = new NamedList(this, "Subroutines");
             var actions = new NamedList(this, "Actions");
-            for (int i = _header.Unknown4; i < _header.Unknown5; i += 4)
+            for (int i = _header.ActionsStart; i < _header.Actions2Start; i += 4)
                 actions[count] = new CommandList(actions, i, String.Format("{0:X03}",count++), subroutines);
             count = 0;
             var actions2 = new NamedList(this, "Actions2");
-            for (int i = _header.Unknown5; i < _header.Unknown7; i += 4)
+            for (int i = _header.Actions2Start; i < _header.Unknown7; i += 4)
                 actions2[count] = new CommandList(actions2, i, String.Format("{0:X03}",count++), subroutines);
             AddByName(actions);
             AddByName(actions2);
