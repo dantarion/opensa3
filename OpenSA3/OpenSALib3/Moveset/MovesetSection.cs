@@ -14,38 +14,46 @@ namespace OpenSALib3.Moveset
 #pragma warning disable 649 //'Field ____ is never assigned'
         private struct MovesetHeader
         {
-            public bint SubactionFlagsStart;
-            public bint ModelVisibilityStart;//UnknownB
-            public bint AttributeStart;
-            public bint SSEAttributeStart;
+            public bint SubactionFlagsStart;//8089D918,8089D980 Read
+            public bint ModelVisibilityStart;//8089D980, UnknownB
+            public bint AttributeStart;//8084FF40,8084FF14
+            public bint SSEAttributeStart;//8084FF40,
+			
             public bint MiscSectionOffset;
-            public bint CommonActionFlagsStart;//UnknownA
-            public bint ActionFlagsStart;//UnknownC
-            public bint Unknown7;
-            public bint Unknown8;
-            public bint ActionsStart;
-            public bint Actions2Start;
-            public bint ActionPreStart;
-            public bint SubactionMainStart;
-            public bint SubactionGFXStart;
-            public bint SubactionSFXStart;
-            public bint SubactionOtherStart;
-            public bint Unknown16;
-            public bint Unknown17;
-            public bint Unknown18;
-            public bint Unknown19;
-            public bint Unknown20;
-            public bint Unknown21;
-            public bint Unknown22;//Bone References?
-            public bint Unknown23;
-            public bint Unknown24;
+            public bint CommonActionFlagsStart;//8089D94C UnknownA
+            public bint ActionFlagsStart;//810C860C UnknownC
+            public bint Unknown7;//8084FF80
+			
+            public bint Unknown8;//80833F58
+            public bint ActionsStart;//810C9108
+            public bint Actions2Start;//810C9124
+            public bint ActionPreStart;//8089DA78
+			
+            public bint SubactionMainStart;//8089D838
+            public bint SubactionGFXStart;//8089D844
+            public bint SubactionSFXStart;//80630038
+            public bint SubactionOtherStart;//8063003C
+			
+            public bint Unknown16;//808338EC
+            public bint Unknown17;//80833960
+            public bint Unknown18;//80835BDC
+            public bint Unknown19;//808340BC
+			
+            public bint Unknown20;//8089D8B0
+            public bint Unknown21;//8089D8C4
+            public bint Unknown22;//80833F68 Bone References?
+            public bint Unknown23;//8083396C
+			
+            public bint Unknown24;//8084E670,8084E874 optional
             public bint Unknown25;
-            public bint EntryArticleStart;
-            public bint Unknown27;
-            public bint Unknown28;
-            public bint Unknown29;
-            public bint Unknown30;
+            public bint EntryArticleStart;//80896FC0 (doesn't even get read in training)
+            public bint Unknown27;//80835D38
+			
+            public bint Unknown28;//80835D3C ^related
+            public bint Unknown29;//80835C40
+            public bint Unknown30;//80833890 -1?
             public bint Unknown31;
+			//80835D3C
         }
 #pragma warning restore 169 //'Field ____ is never used'
 #pragma warning restore 649 //'Field ____ is never assigned'
