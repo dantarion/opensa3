@@ -9,26 +9,31 @@ namespace OpenSALib3.Moveset {
 #pragma warning disable 169 //'Field ____ is never used'
 #pragma warning disable 649 //'Field ____ is never assigned';
         private struct Header {
-            public bint Section1;
+            public bint Section1;//80856634
             public bint HurtBoxOffset;
             public bint HurtBoxCount;
-            public bint UnknownSectionOffset;//Used
-            public bint UnknownSectionCount;
-            public bint LedgegrabOffset;
+			
+            public bint UnknownSectionOffset;//8074C68C
+			public bint UnknownSectionCount;
+            public bint LedgegrabOffset;//80731C88
             public bint LedgegrabCount;
-            public bint UnknownSection2Offset;
+			
+            public bint UnknownSection2Offset;//80858B10,80858B2C,80858B60,80858B9C,80858BC0,807AE654 RESULT SCREEN		
             public bint UnknownSection2Count;
-            public bint BoneRef2Offset;
-            public bint UnknownSection3Offset;
-            public bint UnknownSection4Offset;
-            public bint UnknownSection5Offset;
-            public bint MultiJumpOffset;
-            public bint GlideOffset;
-            public bint CrawlOffset;
-            public bint UnknownSection9Offset;
-            public bint TetherOffset;
-            public bint UnknownSection12Offset;
-            public bint UnknownSection13Offset;
+            public bint BoneRef2Offset;//8085665C
+            public bint UnknownSection3Offset;//80856664
+            public bint UnknownSection4Offset;//8085666C
+            public bint UnknownSection5Offset;//80856674
+            public bint MultiJumpOffset;//8085667C
+            public bint GlideOffset;//80856684
+            public bint CrawlOffset;//8085668C
+            public bint UnknownSection9Offset;//80856694
+            public bint TetherOffset;//8085669C
+            public bint UnknownSection12Offset;//808566A4
+            public bint UnknownSection13Offset;//808338EC
+			//80833960
+			//80835BDC
+			
         }
 #pragma warning restore 169 //'Field ____ is never used'
 #pragma warning restore 649 //'Field ____ is never assigned';

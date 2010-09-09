@@ -41,6 +41,7 @@ namespace Tabuu.UI
             CommandBindings.Add(new CommandBinding(ModelOpenCommand, ModelOpenCommandExecuted, AlwaysExecute));
             CommandBindings.Add(new CommandBinding(CloseFileCommand, CloseFileCommandExecuted, AlwaysExecute));
             CommandBindings.Add(new CommandBinding(SaveFileCommand, SaveFileCommandExecuted, AlwaysExecute));
+            CommandBindings.Add(new CommandBinding(SaveFileAsCommand, SaveFileAsCommandExecuted, AlwaysExecute));
             CommandBindings.Add(new CommandBinding(LoadModelCommand, LoadModelCommandExecuted, AlwaysExecute));
             CommandBindings.Add(new CommandBinding(LoadAnimationCommand, LoadAnimationCommandExecuted, AlwaysExecute));
             /* Load Tabuu Assembly for scripting*/
@@ -138,7 +139,6 @@ namespace Tabuu.UI
         }
         private static void SaveFileCommandExecuted(object sender, ExecutedRoutedEventArgs e)
         {
-            e.Parameter.ToString();
             var d = (DatFile)e.Parameter;
             if (d.IsChanged)
             {
@@ -147,13 +147,25 @@ namespace Tabuu.UI
                 if (result != MessageBoxResult.OK)
                     return;
             }
-            var filename = d.Node.RootNode.FilePath;
+            var filename = d.Filename;
             d.Node.Rebuild(true);
             d.Node.RootNode.Merge();
             d.Node.RootNode.Export(filename);
             d.MarkClean();
         }
-
+        private static void SaveFileAsCommandExecuted(object sender, ExecutedRoutedEventArgs e)
+        {
+            var dialog = new Microsoft.Win32.SaveFileDialog();
+            if (!dialog.ShowDialog().Value)
+                return;
+            var d = (DatFile)e.Parameter;
+            var filename = dialog.FileName;
+            d.Filename = filename;
+            d.Node.Rebuild(true);
+            d.Node.RootNode.Merge();
+            d.Node.RootNode.Export(filename);
+            d.MarkClean();
+        }
         private static void AlwaysExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             e.CanExecute = true;
@@ -184,7 +196,6 @@ namespace Tabuu.UI
                     }
 
                 }
-                rs.Rebuild(true);
                 rs.Merge();
             }
             catch (System.IO.IOException err)
@@ -195,12 +206,10 @@ namespace Tabuu.UI
         public void LoadModel(DatFile d, string s)
         {
             d.LoadModel(s);
-            TreeView.Items.Refresh();
         }
         public void LoadAnimations(DatFile d, string s)
         {
             d.LoadAnimations(s);
-            TreeView.Items.Refresh();
         }
         #endregion
 
