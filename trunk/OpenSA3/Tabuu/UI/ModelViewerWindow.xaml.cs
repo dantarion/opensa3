@@ -27,16 +27,18 @@ namespace Tabuu.UI
             windowsFormsHost1.Child = _mc;
 
             ctx = BrawlLib.OpenGL.GLContext.Attach(_mc);
+            /*
+             * Set default hidden bones
+             */
             foreach (BoneRef boneref in d.GetDefaultHiddenBones())
             {
                 int tmp = 0;
                 var bone = d.Model.FindChild(boneref.BoneName, true);
                 (bone as MDL0BoneNode)._render = false;
             }
-            //Hitbox Rendering
+            /* LedgegrabBox Rendering */
             foreach (MDL0BoneNode bone in d.Model.FindChildrenByType(".", ResourceType.MDL0Bone))
             {
-
                 if (bone.Name == "TransN")
                     bone.CustomRenderEvent += RenderLedgegrab;
                 else
@@ -44,13 +46,17 @@ namespace Tabuu.UI
             }
             _mc.AddTarget(d.Model);
             _mc.AddReference(d.Node);
-            var bone2 = (MDL0BoneNode)d.Model.FindChild("TopN", true);
 
+            /* Default Camera Position */
+            var bone2 = (MDL0BoneNode)d.Model.FindChild("TopN", true);
             _mc.Rotate(0, -90);
             _mc.Translate(bone2.BoxMax._x / 2, bone2.BoxMax._y / 2, 30);
 
+            /* Hide Bones and Wireframe view*/
             d.Model.RenderBones = false;
             d.Model.RenderWireframe = false;
+
+            /* Start render cycle */
             timer.Tick += NextFrame;
             timer.Interval = new System.TimeSpan(166667);
         }
@@ -61,9 +67,8 @@ namespace Tabuu.UI
             foreach (LedgegrabBox ledgegrab in ledgegrabs)
             {
                 MDL0BoneNode bone = (MDL0BoneNode)sender;
-                bone.DrawBox(ctx, ledgegrab.X, ledgegrab.Y, ledgegrab.Width,ledgegrab.Height);
+                bone.DrawBox(ctx, ledgegrab.X, ledgegrab.Y, ledgegrab.Width, ledgegrab.Height);
             }
-            //bone.RenderSphere(ctx, 4);
         }
         /*
        public void RenderHitboxes(object sender, EventArgs e)
@@ -98,10 +103,8 @@ namespace Tabuu.UI
                 frame = 0;
                 if (!Loop.IsChecked.Value)
                     Stop();
-
             }
             SetFrame(++frame);
-
         }
         public void ChangeAnimation(CHR0Node animation)
         {
