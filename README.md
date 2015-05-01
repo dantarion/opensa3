@@ -20,7 +20,7 @@ While BrawlBox does an excellent job of editing 90% of Brawl files, there are a 
 ## Milestone 2
 * Create tools and scripts with the goal of being about to account for every byte in the moveset files
 * Add in luxury features such as model+animation+hitbox display
-## Milestone 3 ==
+## Milestone 3
 * 100% Documentation of the moveset files
 * A .pac file rebuilder
 * A IronPython based PSA language for writing movesets
