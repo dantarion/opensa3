@@ -13,16 +13,20 @@ This will allow someone else to take over this project in my absence.
 While BrawlBox does an excellent job of editing 90% of Brawl files, there are a few filetypes that BrawlBox doesn't edit, or doesn't visualize well, etc. OpenSA's main focus are the moveset files that contain the information for each characters moves.
 # Plan
 ## Milestone 1
- * Create a moveset viewer that can view everything that OpenSA2 can
- * Code the project so that editing support will be there from the beginning
- * Code the project to be able to keep track of unknown areas in the files
- * Emedded IronPython Console for running batch operations and queries on files.
+* Create a moveset viewer that can view everything that OpenSA2 can
+* Code the project so that editing support will be there from the beginning
+* Code the project to be able to keep track of unknown areas in the files
+* Emedded IronPython Console for running batch operations and queries on files.
+ 
 ## Milestone 2
 * Create tools and scripts with the goal of being about to account for every byte in the moveset files
 * Add in luxury features such as model+animation+hitbox display
+
 ## Milestone 3
 * 100% Documentation of the moveset files
 * A .pac file rebuilder
 * A IronPython based PSA language for writing movesets
+
+
 # Notes
 The above is a tentative plan that can change at any time. If you have a feature request or a question, you can create an Issue on the Issues page, or you can PM Dantarion on SmashBoards, AIM, or on #projectm on irc.gamesurge.net
