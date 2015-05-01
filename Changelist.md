@@ -1,0 +1,7 @@
+# Alphas #
+## Alpha 2 ##
+  * Fixed bug with files that had been modified by PSA
+  * Fixed bug with articles on files that had been modified by PSA
+  * Caught some exceptions so that files can partially be parsed (The ones modified by PSA....)
+## Alpha 1 ##
+  * Initial Binary Release

@@ -1,0 +1,25 @@
+Page last updated by Dantarion
+8/20/2010
+Accurage as of Alpha 2
+
+# Introduction #
+Tabuu's scripting system allows for one to automate tasks that normally would require a lot of work. It uses IronPython, a .NET compatible Python interpreter, to expose the information inside the currently opened files to a skilled user of the program.
+
+# Global Variables #
+When the script panel is opened, by default, Tabuu will define some variables to allow you to access the files that have been opened. Heres a overview of them.
+
+| **Variable Name** | Description | Type |
+|:------------------|:------------|:-----|
+|loadedFiles|List of the loaded files. Iterate through this to batch operations on all loaded files | List of DatElement|
+
+# Examples #
+## Iterate through all loaded files ##
+```
+for file in loadedFiles:
+	print file
+```
+This example can be extended to do any operation on all files loaded in Tabuu.
+## Print usage report ##
+```
+print loadedFiles[0].Report(0)
+```

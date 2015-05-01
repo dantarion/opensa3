@@ -1,0 +1,5 @@
+Heres some teaser images of how the GUI looks like
+<img width='600px' src='http://i36.tinypic.com/vxhmkg.png' />
+<img width='600px' src='http://i38.tinypic.com/211tohg.png' />
+<img width='600px' src='http://i36.tinypic.com/j99et2.png' />
+<img width='600px' src='http://i35.tinypic.com/ap9p2e.png' />
